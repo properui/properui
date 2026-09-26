@@ -57,6 +57,8 @@ export type { DropdownItemProps } from "./components/base/dropdown/dropdown";
 export { FileTrigger } from "./components/base/file-upload-trigger/file-upload-trigger";
 export { Form } from "./components/base/form/form";
 export { FormField, HookForm } from "./components/base/form/hook-form";
+export { HoverCard, HoverCardTrigger } from "./components/base/hover-card/hover-card";
+export type { HoverCardProps, HoverCardTriggerProps } from "./components/base/hover-card/hover-card";
 export { HintText } from "./components/base/input/hint-text";
 export type { HintTextProps } from "./components/base/input/hint-text";
 export { InputDate, InputDateBase } from "./components/base/input/input-date";
@@ -78,6 +80,10 @@ export { Label } from "./components/base/input/label";
 export type { LabelProps } from "./components/base/input/label";
 export { PinInput } from "./components/base/input/pin-input";
 export type { GroupProps, PinInputSize, RootProps } from "./components/base/input/pin-input";
+export { Menubar } from "./components/base/menubar/menubar";
+export type { MenubarMenuProps, MenubarProps } from "./components/base/menubar/menubar";
+export { NumberInput, NumberInputBase } from "./components/base/number-input/number-input";
+export type { NumberInputBaseProps, NumberInputButtonVariant, NumberInputProps } from "./components/base/number-input/number-input";
 export type { PopoverProps } from "./components/base/popover/popover";
 export { ProgressBarCircle, ProgressBarHalfCircle } from "./components/base/progress-indicators/progress-circles";
 export { ProgressBar, ProgressBarBase } from "./components/base/progress-indicators/progress-indicators";
@@ -95,6 +101,8 @@ export { TagSelect, TagSelectBase, TagSelectTagsValue } from "./components/base/
 export { Skeleton, SkeletonText } from "./components/base/skeleton/skeleton";
 export type { SkeletonProps, SkeletonTextProps } from "./components/base/skeleton/skeleton";
 export { Slider } from "./components/base/slider/slider";
+export { TagInput } from "./components/base/tag-input/tag-input";
+export type { TagInputProps, TagInputRejectReason } from "./components/base/tag-input/tag-input";
 export { TagCheckbox } from "./components/base/tags/base-components/tag-checkbox";
 export { TagCloseX } from "./components/base/tags/base-components/tag-close-x";
 export { Tag, TagAvatar, TagGroup, TagList } from "./components/base/tags/tags";
@@ -203,6 +211,8 @@ export { CardHeader } from "./components/application/card-headers/card-headers";
 export type { CardHeaderProps } from "./components/application/card-headers/card-headers";
 export { Carousel, CarouselContext } from "./components/application/carousel/carousel-base";
 export { ChartActiveDot, ChartLegendContent, ChartTooltipContent } from "./components/application/charts/charts-base";
+export { CodeEditor } from "./components/application/code-editor/code-editor";
+export type { CodeEditorDiagnostic, CodeEditorDiagnosticSeverity, CodeEditorProps } from "./components/application/code-editor/code-editor";
 export { CodeSnippet, CodeSnippetTabs } from "./components/application/code-snippet/code-snippet";
 export type { CodeSnippetProps, CodeSnippetTabItem, CodeSnippetTabsProps } from "./components/application/code-snippet/code-snippet";
 export { ColorPicker } from "./components/application/color-picker/color-picker";
@@ -270,6 +280,20 @@ export type {
     FilterBarFilterRowProps,
     FilterBarRootProps,
 } from "./components/application/filter-bar/filter-bar";
+export { Gantt, GanttFeature, GanttProvider, GanttSidebar, GanttTimeline } from "./components/application/gantt/gantt";
+export type {
+    GanttChangeEvent,
+    GanttColor,
+    GanttFeatureData,
+    GanttFeatureProps,
+    GanttGroupData,
+    GanttMarkerData,
+    GanttOwner,
+    GanttProviderProps,
+    GanttSidebarProps,
+    GanttTimelineProps,
+    GanttZoom,
+} from "./components/application/gantt/gantt";
 export type { GradientStopInput } from "./components/application/gradient-picker/gradient-picker-utils";
 export { GradientPicker } from "./components/application/gradient-picker/gradient-picker";
 export type {
@@ -285,6 +309,19 @@ export { ImagePicker } from "./components/application/image-picker/image-picker"
 export type { ImagePickerAdjustmentSlidersProps, ImagePickerDropZoneProps, ImagePickerProviderProps } from "./components/application/image-picker/image-picker";
 export { InlineCTA } from "./components/application/inline-cta/inline-cta";
 export type { InlineCTAProps } from "./components/application/inline-cta/inline-cta";
+export { Kanban } from "./components/application/kanban/kanban";
+export type {
+    KanbanAssignee,
+    KanbanBoardProps,
+    KanbanCardData,
+    KanbanCardProps,
+    KanbanColumnData,
+    KanbanColumnProps,
+    KanbanItem,
+    KanbanMoveEvent,
+    KanbanPriority,
+    KanbanTag,
+} from "./components/application/kanban/kanban";
 export { LoadingIndicator } from "./components/application/loading-indicator/loading-indicator";
 export type { LoadingIndicatorProps } from "./components/application/loading-indicator/loading-indicator";
 export { MessageActions } from "./components/application/messaging/message-actions";
@@ -370,11 +407,27 @@ export type {
     ProgressStepsProps,
     ProgressStepsType,
 } from "./components/application/progress-steps/progress-steps";
+export { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "./components/application/resizable/resizable";
+export type { ResizableDirection, ResizableHandleProps, ResizablePanelGroupProps, ResizablePanelProps } from "./components/application/resizable/resizable";
+export { ScrollArea } from "./components/application/scroll-area/scroll-area";
+export type { ScrollAreaOrientation, ScrollAreaProps, ScrollAreaType } from "./components/application/scroll-area/scroll-area";
 export { SectionFooter } from "./components/application/section-footers/section-footers";
 export type { SectionFooterProps } from "./components/application/section-footers/section-footers";
 export { SectionHeader } from "./components/application/section-headers/section-headers";
 export type { SectionHeaderProps } from "./components/application/section-headers/section-headers";
 export { SlideoutMenu } from "./components/application/slideout-menus/slideout-menu";
+export { SortableList } from "./components/application/sortable-list/sortable-list";
+export type { SortableListItemProps, SortableListProps, SortableListSize, SortableListVariant } from "./components/application/sortable-list/sortable-list";
+export { Stepper } from "./components/application/stepper/stepper";
+export type {
+    StepperContentProps,
+    StepperControlsProps,
+    StepperOrientation,
+    StepperProps,
+    StepperStepProps,
+    StepperStepStatus,
+    StepperStepsProps,
+} from "./components/application/stepper/stepper";
 export { TablePaginationMinimal, TablePaginationNumbered } from "./components/application/table/table-pagination";
 export { Table, TableCard, TableRowActionsDropdown } from "./components/application/table/table";
 export type {
@@ -386,6 +439,8 @@ export type {
     TableRowProps,
 } from "./components/application/table/table";
 export { Tab, TabList, TabPanel, Tabs } from "./components/application/tabs/tabs";
+export { Timeline } from "./components/application/timeline/timeline";
+export type { TimelineItemColor, TimelineItemProps, TimelineItemStatus, TimelineProps, TimelineVariant } from "./components/application/timeline/timeline";
 export { TreeView } from "./components/application/tree-view/tree-view";
 export type { TreeViewItemContentProps, TreeViewItemProps, TreeViewProps, TreeViewSize } from "./components/application/tree-view/tree-view";
 

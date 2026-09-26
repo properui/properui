@@ -26,7 +26,7 @@ generated screen lands on the system rather than near it.
 
 <!-- stats:start -->
 
-The registry currently holds **804 entries**: **75 published component groups** (**111** counting foundations, shared assets and example-page groups) across seven layers (22 base, 35 application, 18 marketing sections, 12 application page examples, 10 marketing page examples, 8 foundations, 6 shared assets), **446 section variants** and **233 full-page examples** (**679** composable variants total), and the shared hooks, utils and styles they depend on.
+The registry currently holds **816 entries**: **87 published component groups** (**123** counting foundations, shared assets and example-page groups) across seven layers (26 base, 43 application, 18 marketing sections, 12 application page examples, 10 marketing page examples, 8 foundations, 6 shared assets), **446 section variants** and **233 full-page examples** (**679** composable variants total), and the shared hooks, utils and styles they depend on.
 <!-- stats:end -->
 
 ## Built for AI code generators
