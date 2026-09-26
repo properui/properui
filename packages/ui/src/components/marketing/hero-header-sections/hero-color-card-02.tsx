@@ -169,15 +169,15 @@ export const HeroColorCard02 = () => (
 
                     <div className="hidden min-h-160 items-center lg:flex">
                         <div className="relative h-127">
-                            <ChartCard className="absolute top-0 left-16 w-200 md:h-115 lg:h-115" />
-                            <ActiveUsersMetric className="absolute -right-12 -bottom-10 size-[272px] md:bottom-2 md:left-2" />
+                            <ChartCard className="absolute start-16 top-0 w-200 md:h-115 lg:h-115" />
+                            <ActiveUsersMetric className="absolute -right-12 -bottom-10 size-[272px] md:start-2 md:bottom-2" />
                         </div>
                     </div>
                 </div>
 
                 <div className="relative mx-auto -mt-8 w-max max-w-full px-4 md:-mt-24 md:px-8 lg:hidden">
                     <ChartCard className="md:h-90 lg:h-115" />
-                    <ActiveUsersMetric className="absolute -right-12 -bottom-10 size-[192px] md:right-[-65px] md:-bottom-8" />
+                    <ActiveUsersMetric className="absolute -right-12 -bottom-10 size-[192px] md:end-[-65px] md:-bottom-8" />
                 </div>
             </div>
         </section>

@@ -173,7 +173,7 @@ export const CreditCard = ({
                     width: `${originalWidth}px`,
                     height: `${originalHeight}px`,
                 }}
-                className={cx("absolute top-0 left-0 flex origin-top-left flex-col justify-between overflow-hidden rounded-2xl p-4", styles[type].root)}
+                className={cx("absolute start-0 top-0 flex origin-top-left flex-col justify-between overflow-hidden rounded-2xl p-4", styles[type].root)}
             >
                 {/* Horizontal strip */}
                 {STRIP_TYPES.includes(type as (typeof STRIP_TYPES)[number]) && (
@@ -181,7 +181,7 @@ export const CreditCard = ({
                 )}
                 {/* Vertical stripe */}
                 {VERTICAL_STRIP_TYPES.includes(type as (typeof VERTICAL_STRIP_TYPES)[number]) && (
-                    <div className="pointer-events-none absolute inset-y-0 right-22 left-0 z-0 bg-neutral-800"></div>
+                    <div className="pointer-events-none absolute inset-y-0 start-0 end-22 z-0 bg-neutral-800"></div>
                 )}
                 {/* Gradient diffusor */}
                 {type === "transparent-gradient" && (

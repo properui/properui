@@ -120,7 +120,7 @@ export const Avatar = ({
         }
 
         if (verified) {
-            return <VerifiedTick size={size} className={cx("absolute right-0 bottom-0", size === "xs" && "-right-px -bottom-px")} />;
+            return <VerifiedTick size={size} className={cx("absolute end-0 bottom-0", size === "xs" && "-right-px -bottom-px")} />;
         }
 
         if (count) {

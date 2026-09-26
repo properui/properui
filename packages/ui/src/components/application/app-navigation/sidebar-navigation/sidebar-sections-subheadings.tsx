@@ -74,7 +74,7 @@ export const SidebarNavigationSectionsSubheadings = ({ activeUrl = "/", items }:
                 style={{
                     paddingLeft: MAIN_SIDEBAR_WIDTH + 4,
                 }}
-                className="invisible hidden lg:sticky lg:top-0 lg:bottom-0 lg:left-0 lg:block"
+                className="invisible hidden lg:sticky lg:start-0 lg:top-0 lg:bottom-0 lg:block"
             />
         </>
     );

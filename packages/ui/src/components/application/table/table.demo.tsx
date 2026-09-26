@@ -75,7 +75,7 @@ const TeamMembersTable = ({ size = "md", alternating = false }: { size?: "sm" | 
                 title="Team members"
                 badge="100 users"
                 contentTrailing={
-                    <div className="absolute top-5 right-4 md:right-6">
+                    <div className="absolute end-4 top-5 md:end-6">
                         <DropdownIconSimple />
                     </div>
                 }
@@ -172,7 +172,7 @@ const CustomersTable = ({ alternating = false }: { alternating?: boolean }) => {
                 title="Customers"
                 description="These companies have purchased in the last 12 months."
                 contentTrailing={
-                    <div className="absolute top-5 right-4 md:right-6">
+                    <div className="absolute end-4 top-5 md:end-6">
                         <DropdownIconSimple />
                     </div>
                 }
@@ -480,7 +480,7 @@ export const NoVendorsFound = () => {
                                 Add vendor
                             </Button>
                         </div>
-                        <div className="absolute top-5 right-4 md:right-6">
+                        <div className="absolute end-4 top-5 md:end-6">
                             <DropdownIconSimple />
                         </div>
                     </>
@@ -541,7 +541,7 @@ export const SomethingWentWrong = () => {
                 title="Team members"
                 badge="100 users"
                 contentTrailing={
-                    <div className="absolute top-5 right-4 md:right-6">
+                    <div className="absolute end-4 top-5 md:end-6">
                         <DropdownIconSimple />
                     </div>
                 }
@@ -595,7 +595,7 @@ export const NoUsersFound = () => {
                                 Add vendor
                             </Button>
                         </div>
-                        <div className="absolute top-5 right-4 md:right-6">
+                        <div className="absolute end-4 top-5 md:end-6">
                             <DropdownIconSimple />
                         </div>
                     </>

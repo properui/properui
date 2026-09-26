@@ -79,7 +79,7 @@ export const CloseX = () => {
 
 export const CloseXDark = () => {
     return (
-        <div className="flex items-start gap-3 rounded-2xl bg-neutral-950 p-8">
+        <div className="bg-primary-solid flex items-start gap-3 rounded-2xl p-8">
             <CloseButton size="sm" theme="dark" />
             <CloseButton size="md" theme="dark" />
             <CloseButton size="lg" theme="dark" />

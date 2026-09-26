@@ -213,7 +213,7 @@ const StepRow = ({ onPress, isLocked, className, children }: { onPress?: () => v
             disabled={isLocked}
             className={cx(
                 className,
-                "outline-focus-ring cursor-pointer text-left focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed",
+                "outline-focus-ring cursor-pointer text-start focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed",
             )}
         >
             {children}

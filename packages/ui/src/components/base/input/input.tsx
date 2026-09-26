@@ -80,20 +80,20 @@ export const InputBase = ({
     const sizes = sortCx({
         sm: {
             root: cx("px-3 py-2 text-sm", hasLeadingIcon && "ps-9", hasTrailingIcon && "pe-9"),
-            iconLeading: "left-3 size-4 stroke-[2.25px]",
-            iconTrailing: "right-3",
+            iconLeading: "start-3 size-4 stroke-[2.25px]",
+            iconTrailing: "end-3",
             shortcut: "pe-1.5",
         },
         md: {
             root: cx("px-3 py-2 text-md", hasLeadingIcon && "ps-10", hasTrailingIcon && "pe-9"),
-            iconLeading: "left-3 size-5",
-            iconTrailing: "right-3",
+            iconLeading: "start-3 size-5",
+            iconTrailing: "end-3",
             shortcut: "pe-2",
         },
         lg: {
             root: cx("px-3.5 py-2.5 text-md", hasLeadingIcon && "ps-10.5", hasTrailingIcon && "pe-9.5"),
-            iconLeading: "left-3.5 size-5",
-            iconTrailing: "right-3.5",
+            iconLeading: "start-3.5 size-5",
+            iconTrailing: "end-3.5",
             shortcut: "pe-2.5",
         },
     });
@@ -200,7 +200,7 @@ export const InputBase = ({
             {shortcut && (
                 <div
                     className={cx(
-                        "to-bg-primary pointer-events-none absolute inset-y-0.5 right-0.5 z-10 hidden items-center rounded-e-[inherit] bg-linear-to-r from-transparent to-40% ps-8 md:flex",
+                        "to-bg-primary pointer-events-none absolute inset-y-0.5 end-0.5 z-10 hidden items-center rounded-e-[inherit] bg-linear-to-r from-transparent to-40% ps-8 md:flex",
                         sizes[inputSize].shortcut,
                     )}
                 >

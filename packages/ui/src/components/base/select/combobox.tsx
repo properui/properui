@@ -109,7 +109,7 @@ const ComboBoxValue = ({ size, shortcut, placeholder, shortcutClassName, icon: I
             {shortcut && (
                 <div
                     className={cx(
-                        "to-bg-primary absolute inset-y-0.5 right-0.5 z-10 hidden items-center rounded-e-[inherit] bg-linear-to-r from-transparent to-40% ps-8 md:flex",
+                        "to-bg-primary absolute inset-y-0.5 end-0.5 z-10 hidden items-center rounded-e-[inherit] bg-linear-to-r from-transparent to-40% ps-8 md:flex",
                         sizes[size].shortcut,
                         shortcutClassName,
                     )}

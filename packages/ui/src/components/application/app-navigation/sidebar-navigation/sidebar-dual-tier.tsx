@@ -146,7 +146,7 @@ export const SidebarNavigationDualTier = ({
 
             {/* Desktop sidebar navigation */}
             <div
-                className="z-50 hidden lg:fixed lg:inset-y-0 lg:left-0 lg:flex"
+                className="z-50 hidden lg:fixed lg:inset-y-0 lg:start-0 lg:flex"
                 onPointerEnter={() => setIsHovering(true)}
                 onPointerLeave={() => setIsHovering(false)}
             >
@@ -159,7 +159,7 @@ export const SidebarNavigationDualTier = ({
                 style={{
                     paddingLeft: MAIN_SIDEBAR_WIDTH,
                 }}
-                className="invisible hidden lg:sticky lg:top-0 lg:bottom-0 lg:left-0 lg:block"
+                className="invisible hidden lg:sticky lg:start-0 lg:top-0 lg:bottom-0 lg:block"
             />
         </>
     );

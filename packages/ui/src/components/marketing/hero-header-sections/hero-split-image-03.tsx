@@ -79,7 +79,7 @@ export const HeroSplitImage03 = () => (
                         />
                     </ul>
 
-                    <div className="absolute top-6 right-5 z-10 translate-x-1/2 md:-top-10">
+                    <div className="absolute end-5 top-6 z-10 translate-x-1/2 md:-top-10">
                         <DashField className="text-fg-quaternary hidden w-48.5 opacity-30 md:block md:w-74.5" />
                     </div>
 

@@ -50,6 +50,7 @@
     "devDependencies": {
         "@changesets/cli": "^2.27.9",
         "@eslint/js": "^9.39.0",
+        "@properui/eslint-plugin": "workspace:*",
         "@storybook/addon-themes": "^10.5.3",
         "@storybook/nextjs-vite": "^10.5.3",
         "@tailwindcss/postcss": "^4.3.3",

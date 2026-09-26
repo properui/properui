@@ -16,6 +16,11 @@ ruleTester.run("no-physical-properties", rule, {
         // Not physical: no hyphen right after "rounded-l"/"border-l" (rounded-lg, border-left-ish
         // names that don't actually exist, but the base pattern still must not misfire).
         { code: `<div className="rounded-lg" />` },
+        // Centring with left-1/2 + -translate-x-1/2 reads the same in both directions; rewriting it would break RTL.
+        { code: `<div className="absolute left-1/2 -translate-x-1/2" />` },
+        { code: `<div className="absolute md:right-1/2" />` },
+        // The allow option takes regex patterns matched against the utility (and the full token).
+        { code: `<div className="left-[-98px]" />`, options: [{ allow: ["^left-\\["] }] },
     ],
     invalid: [
         {

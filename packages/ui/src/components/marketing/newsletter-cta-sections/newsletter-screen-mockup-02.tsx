@@ -46,12 +46,12 @@ export const NewsletterScreenMockup02 = () => (
                 <img
                     src={IMAGES.landscape[0].src}
                     alt="Dashboard mockup showing the Proper UI application interface"
-                    className="ring-screen-mockup-border shadow-3xl aspect-3/2 h-auto w-full max-w-5xl rounded object-cover ring-4 max-md:hidden md:ms-24 md:h-90 md:w-auto md:rounded-xl lg:absolute lg:inset-0 lg:left-24 lg:ms-0 lg:h-128"
+                    className="ring-screen-mockup-border shadow-3xl aspect-3/2 h-auto w-full max-w-5xl rounded object-cover ring-4 max-md:hidden md:ms-24 md:h-90 md:w-auto md:rounded-xl lg:absolute lg:inset-0 lg:start-24 lg:ms-0 lg:h-128"
                 />
 
                 <IPhoneMockup
                     image={IMAGES.square[1].src}
-                    className="absolute left-1/2 max-w-71 -translate-x-1/2 md:top-12 md:left-0 md:max-w-45 md:translate-x-0 lg:top-18 lg:max-w-61"
+                    className="absolute left-1/2 max-w-71 -translate-x-1/2 md:start-0 md:top-12 md:max-w-45 md:translate-x-0 lg:top-18 lg:max-w-61"
                 />
             </div>
         </div>

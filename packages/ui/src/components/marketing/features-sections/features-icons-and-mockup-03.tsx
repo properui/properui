@@ -59,11 +59,11 @@ export const FeaturesIconsAndMockup03 = () => (
                 <div className="relative flex h-90 w-full justify-center md:h-120 lg:-ms-4 lg:h-140 lg:overflow-y-clip">
                     <IPhoneMockup
                         image={IMAGES.square[0].src}
-                        className="drop-shadow-iphone-mockup absolute top-16 left-1/2 hidden w-78.5 -translate-x-3/4 md:block lg:left-0 lg:translate-x-0"
+                        className="drop-shadow-iphone-mockup absolute top-16 left-1/2 hidden w-78.5 -translate-x-3/4 md:block lg:start-0 lg:translate-x-0"
                     />
                     <IPhoneMockup
                         image={IMAGES.square[1].src}
-                        className="drop-shadow-iphone-mockup w-71 md:absolute md:top-0 md:right-1/2 md:w-78.5 md:translate-x-2/3 lg:right-0 lg:translate-x-0"
+                        className="drop-shadow-iphone-mockup w-71 md:absolute md:top-0 md:right-1/2 md:w-78.5 md:translate-x-2/3 lg:end-0 lg:translate-x-0"
                     />
                 </div>
             </div>

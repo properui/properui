@@ -14,6 +14,7 @@ export const nav: NavGroup[] = [
             { title: "Icons", href: "/docs/icons" },
             { title: "Installation", href: "/docs/installation" },
             { title: "Introduction", href: "/docs/introduction" },
+            { title: "Linting", href: "/docs/linting" },
             { title: "Quality", href: "/docs/quality" },
             { title: "Registry metadata for agents", href: "/docs/registry-metadata" },
             { title: "RTL support", href: "/docs/rtl" },

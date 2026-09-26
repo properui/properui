@@ -77,7 +77,7 @@ export const PricingSimpleCallOut = () => (
                 {plans.map((plan) => (
                     <div key={plan.name} className="bg-primary ring-secondary_alt relative flex flex-col rounded-2xl shadow-lg ring-1">
                         {plan.isPopular && (
-                            <div className="absolute -top-6 right-2 md:-right-16">
+                            <div className="absolute end-2 -top-6 md:-right-16">
                                 <div className="text-brand-secondary flex">
                                     <CalloutArrow />
                                     <span className="-mt-2 text-sm font-semibold">Most popular!</span>

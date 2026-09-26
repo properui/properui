@@ -27,7 +27,7 @@ export const DropdownAccountCardMD = () => {
             >
                 <AvatarLabelGroup size="md" src={account.src} alt="" status="online" title={account.name} subtitle={account.email} />
 
-                <div className="absolute top-2 right-2 flex size-7 items-center justify-center rounded-md">
+                <div className="absolute end-2 top-2 flex size-7 items-center justify-center rounded-md">
                     <ChevronSelectorVertical className="text-fg-quaternary size-4 shrink-0 stroke-[2.25px]" />
                 </div>
             </AriaButton>

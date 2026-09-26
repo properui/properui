@@ -75,7 +75,7 @@ export const FeaturesAlternatingLayout04 = () => (
                                 alt={feature.image.alt}
                                 className={cx(
                                     "absolute inset-0 size-full object-cover lg:w-[50vw] lg:max-w-[50vw]",
-                                    isReversed ? "lg:left-auto" : "lg:right-auto",
+                                    isReversed ? "lg:start-auto" : "lg:end-auto",
                                 )}
                             />
                         </div>

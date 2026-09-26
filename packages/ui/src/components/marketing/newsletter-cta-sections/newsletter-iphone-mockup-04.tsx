@@ -96,7 +96,7 @@ export const NewsletterIphoneMockup04 = () => (
 
                 <IPhoneMockup
                     image={IMAGES.square[2].src}
-                    className="drop-shadow-iphone-mockup top-10 right-16 max-h-70 w-full max-w-67 justify-self-center lg:absolute lg:max-h-none lg:max-w-78.5"
+                    className="drop-shadow-iphone-mockup end-16 top-10 max-h-70 w-full max-w-67 justify-self-center lg:absolute lg:max-h-none lg:max-w-78.5"
                 />
 
                 <ul aria-hidden="true" className="absolute bottom-10 left-1/2 hidden -translate-x-2 flex-col gap-3 lg:flex">

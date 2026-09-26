@@ -85,7 +85,7 @@ export const FooterLarge06Brand = () => {
                 </div>
 
                 {/* Absolutely positioned so the rule spans the band without adding a border box. */}
-                <div className="bg-border-brand_alt absolute bottom-0 left-0 h-px w-full" />
+                <div className="bg-border-brand_alt absolute start-0 bottom-0 h-px w-full" />
             </div>
 
             <div className="bg-brand-section py-12 md:pt-16">
@@ -129,7 +129,7 @@ export const FooterLarge06Brand = () => {
 
                     <div className="relative mt-12 flex flex-col-reverse justify-between gap-6 pt-8 md:mt-16 md:flex-row">
                         {/* Absolutely positioned so the rule spans the row without adding a border box. */}
-                        <div className="bg-border-brand_alt absolute top-0 left-0 h-px w-full" />
+                        <div className="bg-border-brand_alt absolute start-0 top-0 h-px w-full" />
 
                         <p className="text-quaternary_on-brand text-sm">© 2077 Proper UI. All rights reserved.</p>
 

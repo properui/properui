@@ -26,7 +26,7 @@ export const DropdownSearchField = ({ placeholder, icon: Icon, className }: Drop
             className,
         )}
     >
-        {Icon && <Icon aria-hidden="true" className="text-fg-quaternary pointer-events-none absolute left-3 size-5" />}
+        {Icon && <Icon aria-hidden="true" className="text-fg-quaternary pointer-events-none absolute start-3 size-5" />}
 
         <AriaInput
             placeholder={placeholder}

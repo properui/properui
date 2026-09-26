@@ -37,7 +37,7 @@ export const FooterLarge16Brand = () => {
 
                 <div className="relative mt-12 flex flex-col justify-between gap-8 pt-8 md:mt-16 md:flex-row md:items-center">
                     {/* Absolutely positioned so the rule spans the row without adding a border box. */}
-                    <div className="bg-border-brand_alt absolute top-0 left-0 h-px w-full" />
+                    <div className="bg-border-brand_alt absolute start-0 top-0 h-px w-full" />
 
                     <Form className="flex w-full flex-col gap-4 sm:flex-row md:max-w-100">
                         <Input isRequired size="lg" name="email" type="email" placeholder="Enter your email" wrapperClassName="flex-1" />

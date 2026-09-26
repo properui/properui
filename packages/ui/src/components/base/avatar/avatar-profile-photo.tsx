@@ -13,7 +13,7 @@ const styles = sortCx({
         content: "outline-[0.5px] -outline-offset-[0.5px] before:border",
         icon: "size-9",
         initials: "text-display-sm font-semibold",
-        badge: "bottom-0.5 right-0.5",
+        badge: "bottom-0.5 end-0.5",
     },
     md: {
         root: "size-24 p-1",
@@ -21,7 +21,7 @@ const styles = sortCx({
         content: "shadow-xl outline-[0.75px] -outline-offset-[0.75px] before:border-[1.5px]",
         icon: "size-12",
         initials: "text-display-md font-semibold",
-        badge: "bottom-1 right-1",
+        badge: "bottom-1 end-1",
     },
     lg: {
         root: "size-40 p-1.5",
@@ -29,7 +29,7 @@ const styles = sortCx({
         content: "shadow-2xl outline-[0.75px] -outline-offset-[0.75px] before:border-[1.5px]",
         icon: "size-20",
         initials: "text-display-xl font-semibold",
-        badge: "bottom-2 right-2",
+        badge: "bottom-2 end-2",
     },
 });
 

@@ -6,6 +6,7 @@ import reactHooks from "eslint-plugin-react-hooks";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
 import unusedImports from "eslint-plugin-unused-imports";
 import tseslint from "typescript-eslint";
+import properui from "@properui/eslint-plugin";
 
 export default tseslint.config(
     {
@@ -33,6 +34,28 @@ export default tseslint.config(
                     message: "Import with an Aria* alias: import { Button as AriaButton } from 'react-aria-components'.",
                 },
             ],
+        },
+    },
+    {
+        files: ["packages/ui/src/components/**/*.{ts,tsx}"],
+        plugins: { "@properui": properui },
+        rules: {
+            "@properui/no-raw-palette": "error",
+            // Arbitrary spacing and size values are widespread in the ported sections and are tracked by
+            // `properui check` instead; colour arbitrary values are still caught by no-raw-palette's sibling in the CLI.
+            "@properui/no-arbitrary-values": "off",
+            // Image and logo swaps (`dark:hidden` / `dark:block` / `dark:invert`) and the textarea resize
+            // handle image are the cases a token cannot express; everything else must go through the theme.
+            "@properui/no-dark-variant": ["error", { allow: ["^(hidden|block|inline|inline-block|flex|invert)$", "^\\[&::-webkit-resizer\\]:"] }],
+            "@properui/no-physical-properties": "error",
+        },
+    },
+    {
+        // Artwork with fixed colours: a credit card and a phone mockup are the same in both themes by design.
+        files: ["packages/ui/src/components/shared-assets/{credit-card,mockups}/**/*.{ts,tsx}"],
+        rules: {
+            "@properui/no-raw-palette": "off",
+            "@properui/no-dark-variant": "off",
         },
     },
     prettier,

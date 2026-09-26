@@ -92,7 +92,7 @@ export const InputGroup = ({ size = "md", prefix, leadingAddon, trailingAddon, l
             size={size}
             aria-label={label || undefined}
             inputClassName={cx(paddings[size].input)}
-            tooltipClassName={cx(hasTrailing && !hasLeading && "group-has-[&>select]:right-0")}
+            tooltipClassName={cx(hasTrailing && !hasLeading && "group-has-[&>select]:end-0")}
             wrapperClassName={cx(
                 "z-10",
                 // Apply styles based on the presence of leading or trailing elements

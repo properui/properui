@@ -76,7 +76,7 @@ export const HeroIphoneMockup03 = () => (
                 </div>
 
                 <div className="relative flex h-90 w-full items-start justify-center lg:h-128 lg:flex-1 lg:items-center">
-                    <div className="absolute top-0 left-16 max-lg:hidden">
+                    <div className="absolute start-16 top-0 max-lg:hidden">
                         <div className={styles.desktopFrame.outer}>
                             <div className={styles.desktopFrame.inner}>
                                 <div className={styles.desktopFrame.screen}>
@@ -86,7 +86,7 @@ export const HeroIphoneMockup03 = () => (
                         </div>
                     </div>
 
-                    <div className="top-26 left-0 lg:absolute">
+                    <div className="start-0 top-26 lg:absolute">
                         <div className={styles.mobileFrame.outer}>
                             <div className={styles.mobileFrame.inner}>
                                 <div className={styles.mobileFrame.screen}>

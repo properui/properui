@@ -76,10 +76,10 @@ export const QRCode = ({ size = "md", value, options, className }: QRCodeProps) 
         <div className={cx("relative flex items-center justify-center", styles[size].root, className)}>
             <div ref={ref} />
 
-            <QRCodeFrameHandle className="absolute top-0 left-0" />
-            <QRCodeFrameHandle className="absolute top-0 right-0 rotate-90" />
-            <QRCodeFrameHandle className="absolute right-0 bottom-0 rotate-180" />
-            <QRCodeFrameHandle className="absolute bottom-0 left-0 -rotate-90" />
+            <QRCodeFrameHandle className="absolute start-0 top-0" />
+            <QRCodeFrameHandle className="absolute end-0 top-0 rotate-90" />
+            <QRCodeFrameHandle className="absolute end-0 bottom-0 rotate-180" />
+            <QRCodeFrameHandle className="absolute start-0 bottom-0 -rotate-90" />
         </div>
     );
 };

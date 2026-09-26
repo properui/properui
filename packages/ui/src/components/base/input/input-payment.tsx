@@ -146,7 +146,7 @@ export const PaymentInput = ({
                         }}
                         icon={card.icon}
                         inputClassName={cx(size === "sm" && "ps-12", size === "md" && "ps-12.5", size === "lg" && "ps-13", inputClassName)}
-                        iconClassName={cx("h-6 w-8.5", size === "sm" && "left-1.5", size === "md" && "left-2", size === "lg" && "left-2.5", iconClassName)}
+                        iconClassName={cx("h-6 w-8.5", size === "sm" && "start-1.5", size === "md" && "start-2", size === "lg" && "start-2.5", iconClassName)}
                     />
 
                     {hint && (

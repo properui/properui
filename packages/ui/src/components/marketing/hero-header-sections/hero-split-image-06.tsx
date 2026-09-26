@@ -72,7 +72,7 @@ export const HeroSplitImage06 = () => (
                 </div>
 
                 <div className="relative lg:absolute lg:end-8 lg:top-0 lg:h-full lg:w-140">
-                    <CurvedArrow className="text-fg-brand-secondary absolute -bottom-2 left-4 hidden -translate-x-1/2 lg:block" />
+                    <CurvedArrow className="text-fg-brand-secondary absolute start-4 -bottom-2 hidden -translate-x-1/2 lg:block" />
                     <img src={IMAGES.square[1].src} alt={IMAGES.square[1].alt} className="inset-0 h-60 w-full object-cover md:h-110 lg:h-full" />
                 </div>
             </div>

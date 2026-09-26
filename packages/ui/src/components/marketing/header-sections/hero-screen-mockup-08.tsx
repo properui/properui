@@ -68,7 +68,7 @@ export const HeroScreenMockup08 = () => (
                 </div>
 
                 <div className="relative w-full lg:h-128">
-                    <div className="flex size-full items-center justify-center lg:absolute lg:top-0 lg:left-0 lg:w-full lg:items-start lg:justify-start">
+                    <div className="flex size-full items-center justify-center lg:absolute lg:start-0 lg:top-0 lg:w-full lg:items-start lg:justify-start">
                         <div className={styles.mockup.bezel}>
                             <div className={styles.mockup.frame}>
                                 <div className={styles.mockup.screen}>

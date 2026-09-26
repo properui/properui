@@ -194,7 +194,7 @@ export const BlogHeaderFeaturedPost02 = () => (
             >
                 <img src={featuredPost.image.src} alt={featuredPost.title} className="absolute inset-0 size-full object-cover" />
 
-                <div className="from-bg-primary absolute top-0 left-0 size-20 bg-linear-to-br from-50% via-black via-50% to-black" />
+                <div className="from-bg-primary absolute start-0 top-0 size-20 bg-linear-to-br from-50% via-black via-50% to-black" />
 
                 <div className="absolute inset-x-0 bottom-0 w-full bg-linear-to-t from-black/40 to-transparent pt-24">
                     <div className="flex w-full items-start gap-6 p-8">

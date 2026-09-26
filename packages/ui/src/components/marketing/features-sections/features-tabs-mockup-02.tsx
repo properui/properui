@@ -78,9 +78,9 @@ export const FeaturesTabsMockup02 = () => (
                         <AriaTabPanel key={tab.id} id={tab.id} className="relative flex w-144 justify-center">
                             <IPhoneMockup
                                 image={tab.frontImage.src}
-                                className="drop-shadow-iphone-mockup absolute top-16 left-0 hidden w-71 md:block md:w-[313px]"
+                                className="drop-shadow-iphone-mockup absolute start-0 top-16 hidden w-71 md:block md:w-[313px]"
                             />
-                            <IPhoneMockup image={tab.backImage.src} className="drop-shadow-iphone-mockup w-71 md:absolute md:right-0 md:w-[313px]" />
+                            <IPhoneMockup image={tab.backImage.src} className="drop-shadow-iphone-mockup w-71 md:absolute md:end-0 md:w-[313px]" />
                         </AriaTabPanel>
                     ))}
                 </div>
