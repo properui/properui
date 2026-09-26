@@ -1,37 +1,81 @@
 ---
 title: MCP integration
 section: integrations
-description: A Model Context Protocol server for Proper UI is planned but not yet built. This page describes the intent for anyone who wants to build it.
-metaTitle: MCP (Model Context Protocol) integration | Proper UI
-metaDescription: Proper UI does not ship an MCP server today. This page describes the planned design and links to the GitHub repo for contributors.
+description: "@properui/mcp is a Model Context Protocol server that gives Claude Code, Cursor, Codex, Windsurf and VS Code the Proper UI registry and the CLI's add as tools."
+metaTitle: MCP (Model Context Protocol) server | Proper UI
+metaDescription: "Connect the Proper UI MCP server (@properui/mcp) to Claude Code, Cursor, Codex, Windsurf or VS Code: search, read and install registry components as tools."
 ---
 
-> **Planned, not built.** There is no `properui-mcp` package and nothing to install today: `packages/` in the [Proper UI repo](https://github.com/properui/properui) holds only `cli`, `registry`, and `ui`. This page describes the intent for an MCP server, for anyone who'd like to build it.
+`@properui/mcp` is a [Model Context Protocol](https://modelcontextprotocol.io) server. It gives an MCP-aware assistant the Proper UI registry and the CLI's `add` as tools, so it can search for a component by description, read its real source and docs, and install it with its dependency chain without leaving the chat or shelling out to `npx @properui/cli` for every lookup.
 
-## The idea
+It is not a second implementation: the registry client, fuzzy search, `add`, `info` and `check` are the CLI's own modules, bundled into the server. A file `add_component` writes is exactly what `properui add` would have written.
 
-The `properui` CLI already exposes the whole registry through commands: `list`, `search`, `add`, `diff` (see the [CLI docs](/docs/cli)). An [MCP](https://modelcontextprotocol.io) server would wrap that same registry so an MCP-aware assistant could search for and install components by description, without you leaving the chat.
+## Connect it
 
-### What it would let you do
+The server runs over stdio through `npx`, so there is nothing to install.
 
-- Search the registry by description instead of remembering an exact component name: the MCP equivalent of `properui search`.
-- Look up a component's props, examples, and dependencies before deciding to install it.
-- Have the assistant run the equivalent of `properui add`, including its dependency chain.
-- Ask for a full page example and get every component it composes in one pass, the way `properui add example <name>` does from the terminal.
+**Claude Code:**
 
-### How it would work
+```bash
+claude mcp add properui -- npx -y @properui/mcp
+```
 
-The intent is for the server to wrap the same registry JSON the CLI already reads (`<registry>/<name>.json`) rather than generating or guessing anything, and for its install operations to follow the same rules `add` already implements: resolving `registryDependencies`, rewriting `@/` imports to the consuming project's configured alias, and reporting which files changed.
+**Cursor** (`.cursor/mcp.json`), **Windsurf** (`~/.codeium/windsurf/mcp_config.json`) and **Claude Desktop**:
 
-## Building it
+```json
+{
+    "mcpServers": {
+        "properui": {
+            "command": "npx",
+            "args": ["-y", "@properui/mcp"]
+        }
+    }
+}
+```
 
-The pieces this would sit on top of already exist and are documented, if you want to take it on:
+**Codex** (`~/.codex/config.toml`):
 
-- The registry format and build step: `packages/registry` (see `packages/registry/src/build.ts`) and the `pnpm registry:build` script.
-- The install logic to mirror: `packages/cli/src/commands/add.ts`, `list.ts`, `search.ts`, and `diff.ts`.
-- The CLI's own command surface: documented on the [CLI page](/docs/cli) and in `docs/cli.md`.
+```toml
+[mcp_servers.properui]
+command = "npx"
+args = ["-y", "@properui/mcp"]
+```
 
-Open an issue or a pull request on the [GitHub repo](https://github.com/properui/properui) if you'd like to build this: there's no `packages/mcp` yet, so there's no existing implementation to work around.
+**VS Code** (`.vscode/mcp.json`):
+
+```json
+{
+    "servers": {
+        "properui": {
+            "type": "stdio",
+            "command": "npx",
+            "args": ["-y", "@properui/mcp"]
+        }
+    }
+}
+```
+
+`npx @properui/cli@latest agent init` writes the Claude Code (`.mcp.json`) and Cursor (`.cursor/mcp.json`) entries for you, next to the Proper UI Skill, and prints the Codex block. See [AI agents & the Proper UI Skill](/docs/agents).
+
+## Tools
+
+| Tool                 | What it does                                                                                                                 |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `list_components`    | Registry entries (name, layer, type, title, description), filtered by layer and type                                         |
+| `search_components`  | Fuzzy search over names, titles, descriptions, example names and exported symbols, scored like `properui search`             |
+| `get_component`      | One entry in full: every file with its source, npm and registry dependencies, usage guidance and the docs URL                |
+| `get_component_docs` | The entry's docs page as markdown                                                                                            |
+| `add_component`      | `properui add`: resolves `registryDependencies`, rewrites `@/` imports, records the install, returns the npm install command |
+| `get_project_info`   | `properui info --json`: framework, Tailwind, aliases, theme path, registry reachability, installed entries                   |
+| `check_tokens`       | `properui check`: raw palette classes, `dark:` variants and arbitrary colour values in a file or directory                   |
+
+The registry index is also exposed as a resource (`properui://registry/index`), and so is every entry (`properui://registry/<name>`).
+
+`add_component` needs `components.json`, so run `npx @properui/cli@latest init` first; there is no `init` tool. It never runs the package manager unless the call passes `install: true`: by default it returns the install command for the agent to run or show you.
+
+## Another registry
+
+The server resolves the registry the way the CLI does: `--registry <source>` after the package name, then `PROPERUI_REGISTRY`, `REGISTRY_URL`, the `registry` field of the project's `components.json`, then `https://properui.dev/r`. A directory on disk works too, e.g. `"args": ["-y", "@properui/mcp", "--registry", "./packages/registry/dist"]`.
 
 ## FAQs
 
@@ -39,18 +83,15 @@ Open an issue or a pull request on the [GitHub repo](https://github.com/properui
     items={[
         {
             question: "Is there an MCP server for Proper UI today?",
-            answer: "No. This page describes a planned design, not a shipped package: there's nothing named properui-mcp to install.",
+            answer: "Yes: @properui/mcp. Run it with npx -y @properui/mcp from any MCP client; the setup for Claude Code, Cursor, Codex, Windsurf and VS Code is above.",
         },
         {
-            question: "Can I still use an AI coding assistant to add components?",
-            answer: "Yes, today, through the CLI directly: ask your assistant to run npx @properui/cli@latest add <component> (or search, list, diff) in its shell tool. That works right now and needs no MCP server.",
+            question: "Do I still need the CLI?",
+            answer: "For init, yes: there is no init tool. For everything else the server covers the same ground as list, search, add, info and check. diff, remove, why and login are CLI-only.",
         },
         {
-            question: "Where do I go to help build this?",
-            answer: "The GitHub repo: github.com/properui/properui. The registry format and the CLI's add/list/search/diff commands are the pieces an MCP server would wrap.",
+            question: "Which project does add_component write into?",
+            answer: "The directory the client starts the server in, which is the project root for every client above. Each project tool also accepts an explicit cwd, and the server takes --cwd.",
         },
     ]}
 />
-
-The MCP server is tracked with the project's other planned work on the
-[roadmap](https://github.com/properui/properui/blob/main/ROADMAP.md).

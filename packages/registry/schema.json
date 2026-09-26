@@ -14,7 +14,8 @@
         "optionalRegistryDependencies",
         "dependencies",
         "cssVars",
-        "examples"
+        "examples",
+        "changelog"
     ],
     "additionalProperties": false,
     "properties": {
@@ -169,6 +170,28 @@
             "type": "array",
             "items": {
                 "type": "string"
+            }
+        },
+        "changelog": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "version",
+                    "changes"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "version": {
+                        "type": "string"
+                    },
+                    "changes": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
             }
         }
     }

@@ -48,6 +48,8 @@ export interface RegistryMeta {
     /** Present once the registry publishes a stable version/hash for the entry; see `entryVersion`. */
     version?: string;
     hash?: string;
+    /** `@properui/ui` releases whose CHANGELOG.md bullets mention this entry; `[]` when none do. */
+    changelog?: { version: string; changes: string[] }[];
 }
 
 export interface RegistryIndexEntry extends RegistryMeta {

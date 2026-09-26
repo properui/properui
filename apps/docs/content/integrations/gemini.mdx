@@ -12,7 +12,7 @@ Gemini CLI and Gemini-based coding agents can run shell commands the same way Cl
 
 - A project already scaffolded with `npx @properui/cli@latest init`: Gemini works best once `components.json` exists.
 - Gemini CLI installed and authenticated (`gemini` on your `PATH`), or a Gemini-based agent with shell access.
-- Optional: the `properui-mcp` server, covered below, for tool-based access instead of shelling out to `npx`.
+- Optional: the `@properui/mcp` server, covered below, for tool-based access instead of shelling out to `npx`.
 
 ## Start using Proper UI with Gemini
 
@@ -49,20 +49,20 @@ UI markup:
 
 ## MCP integration
 
-Gemini CLI reads the same `mcpServers` config format as most other MCP clients. Register `properui-mcp` in your `settings.json`:
+Gemini CLI reads the same `mcpServers` config format as most other MCP clients. Register `@properui/mcp` in your `settings.json`:
 
 ```json
 {
     "mcpServers": {
-        "properui-mcp": {
+        "properui": {
             "command": "npx",
-            "args": ["-y", "properui-mcp"]
+            "args": ["-y", "@properui/mcp"]
         }
     }
 }
 ```
 
-The [MCP integration guide](/integrations/mcp) covers authentication options and the full tool list: `search_components`, `get_component`, `add_component`, and `list_components`.
+The [MCP integration guide](/integrations/mcp) covers registry options and the full tool list: `list_components`, `search_components`, `get_component`, `get_component_docs`, `add_component`, `get_project_info` and `check_tokens`.
 
 ## FAQs
 

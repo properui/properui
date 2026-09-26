@@ -11,6 +11,11 @@ source, not a runtime package you import blindly. The `properui` CLI copies the 
 into the project and rewrites their imports to fit. Follow these steps, in order, every time UI work
 comes up.
 
+If the Proper UI MCP server (`@properui/mcp`) is connected, prefer its tools to the shell commands
+below: `get_project_info` is `info --json`, `search_components` and `list_components` are `search`
+and `list`, `get_component` and `get_component_docs` return the real source and docs page,
+`add_component` is `add`, and `check_tokens` is `check`. Without it, use the CLI exactly as shown.
+
 ## 1. Inspect the project first
 
 Before adding or writing anything, run:

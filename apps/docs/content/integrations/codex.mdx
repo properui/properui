@@ -44,7 +44,7 @@ If you already keep an `AGENTS.md`, `agent init` appends its block between marke
     items={[
         {
             question: "Does Codex need a Skill file or an MCP server for this?",
-            answer: "An MCP server doesn't exist for Proper UI today, but a Skill file does: run npx @properui/cli@latest agent init --client codex to install it, alongside Codex's own shell tool which can already run npx @properui/cli@latest search and add.",
+            answer: "Neither is required, but both exist. npx @properui/cli@latest agent init --client codex installs the Skill and prints the [mcp_servers.properui] block for ~/.codex/config.toml that registers @properui/mcp. Without the server, Codex's shell tool runs npx @properui/cli@latest search and add instead.",
         },
         {
             question: "Will Codex overwrite my customizations to an installed component?",

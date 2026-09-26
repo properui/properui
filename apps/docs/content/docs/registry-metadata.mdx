@@ -12,15 +12,16 @@ Every entry in `/r/<name>.json` can also carry a semantic manifest: a small set 
 
 ## The fields
 
-| Field                 | Type       | Hand-authored for                         | Meaning                                                                                        |
-| --------------------- | ---------- | ----------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `intent`              | `string`   | base + application components             | The user goal this component serves, in one sentence.                                          |
-| `avoid_when`          | `string[]` | base + application components             | Plausible-but-wrong uses: situations where a different component is the right call.            |
-| `composes_with`       | `string[]` | base + application; derived elsewhere     | Registry names this entry is typically used alongside.                                         |
-| `a11y_contract`       | `string[]` | base + application components             | What React Aria / the component already handles, and what the caller still has to supply.      |
-| `responsive_contract` | `string[]` | base + application components (when true) | How the component's own layout changes across breakpoints: only present when it actually does. |
-| `token_contract`      | `string[]` | every entry, always derived               | The semantic design tokens (`bg-*`/`text-*`/`border-*`) the component's appearance depends on. |
-| `requires_data`       | `string[]` | base + application components             | The props or data the caller must supply for the component to be meaningful, not just render.  |
+| Field                 | Type                     | Hand-authored for                         | Meaning                                                                                        |
+| --------------------- | ------------------------ | ----------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `intent`              | `string`                 | base + application components             | The user goal this component serves, in one sentence.                                          |
+| `avoid_when`          | `string[]`               | base + application components             | Plausible-but-wrong uses: situations where a different component is the right call.            |
+| `composes_with`       | `string[]`               | base + application; derived elsewhere     | Registry names this entry is typically used alongside.                                         |
+| `a11y_contract`       | `string[]`               | base + application components             | What React Aria / the component already handles, and what the caller still has to supply.      |
+| `responsive_contract` | `string[]`               | base + application components (when true) | How the component's own layout changes across breakpoints: only present when it actually does. |
+| `token_contract`      | `string[]`               | every entry, always derived               | The semantic design tokens (`bg-*`/`text-*`/`border-*`) the component's appearance depends on. |
+| `requires_data`       | `string[]`               | base + application components             | The props or data the caller must supply for the component to be meaningful, not just render.  |
+| `changelog`           | `{ version, changes }[]` | every entry, always derived               | Releases of `@properui/ui` whose `CHANGELOG.md` bullets mention this entry, `[]` otherwise.    |
 
 ### `intent`
 
@@ -49,6 +50,10 @@ Never hand-authored, always computed from the component's own source at build ti
 ### `requires_data`
 
 The minimum a caller must supply for the component to convey anything, not the full prop API. `avatar` requires `src` or `initials` ("the placeholder icon alone carries no identity"); `progress-indicators` requires a real numeric `value`. If a candidate's `requires_data` can't be satisfied by the data you actually have, that's a sign to keep looking rather than to render it half-populated.
+
+### `changelog`
+
+Never hand-authored. The build script parses `packages/ui/CHANGELOG.md`'s `## x.y.z` release headings and their top-level bullets, then attributes a bullet to an entry when the bullet's text names that entry — by its own kebab-case name (`close-button`), by the folder its files live in when that differs (an `example` entry's slug versus its parent group), or by either's PascalCase component-name form (`CloseButton`). An entry with no matching bullet in any release gets `[]`, not an omitted field. Use it to see what changed in a component you already installed, and whether it's worth re-running `add --overwrite`: `properui diff <component>` prints the releases newer than what's recorded in your `components.json` `installed` manifest, when that record carries a real version to compare against.
 
 ## Example: a hand-authored base component
 
@@ -113,7 +118,7 @@ Marketing and page-example layers get no hand-authored prose. Just the two field
 
 ## Coverage
 
-The manifest is hand-authored for the 19 base and 32 application component groups, the entries most often chosen from scratch. `token_contract` is derived for every entry that references at least one semantic token (777 of 797 at last build); a handful of entries (styles, hooks, and a few purely structural components) reference none and omit the field. `composes_with` is present wherever an entry either has a manifest that names it or has at least one `registryDependencies` entry to derive it from.
+The manifest is hand-authored for the 19 base and 32 application component groups, the entries most often chosen from scratch. `token_contract` is derived for every entry that references at least one semantic token (777 of 797 at last build); a handful of entries (styles, hooks, and a few purely structural components) reference none and omit the field. `composes_with` is present wherever an entry either has a manifest that names it or has at least one `registryDependencies` entry to derive it from. `changelog` is derived for every entry; most carry `[]` today, since `CHANGELOG.md` only names the components a given release actually touched.
 
 ## Where this comes from
 

@@ -1,0 +1,56 @@
+{
+    "name": "@properui/mcp",
+    "version": "0.1.0",
+    "description": "Model Context Protocol server for Proper UI: lets an AI coding assistant search, read and install registry components directly.",
+    "keywords": [
+        "mcp",
+        "model-context-protocol",
+        "react",
+        "react-aria",
+        "tailwindcss",
+        "design-system",
+        "components",
+        "ai"
+    ],
+    "license": "MIT",
+    "author": "Ayman Shabaro (https://github.com/aymanshabaro)",
+    "homepage": "https://github.com/properui/properui#readme",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/properui/properui.git",
+        "directory": "packages/mcp"
+    },
+    "bugs": {
+        "url": "https://github.com/properui/properui/issues"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "type": "module",
+    "engines": {
+        "node": ">=20"
+    },
+    "bin": {
+        "properui-mcp": "./dist/index.js"
+    },
+    "files": [
+        "dist",
+        "README.md",
+        "LICENSE"
+    ],
+    "scripts": {
+        "build": "tsup",
+        "lint": "eslint src test",
+        "type-check": "tsc --noEmit",
+        "test": "vitest run"
+    },
+    "dependencies": {
+        "@modelcontextprotocol/sdk": "^1.30.1",
+        "zod": "^4.5.4"
+    },
+    "devDependencies": {
+        "tsup": "^8.3.5",
+        "typescript": "^5.9.3",
+        "vitest": "^2.1.8"
+    }
+}

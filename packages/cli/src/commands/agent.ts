@@ -7,6 +7,12 @@
  * cursor  → .cursor/rules/properui.mdc (alwaysApply: true) — Cursor does not read SKILL.md
  * lovable → prints the public GitHub URL of skills/properui/SKILL.md and what to paste
  *
+ * It also registers the Proper UI MCP server (`@properui/mcp`) where the client reads a
+ * project-level MCP config: `.mcp.json` for claude, `.cursor/mcp.json` for cursor. Codex keeps
+ * MCP servers in `~/.codex/config.toml`, outside the project, so for codex the TOML block is
+ * printed instead. An existing config is merged: other servers are kept, and an existing
+ * `properui` entry is left alone unless `--overwrite` is passed. `--no-mcp` skips all of this.
+ *
  * CLAUDE.md/AGENTS.md are never clobbered: the block is inserted between marker comments and
  * replaced in place on a second run, so `agent init` is idempotent. See docs/cli.md and
  * apps/docs/content/docs/agents.mdx for the user-facing walkthrough.
@@ -15,7 +21,19 @@
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { AGENTS_MD_BLOCK, CLAUDE_MD_BLOCK, CURSOR_RULE_MDC, LOVABLE_INSTRUCTIONS, LOVABLE_SKILL_URL, SKILL_MD, upsertMarkedBlock } from "../agent-templates.js";
+import {
+    AGENTS_MD_BLOCK,
+    CLAUDE_MD_BLOCK,
+    CODEX_MCP_TOML,
+    CURSOR_RULE_MDC,
+    LOVABLE_INSTRUCTIONS,
+    LOVABLE_SKILL_URL,
+    MCP_SERVER_ENTRY,
+    MCP_SERVER_NAME,
+    SKILL_MD,
+    upsertMarkedBlock,
+} from "../agent-templates.js";
+import { parseJsonc } from "../detect.js";
 import { type WriteFileOptions, type WriteResult, writeSourceFile } from "../files.js";
 import { kleur, log } from "../ui.js";
 
@@ -26,6 +44,8 @@ export interface AgentInitOptions {
     yes?: boolean;
     overwrite?: boolean;
     cwd?: string;
+    /** `--no-mcp` sets this to `false`; absent/true also registers the MCP server. */
+    mcp?: boolean;
 }
 
 const CLIENTS: Exclude<AgentClient, "all">[] = ["claude", "codex", "cursor", "lovable"];
@@ -56,6 +76,41 @@ function statusLabel(status: WriteResult["status"]): string {
     return kleur.dim("keep  ");
 }
 
+/**
+ * Adds the `properui` server to a JSON MCP config (`{ "mcpServers": { ... } }`), keeping every
+ * other server. An existing `properui` entry is only replaced with `overwrite`.
+ */
+function upsertMcpJson(file: string, cwd: string, overwrite: boolean): WriteResult | { file: string; relative: string; status: "invalid" } {
+    const relative = path.relative(cwd, file) || path.basename(file);
+    const exists = existsSync(file);
+    const source = exists ? readFileSync(file, "utf8") : "";
+    const parsed = source.trim() ? parseJsonc<Record<string, unknown>>(source) : {};
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return { file, relative, status: "invalid" };
+
+    const servers = (parsed.mcpServers && typeof parsed.mcpServers === "object" ? parsed.mcpServers : {}) as Record<string, unknown>;
+    const current = servers[MCP_SERVER_NAME];
+    if (current !== undefined) {
+        if (JSON.stringify(current) === JSON.stringify(MCP_SERVER_ENTRY)) return { file, relative, status: "unchanged" };
+        if (!overwrite) return { file, relative, status: "skipped" };
+    }
+
+    const next = { ...parsed, mcpServers: { ...servers, [MCP_SERVER_NAME]: MCP_SERVER_ENTRY } };
+    mkdirSync(path.dirname(file), { recursive: true });
+    writeFileSync(file, `${JSON.stringify(next, null, 2)}\n`, "utf8");
+    return { file, relative, status: exists ? "updated" : "created" };
+}
+
+function installMcpJson(file: string, cwd: string, overwrite: boolean): void {
+    const result = upsertMcpJson(file, cwd, overwrite);
+    if (result.status === "invalid") {
+        log.warn(`${result.relative} is not valid JSON; left it alone. Add this under "mcpServers" yourself:`);
+        log.plain(kleur.dim(`        "${MCP_SERVER_NAME}": ${JSON.stringify(MCP_SERVER_ENTRY)}`));
+        return;
+    }
+    const note = result.status === "skipped" ? " (has its own properui server; --overwrite replaces it)" : " (MCP server)";
+    log.step(`${statusLabel(result.status)} ${result.relative}${note}`);
+}
+
 function installClaude(cwd: string, writeOptions: WriteFileOptions): void {
     const skill = writeSourceFile(path.join(cwd, ".claude", "skills", "properui", "SKILL.md"), SKILL_MD, writeOptions);
     log.step(`${statusLabel(skill.status)} ${skill.relative}`);
@@ -75,6 +130,12 @@ function installCodex(cwd: string, writeOptions: WriteFileOptions): void {
 function installCursor(cwd: string, writeOptions: WriteFileOptions): void {
     const rule = writeSourceFile(path.join(cwd, ".cursor", "rules", "properui.mdc"), CURSOR_RULE_MDC, writeOptions);
     log.step(`${statusLabel(rule.status)} ${rule.relative}`);
+}
+
+function printCodexMcp(): void {
+    log.step(`Codex reads MCP servers from ~/.codex/config.toml, outside this project. Add:`);
+    log.plain();
+    for (const line of CODEX_MCP_TOML.split("\n")) log.plain(`        ${line}`);
 }
 
 function installLovable(): void {
@@ -100,6 +161,11 @@ export async function runAgentInit(options: AgentInitOptions): Promise<void> {
         else if (client === "codex") installCodex(cwd, writeOptions);
         else if (client === "cursor") installCursor(cwd, writeOptions);
         else installLovable();
+
+        if (options.mcp === false) continue;
+        if (client === "claude") installMcpJson(path.join(cwd, ".mcp.json"), cwd, writeOptions.overwrite);
+        else if (client === "cursor") installMcpJson(path.join(cwd, ".cursor", "mcp.json"), cwd, writeOptions.overwrite);
+        else if (client === "codex") printCodexMcp();
     }
 
     log.plain();

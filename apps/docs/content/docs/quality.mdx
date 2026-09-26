@@ -94,19 +94,19 @@ Alongside those, a curated visual regression baseline is committed and checked o
 
 Proper UI documents a workflow for the following coding tools. "Documented" means a page under `apps/docs/content/integrations` exists with concrete setup steps; "automated test" means CI runs that exact workflow end to end, not just that the underlying CLI works (which the clean-room job above does verify, framework-scaffolding side).
 
-| Tool        | Documented?                                                      | Automated end-to-end test? |
-| ----------- | ---------------------------------------------------------------- | -------------------------- |
-| Claude Code | Yes (`integrations/claude.mdx`)                                  | No, not yet                |
-| Codex       | Yes (`integrations/codex.mdx`)                                   | No, not yet                |
-| Cursor      | Yes (`integrations/cursor.mdx`)                                  | No, not yet                |
-| Gemini CLI  | Yes (`integrations/gemini.mdx`)                                  | No, not yet                |
-| v0          | Yes (`integrations/v0.mdx`)                                      | No, not yet                |
-| Bolt.new    | Yes (`integrations/bolt.mdx`)                                    | No, not yet                |
-| Lovable     | Yes (`integrations/lovable.mdx`)                                 | No, not yet                |
-| Replit      | Yes (`integrations/replit.mdx`)                                  | No, not yet                |
-| MCP server  | Planned, not built (`integrations/mcp.mdx` describes the intent) | No, nothing to test yet    |
+| Tool        | Documented?                      | Automated end-to-end test?                              |
+| ----------- | -------------------------------- | ------------------------------------------------------- |
+| Claude Code | Yes (`integrations/claude.mdx`)  | No, not yet                                             |
+| Codex       | Yes (`integrations/codex.mdx`)   | No, not yet                                             |
+| Cursor      | Yes (`integrations/cursor.mdx`)  | No, not yet                                             |
+| Gemini CLI  | Yes (`integrations/gemini.mdx`)  | No, not yet                                             |
+| v0          | Yes (`integrations/v0.mdx`)      | No, not yet                                             |
+| Bolt.new    | Yes (`integrations/bolt.mdx`)    | No, not yet                                             |
+| Lovable     | Yes (`integrations/lovable.mdx`) | No, not yet                                             |
+| Replit      | Yes (`integrations/replit.mdx`)  | No, not yet                                             |
+| MCP server  | Yes (`integrations/mcp.mdx`)     | The server, through an MCP client (`packages/mcp/test`) |
 
-None of these tool-specific workflows has an automated end-to-end test today. The `clean-room` job (above) verifies the underlying `init`/`add` CLI path against real Vite and Next.js scaffolds, which every one of these integrations builds on, but it does not drive Claude Code, Codex, Cursor, or any of the other tools themselves.
+None of these tool-specific workflows has an automated end-to-end test today, with one partial exception: `packages/mcp`'s vitest suite drives the MCP server through a real MCP client (in-process and over stdio) against the built registry, but not through any assistant. The `clean-room` job (above) verifies the underlying `init`/`add` CLI path against real Vite and Next.js scaffolds, which every one of these integrations builds on, but it does not drive Claude Code, Codex, Cursor, or any of the other tools themselves.
 
 ## Known limitations
 
@@ -116,7 +116,6 @@ Sourced from `ROADMAP.md`, which exists specifically so nothing in the docs prom
 - **No committed visual regression baseline.** Covered above: the tooling exists, the baseline and CI comparison do not.
 - **No variant gallery thumbnails.** Every variant gallery card renders a neutral placeholder; `pnpm shots:thumbs` generates real thumbnails but none are committed yet.
 - **No bundled build.** `@properui/ui` ships source TSX; consumers whose bundler won't transpile a dependency need `transpilePackages` (Next.js) or their own pipeline (Vite). `packages/ui` has no `build` script.
-- **No MCP server.** The CLI is the supported path today; an MCP server is planned but not built (`integrations/mcp.mdx`).
 - **`cssVars` is reserved but unused.** Every registry entry carries an empty `cssVars` array: components rely entirely on the shared token file, so there's nothing to merge yet.
 - **No manual accessibility audit.** See the [Accessibility](/docs/accessibility) manual verification matrix: every row reads "Not yet verified."
 

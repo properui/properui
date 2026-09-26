@@ -40,10 +40,16 @@ With that in place, Claude reaches for `properui add` before improvising markup 
 
 ## MCP integration
 
-An MCP server that would let an assistant query the registry directly, instead of shelling out to
-`npx` for each lookup, is planned but **not built**: see the [MCP page](/integrations/mcp) and the [roadmap](https://github.com/properui/properui/blob/main/ROADMAP.md). Until it
-exists, the CLI is the supported path, and it is enough: Claude Code runs `properui search` and
-`properui add` through its own shell tool.
+`@properui/mcp` lets Claude query the registry directly instead of shelling out to `npx` for each
+lookup: `search_components`, `get_component`, `get_component_docs`, `add_component` and more. Register it once:
+
+```bash
+claude mcp add properui -- npx -y @properui/mcp
+```
+
+`agent init --client claude` also writes it to the project's `.mcp.json`. The full tool list is on the
+[MCP page](/integrations/mcp). The CLI still works on its own: Claude Code runs `properui search` and
+`properui add` through its shell tool when the server is not connected.
 
 ## FAQs
 
@@ -51,7 +57,7 @@ exists, the CLI is the supported path, and it is enough: Claude Code runs `prope
     items={[
         {
             question: "Does Claude need the MCP server, or is the CLI enough?",
-            answer: "The CLI is enough, and it is the only option today: the MCP server is planned but not built. Claude Code can already run properui search and properui add through its shell tool.",
+            answer: "The CLI is enough: Claude Code can run properui search and properui add through its shell tool. The MCP server (@properui/mcp) exposes the same registry and add as tools, which saves a shell round-trip per lookup; init stays a CLI command either way.",
         },
         {
             question: "Will Claude overwrite my customizations to an installed component?",

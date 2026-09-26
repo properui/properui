@@ -49,6 +49,7 @@
         "./utils/*": "./src/utils/*.ts",
         "./providers": "./src/providers/index.ts",
         "./providers/*": "./src/providers/*.tsx",
+        "./next": "./src/next.ts",
         "./styles/*": "./src/styles/*",
         ".": "./src/index.ts"
     },
