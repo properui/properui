@@ -1,0 +1,15 @@
+{
+    "name": "properui-example-astro",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "astro dev",
+        "build": "astro build",
+        "preview": "astro preview"
+    },
+    "dependencies": {
+        "@properui/elements": "^0.1.0",
+        "@properui/tokens": "^0.1.0",
+        "astro": "^5.1.0"
+    }
+}

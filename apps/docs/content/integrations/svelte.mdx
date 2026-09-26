@@ -1,0 +1,163 @@
+---
+title: Svelte integration
+section: integrations
+description: "Use Proper UI in Svelte 5 and SvelteKit with the <pui-*> custom elements: install, stylesheet, theme toggle and a modal with runes."
+metaTitle: Svelte integration | Proper UI
+metaDescription: "Proper UI in Svelte: install @properui/elements and @properui/tokens, register the elements, and build a button and a modal with Svelte 5 runes."
+---
+
+Svelte projects use the same design tokens as the React library, through `@properui/elements`: light-DOM custom
+elements (`<pui-button>`, `<pui-modal>`, ...) that Svelte renders like native tags, with no configuration. This is a
+curated set, not the full React library; see the end of this page.
+
+## Install
+
+```bash
+npm install @properui/elements @properui/tokens
+```
+
+`@properui/elements` brings `@properui/html` (the behaviours) with it. The CLI does the same on a detected Svelte or SvelteKit project:
+`npx @properui/cli@latest init` puts it on the html platform, and `add` then writes html snippets instead of React
+source (see [Frameworks](/docs/frameworks#install)).
+
+## Stylesheet
+
+Import the prebuilt stylesheet once, from your entry file. It holds the tokens (light and dark), Tailwind's preflight
+and every `pui-` component class; no Tailwind build is needed:
+
+```ts
+import "@properui/tokens/properui.css";
+```
+
+Already on Tailwind v4? Import the sources into your own stylesheet instead, so your utilities and the component
+classes come from one build:
+
+```css
+@import "tailwindcss";
+@import "@properui/tokens/theme.css";
+@import "@properui/html/css";
+```
+
+## Register the elements
+
+Import the register module once. In a Vite + Svelte app, that is `src/main.ts`:
+
+```ts
+import { mount } from "svelte";
+import "@properui/elements/register";
+import "@properui/tokens/properui.css";
+import App from "./App.svelte";
+
+mount(App, { target: document.getElementById("app")! });
+```
+
+Svelte's accessibility checks see `<pui-button onclick>` as a click handler on a non-interactive element, because
+they cannot know the element renders a real `<button>`. Filter those two warnings for `pui-` tags in
+`svelte.config.js`:
+
+```js
+export default {
+    compilerOptions: {
+        warningFilter: (warning) => !(warning.code.startsWith("a11y_") && warning.message.includes("<pui-")),
+    },
+};
+```
+
+In SvelteKit, import both from the root `+layout.svelte`. Registering is a no-op during server rendering, where the
+tags are emitted as plain HTML and upgrade once the page hydrates.
+
+## Theme toggle
+
+```svelte
+<pui-theme-toggle></pui-theme-toggle>
+```
+
+It switches the `.dark-mode` class on `<html>`, which repoints every token, and remembers the choice in
+`localStorage` (`theme`). To drive it from your own control, call `setTheme("light" | "dark" | "system")` from
+`@properui/elements`.
+
+## A button and a modal
+
+```svelte
+<script lang="ts">
+    let open = $state(false);
+    let email = $state("");
+</script>
+
+<pui-button color="primary" onclick={() => (open = true)}>Invite teammates</pui-button>
+
+<pui-modal
+    open={open || undefined}
+    title="Invite teammates"
+    description="They get an email with a link to join."
+    size="sm"
+    onpui-close={() => (open = false)}
+>
+    <pui-input label="Email address" type="email" name="email" value={email} oninput={(e) => (email = e.currentTarget.value)}></pui-input>
+    <div slot="footer">
+        <pui-button color="secondary" onclick={() => (open = false)}>Cancel</pui-button>
+        <pui-button is-disabled={!email || undefined} onclick={() => (open = false)}>Send invite</pui-button>
+    </div>
+</pui-modal>
+```
+
+Pass `undefined` to remove a boolean attribute (`open={open || undefined}`). Custom events are `on` + the event
+name, `onpui-close`, with the data in `event.detail`. The elements re-dispatch `input` and `change` from themselves,
+so `e.currentTarget.value` is the element's current value.
+
+## The same markup without custom elements
+
+The elements render `@properui/html` markup. If you would rather write it yourself (or render it from a server
+template), this is the equivalent of the example above:
+
+```html
+<button class="pui-btn pui-btn--tertiary pui-btn--icon-only" type="button" data-pui="theme-toggle" aria-label="Dark theme">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M22 15.844A10.5 10.5 0 1 1 8.156 2 8 8 0 0 0 22 15.844Z" />
+    </svg>
+</button>
+
+<button class="pui-btn pui-btn--primary" type="button" data-pui-modal-open="invite">Invite teammates</button>
+
+<dialog class="pui-modal pui-modal--sm" id="invite" aria-labelledby="invite-title">
+    <div class="pui-modal__header">
+        <h2 class="pui-modal__title" id="invite-title">Invite teammates</h2>
+        <p class="pui-modal__description">They get an email with a link to join.</p>
+        <button class="pui-modal__close" type="button" aria-label="Close" data-pui-modal-close>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+    <div class="pui-modal__body">
+        <div class="pui-field">
+            <label class="pui-label" for="invite-email">Email address</label>
+            <input class="pui-input" id="invite-email" name="email" type="email" />
+        </div>
+    </div>
+    <div class="pui-modal__footer">
+        <button class="pui-btn pui-btn--secondary" type="button" data-pui-modal-close>Cancel</button>
+        <button class="pui-btn pui-btn--primary" type="button" data-pui-modal-close value="send">Send invite</button>
+    </div>
+</dialog>
+```
+
+`data-pui="theme-toggle"` and `data-pui-modal-open` are picked up by `init()` from `@properui/html` (`import { init }
+from "@properui/html"`, or the `data-auto-init` script tag). `init` is idempotent, so calling it again after new markup
+appears is safe.
+
+## What is React-only
+
+Proper UI is a React 19 library first. The React layer (`@properui/ui`) has 126 component groups on React Aria; the
+elements and the html layer cover a curated set: button, badge, avatar, input, textarea, select, checkbox, toggle,
+alert, tabs, dropdown menu, modal, tooltip, progress, skeleton, breadcrumbs, pagination, toasts and the theme toggle
+(plus radio, card, accordion, table and empty state as html markup). Date pickers, comboboxes, sliders, data tables,
+charts, the command menu, file upload, application shells, every marketing section and every page example are
+React-only today, and there is no Svelte port of the React components. Keyboard and screen-reader support in this layer
+comes from native HTML and the ARIA the behaviours set, not from React Aria. The full matrix is on
+[Frameworks](/docs/frameworks); every element, attribute and event is in the [custom elements reference](/docs/elements).
+
+## Example app
+
+[`examples/svelte-vite`](https://github.com/properui/properui/tree/main/examples/svelte-vite) in the repository is a
+small, complete Svelte app using the elements; its README has the one command to run it.

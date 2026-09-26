@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Acme Analytics: Proper UI with no build step</title>
+        <meta name="description" content="A landing page built with Proper UI custom elements, one stylesheet and one script from a CDN." />
+
+        <!-- Apply a saved dark theme before first paint, so a reload does not flash the light one. -->
+        <script>
+            try {
+                if (localStorage.getItem("theme") === "dark") document.documentElement.classList.add("dark-mode");
+            } catch {}
+        </script>
+
+        <!-- 1. The stylesheet: tokens for both themes, preflight and every pui- component class. -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@properui/tokens@0.1/dist/properui.min.css" />
+        <!-- 2. The script: defines every <pui-*> element and bundles the @properui/html behaviours. -->
+        <script src="https://cdn.jsdelivr.net/npm/@properui/elements@0.1/dist/properui-elements.global.js" defer></script>
+
+        <!-- Page layout only. Every colour, size and radius is a Proper UI token, so dark mode needs nothing extra. -->
+        <style>
+            body {
+                margin: 0;
+                background: var(--color-bg-primary);
+                color: var(--color-text-primary);
+            }
+
+            .container {
+                max-width: 72rem;
+                margin-inline: auto;
+                padding-inline: calc(var(--spacing) * 4);
+            }
+
+            .nav {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: calc(var(--spacing) * 4);
+                padding-block: calc(var(--spacing) * 4);
+                border-block-end: 1px solid var(--color-border-secondary);
+            }
+
+            .brand {
+                font-weight: 600;
+                font-size: var(--text-lg);
+                color: var(--color-text-primary);
+                text-decoration: none;
+            }
+
+            .row {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: calc(var(--spacing) * 3);
+            }
+
+            .hero {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: calc(var(--spacing) * 6);
+                padding-block: calc(var(--spacing) * 24) calc(var(--spacing) * 16);
+                text-align: center;
+            }
+
+            .hero h1 {
+                margin: 0;
+                max-width: 48rem;
+                font-size: var(--text-display-lg);
+                line-height: var(--text-display-lg--line-height);
+                letter-spacing: var(--text-display-lg--letter-spacing);
+                font-weight: 600;
+            }
+
+            .lead {
+                margin: 0;
+                max-width: 40rem;
+                font-size: var(--text-xl);
+                line-height: var(--text-xl--line-height);
+                color: var(--color-text-tertiary);
+            }
+
+            .section {
+                display: flex;
+                flex-direction: column;
+                gap: calc(var(--spacing) * 8);
+                padding-block: calc(var(--spacing) * 16);
+            }
+
+            .section h2 {
+                margin: 0;
+                font-size: var(--text-display-sm);
+                line-height: var(--text-display-sm--line-height);
+                font-weight: 600;
+            }
+
+            .grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+                gap: calc(var(--spacing) * 6);
+            }
+
+            .stack {
+                display: flex;
+                flex-direction: column;
+                gap: calc(var(--spacing) * 4);
+            }
+
+            .footer {
+                padding-block: calc(var(--spacing) * 8);
+                border-block-start: 1px solid var(--color-border-secondary);
+                color: var(--color-text-quaternary);
+                font-size: var(--text-sm);
+            }
+
+            @media (max-width: 40rem) {
+                .hero h1 {
+                    font-size: var(--text-display-md);
+                    line-height: var(--text-display-md--line-height);
+                }
+
+                .nav-links {
+                    display: none;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <a class="pui-skip-link pui-btn pui-btn--secondary" href="#main">Skip to content</a>
+
+        <header class="nav container">
+            <a class="brand" href="#">Acme Analytics</a>
+            <div class="row">
+                <div class="row nav-links">
+                    <pui-button color="link-gray" href="#features">Features</pui-button>
+                    <pui-button color="link-gray" href="#pricing">Pricing</pui-button>
+                </div>
+                <pui-theme-toggle></pui-theme-toggle>
+                <pui-button data-pui-modal-open="signup">Get started</pui-button>
+            </div>
+        </header>
+
+        <main id="main">
+            <section class="hero container">
+                <pui-badge color="brand" type="modern" dot>New: real-time dashboards</pui-badge>
+                <h1>Know what your customers do, the moment they do it</h1>
+                <p class="lead">Acme Analytics turns product events into answers. No SQL, no sampling, no waiting for tomorrow's report.</p>
+                <div class="row">
+                    <pui-button size="xl" data-pui-modal-open="signup">Start free trial</pui-button>
+                    <pui-tooltip text="Opens a two-minute tour">
+                        <pui-button size="xl" color="secondary" href="#features">Take the tour</pui-button>
+                    </pui-tooltip>
+                </div>
+                <div class="row">
+                    <pui-avatar initials="OR" alt="Olivia Rhye" size="sm"></pui-avatar>
+                    <pui-avatar initials="PB" alt="Phoenix Baker" size="sm"></pui-avatar>
+                    <pui-avatar initials="LS" alt="Lana Steiner" size="sm"></pui-avatar>
+                    <span class="lead" style="font-size: var(--text-sm)">Trusted by 4,000+ product teams</span>
+                </div>
+            </section>
+
+            <section class="section container" id="features">
+                <h2>Everything you need to ship with confidence</h2>
+                <div class="grid">
+                    <article class="pui-card">
+                        <div class="pui-card__header">
+                            <h3 class="pui-card__title">Live funnels</h3>
+                            <p class="pui-card__description">Watch conversion move as you release.</p>
+                        </div>
+                        <div class="pui-card__body">
+                            <pui-progress value="72" label="Checkout conversion" show-value></pui-progress>
+                        </div>
+                    </article>
+                    <article class="pui-card">
+                        <div class="pui-card__header">
+                            <h3 class="pui-card__title">Alerts that matter</h3>
+                            <p class="pui-card__description">Get told when a metric breaks, not every time it wiggles.</p>
+                        </div>
+                        <div class="pui-card__body">
+                            <pui-alert variant="warning" title="Sign-ups down 18%">Since the 14:02 deploy.</pui-alert>
+                        </div>
+                    </article>
+                    <article class="pui-card">
+                        <div class="pui-card__header">
+                            <h3 class="pui-card__title">Privacy by default</h3>
+                            <p class="pui-card__description">EU hosting, no cookies, no fingerprinting.</p>
+                        </div>
+                        <div class="pui-card__body">
+                            <div class="row">
+                                <pui-badge color="success" dot>GDPR</pui-badge>
+                                <pui-badge color="success" dot>SOC 2</pui-badge>
+                                <pui-badge color="gray">ISO 27001</pui-badge>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <section class="section container" id="pricing">
+                <h2>Simple pricing</h2>
+                <pui-tabs label="Billing period" type="button">
+                    <pui-tab value="monthly">Monthly</pui-tab>
+                    <pui-tab value="yearly">Yearly</pui-tab>
+                    <pui-tab-panel value="monthly">
+                        <div class="grid">
+                            <article class="pui-card">
+                                <div class="pui-card__body">
+                                    <h3 class="pui-card__title">Starter: $0</h3>
+                                    <p class="pui-card__description">Up to 10k events a month.</p>
+                                    <pui-button color="secondary" data-pui-modal-open="signup">Start free</pui-button>
+                                </div>
+                            </article>
+                            <article class="pui-card">
+                                <div class="pui-card__body">
+                                    <h3 class="pui-card__title">Team: $49 / month</h3>
+                                    <p class="pui-card__description">Unlimited events, five seats.</p>
+                                    <pui-button data-pui-modal-open="signup">Start trial</pui-button>
+                                </div>
+                            </article>
+                        </div>
+                    </pui-tab-panel>
+                    <pui-tab-panel value="yearly">
+                        <div class="grid">
+                            <article class="pui-card">
+                                <div class="pui-card__body">
+                                    <h3 class="pui-card__title">Starter: $0</h3>
+                                    <p class="pui-card__description">Up to 10k events a month.</p>
+                                    <pui-button color="secondary" data-pui-modal-open="signup">Start free</pui-button>
+                                </div>
+                            </article>
+                            <article class="pui-card">
+                                <div class="pui-card__body">
+                                    <h3 class="pui-card__title">Team: $490 / year</h3>
+                                    <p class="pui-card__description">Two months free, same limits.</p>
+                                    <pui-button data-pui-modal-open="signup">Start trial</pui-button>
+                                </div>
+                            </article>
+                        </div>
+                    </pui-tab-panel>
+                </pui-tabs>
+            </section>
+        </main>
+
+        <footer class="footer container">© Acme Analytics. Built with Proper UI custom elements, no build step.</footer>
+
+        <pui-modal id="signup" title="Start your free trial" description="14 days, no card required." size="sm">
+            <form method="dialog" id="signup-form" class="stack">
+                <pui-input label="Work email" type="email" name="email" placeholder="you@company.com" autocomplete="email"></pui-input>
+                <pui-select label="Team size" name="size">
+                    <option value="1">Just me</option>
+                    <option value="10">2 to 10</option>
+                    <option value="50">11 to 50</option>
+                    <option value="51">More than 50</option>
+                </pui-select>
+                <pui-checkbox name="updates" checked>Send me product updates</pui-checkbox>
+            </form>
+            <div slot="footer">
+                <pui-button color="secondary" type="submit" form="signup-form" value="cancel">Cancel</pui-button>
+                <pui-button type="submit" form="signup-form" value="start">Create account</pui-button>
+            </div>
+        </pui-modal>
+
+        <script>
+            // The modal closes itself on submit (<form method="dialog">); pui-close says which button did it.
+            document.getElementById("signup").addEventListener("pui-close", (event) => {
+                if (event.detail.returnValue !== "start") return;
+                const email = document.querySelector("#signup pui-input").value;
+                window.ProperUIElements.toast({ title: "Account created", description: email || "Check your inbox.", variant: "success" });
+            });
+        </script>
+    </body>
+</html>

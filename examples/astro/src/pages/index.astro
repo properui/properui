@@ -1,0 +1,79 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+// Server-side data: rendered straight into the markup, no client framework involved.
+const members = [
+    { name: "Olivia Rhye", initials: "OR", online: true },
+    { name: "Phoenix Baker", initials: "PB", online: false },
+    { name: "Lana Steiner", initials: "LS", online: true },
+];
+---
+
+<Layout title="Proper UI + Astro">
+    <main class="page">
+        <header class="header">
+            <div class="row">
+                <h1 class="title">Workspace</h1>
+                <pui-badge color="brand" size="sm">Astro</pui-badge>
+            </div>
+            <div class="row">
+                <pui-dropdown label="Actions" id="actions">
+                    <pui-menu-item value="rename">Rename</pui-menu-item>
+                    <pui-menu-item value="duplicate">Duplicate</pui-menu-item>
+                    <hr />
+                    <pui-menu-item value="archive">Archive</pui-menu-item>
+                </pui-dropdown>
+                <pui-theme-toggle></pui-theme-toggle>
+            </div>
+        </header>
+
+        <pui-alert variant="info" title="Server-rendered, then upgraded" dismissible>
+            Astro renders these &lt;pui-*&gt; tags as HTML; one small script defines them in the browser.
+        </pui-alert>
+
+        <pui-tabs label="Settings">
+            <pui-tab value="members">Members</pui-tab>
+            <pui-tab value="notifications">Notifications</pui-tab>
+            <pui-tab-panel value="members">
+                <div class="stack">
+                    <div class="row">
+                        {members.map((m) => <pui-avatar initials={m.initials} alt={m.name} status={m.online ? "online" : "offline"} />)}
+                        <pui-button color="primary" data-pui-modal-open="invite">Invite teammates</pui-button>
+                    </div>
+                    <pui-pagination page="1" total="8"></pui-pagination>
+                </div>
+            </pui-tab-panel>
+            <pui-tab-panel value="notifications">
+                <div class="stack">
+                    <pui-toggle label="Product updates" checked></pui-toggle>
+                    <pui-progress value="64" label="Storage used" show-value></pui-progress>
+                </div>
+            </pui-tab-panel>
+        </pui-tabs>
+
+        <pui-modal id="invite" title="Invite teammates" description="They get an email with a link to join." size="sm">
+            <form method="dialog" id="invite-form">
+                <pui-input label="Email address" type="email" name="email" placeholder="name@example.com"></pui-input>
+            </form>
+            <div slot="footer">
+                <pui-button color="secondary" type="submit" form="invite-form" value="cancel">Cancel</pui-button>
+                <pui-button type="submit" form="invite-form" value="send">Send invite</pui-button>
+            </div>
+        </pui-modal>
+    </main>
+</Layout>
+
+<script>
+    import { toast, type PuiInput } from "@properui/elements";
+
+    document.getElementById("invite")?.addEventListener("pui-close", (event) => {
+        const { returnValue } = (event as CustomEvent<{ returnValue: string }>).detail;
+        const email = document.querySelector<PuiInput>("#invite pui-input");
+        if (returnValue === "send" && email?.value) toast({ title: "Invite sent", description: email.value, variant: "success" });
+        if (email) email.value = "";
+    });
+
+    document.getElementById("actions")?.addEventListener("pui-select", (event) => {
+        toast({ title: `Chose "${(event as CustomEvent<{ value: string }>).detail.value}"` });
+    });
+</script>

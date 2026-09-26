@@ -1,0 +1,140 @@
+---
+title: Vanilla JS integration
+section: integrations
+description: "Use Proper UI from vanilla JavaScript: create and drive <pui-*> elements from script, listen to their events, show toasts and switch themes, with or without a bundler."
+metaTitle: Vanilla JS integration | Proper UI
+metaDescription: "Proper UI from vanilla JS: import @properui/elements, create pui- elements with document.createElement, set properties, listen to pui- events, call toast() and setTheme()."
+---
+
+The custom elements are ordinary DOM elements, so plain JavaScript drives them the same way it drives a `<button>`:
+create them, set attributes or properties, listen to events. This page is for apps written without a framework, with
+a bundler (Vite, esbuild) or with a `<script type="module">`. This is a curated set, not the full React library; see
+the end of this page.
+
+## Install
+
+```bash
+npm install @properui/elements @properui/tokens
+```
+
+No bundler? Use the classic script and `window.ProperUIElements` instead of imports (see
+[plain HTML](/integrations/plain-html)).
+
+## Stylesheet
+
+```js
+import "@properui/tokens/properui.css";
+```
+
+Or `<link>` it from a CDN: `https://cdn.jsdelivr.net/npm/@properui/tokens/dist/properui.min.css`.
+
+## Register the elements
+
+```js
+import { defineElements, setTheme, toast } from "@properui/elements";
+
+defineElements(); // or: import "@properui/elements/register";
+```
+
+`defineElements(["pui-button", "pui-modal"])` defines only the tags you list. A tag that is already defined is left
+alone, so two bundles on one page do not clash.
+
+## Theme toggle
+
+```js
+const toggle = document.createElement("pui-theme-toggle");
+document.querySelector("header").append(toggle);
+toggle.addEventListener("pui-theme-change", (event) => console.log("theme:", event.detail.theme));
+
+// Or your own control:
+setTheme("dark"); // "light" | "dark" | "system"
+```
+
+## A button and a modal
+
+```js
+const button = document.createElement("pui-button");
+button.textContent = "Invite teammates";
+button.color = "primary"; // properties reflect to attributes: color="primary"
+
+const modal = document.createElement("pui-modal");
+modal.title = "Invite teammates";
+modal.setAttribute("description", "They get an email with a link to join.");
+modal.size = "sm";
+
+const email = document.createElement("pui-input");
+email.label = "Email address";
+email.type = "email";
+modal.append(email);
+
+const footer = document.createElement("div");
+footer.slot = "footer";
+const send = document.createElement("pui-button");
+send.textContent = "Send invite";
+footer.append(send);
+modal.append(footer);
+
+document.body.append(button, modal);
+
+button.addEventListener("click", () => modal.show());
+send.addEventListener("click", () => modal.close("send"));
+modal.addEventListener("pui-close", (event) => {
+    if (event.detail.returnValue === "send") toast({ title: "Invite sent", description: email.value, variant: "success" });
+});
+```
+
+`button.textContent = "..."` later replaces the label inside the rendered `<button>`, not the button itself. Moving an
+element does not render it again. `show()` / `close()` and the `open` attribute are the modal's API; `.value` is the
+input's.
+
+## The same markup without custom elements
+
+The elements render `@properui/html` markup. If you would rather write it yourself (or render it from a server
+template), this is the equivalent of the example above:
+
+```html
+<button class="pui-btn pui-btn--tertiary pui-btn--icon-only" type="button" data-pui="theme-toggle" aria-label="Dark theme">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M22 15.844A10.5 10.5 0 1 1 8.156 2 8 8 0 0 0 22 15.844Z" />
+    </svg>
+</button>
+
+<button class="pui-btn pui-btn--primary" type="button" data-pui-modal-open="invite">Invite teammates</button>
+
+<dialog class="pui-modal pui-modal--sm" id="invite" aria-labelledby="invite-title">
+    <div class="pui-modal__header">
+        <h2 class="pui-modal__title" id="invite-title">Invite teammates</h2>
+        <p class="pui-modal__description">They get an email with a link to join.</p>
+        <button class="pui-modal__close" type="button" aria-label="Close" data-pui-modal-close>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+    <div class="pui-modal__body">
+        <div class="pui-field">
+            <label class="pui-label" for="invite-email">Email address</label>
+            <input class="pui-input" id="invite-email" name="email" type="email" />
+        </div>
+    </div>
+    <div class="pui-modal__footer">
+        <button class="pui-btn pui-btn--secondary" type="button" data-pui-modal-close>Cancel</button>
+        <button class="pui-btn pui-btn--primary" type="button" data-pui-modal-close value="send">Send invite</button>
+    </div>
+</dialog>
+```
+
+`data-pui="theme-toggle"` and `data-pui-modal-open` are picked up by `init()` from `@properui/html` (`import { init }
+from "@properui/html"`, or the `data-auto-init` script tag). `init` is idempotent, so calling it again after new markup
+appears is safe.
+
+## What is React-only
+
+Proper UI is a React 19 library first. The React layer (`@properui/ui`) has 126 component groups on React Aria; the
+elements and the html layer cover a curated set: button, badge, avatar, input, textarea, select, checkbox, toggle,
+alert, tabs, dropdown menu, modal, tooltip, progress, skeleton, breadcrumbs, pagination, toasts and the theme toggle
+(plus radio, card, accordion, table and empty state as html markup). Date pickers, comboboxes, sliders, data tables,
+charts, the command menu, file upload, application shells, every marketing section and every page example are
+React-only today, and there is no vanilla JS port of the React components. Keyboard and screen-reader support in this layer
+comes from native HTML and the ARIA the behaviours set, not from React Aria. The full matrix is on
+[Frameworks](/docs/frameworks); every element, attribute and event is in the [custom elements reference](/docs/elements).

@@ -1,0 +1,172 @@
+---
+title: Vue integration
+section: integrations
+description: "Use Proper UI in Vue 3 and Nuxt with the <pui-*> custom elements: install, stylesheet, isCustomElement, typed templates, theme toggle and a modal."
+metaTitle: Vue integration | Proper UI
+metaDescription: "Proper UI in Vue 3: install @properui/elements and @properui/tokens, mark pui- tags as custom elements, get typed templates, and build a button and a modal."
+---
+
+Vue projects use the same design tokens as the React library, through `@properui/elements`: light-DOM custom
+elements (`<pui-button>`, `<pui-modal>`, ...) that Vue renders like any other tag. `v-model`, `@event` listeners and
+reactive attributes work on them. This is a curated set, not the full React library; see the end of this page.
+
+## Install
+
+```bash
+npm install @properui/elements @properui/tokens
+```
+
+`@properui/elements` brings `@properui/html` (the behaviours) with it. The CLI does the same on a detected Vue or Nuxt project:
+`npx @properui/cli@latest init` puts it on the html platform, and `add` then writes html snippets instead of React
+source (see [Frameworks](/docs/frameworks#install)).
+
+## Stylesheet
+
+Import the prebuilt stylesheet once, from your entry file. It holds the tokens (light and dark), Tailwind's preflight
+and every `pui-` component class; no Tailwind build is needed:
+
+```ts
+import "@properui/tokens/properui.css";
+```
+
+Already on Tailwind v4? Import the sources into your own stylesheet instead, so your utilities and the component
+classes come from one build:
+
+```css
+@import "tailwindcss";
+@import "@properui/tokens/theme.css";
+@import "@properui/html/css";
+```
+
+## Register the elements
+
+Define the elements once, before mounting, and tell the Vue compiler that `pui-` tags are custom elements, not
+components it should try to resolve:
+
+```ts
+// src/main.ts
+import { createApp } from "vue";
+import "@properui/elements/register";
+import "@properui/tokens/properui.css";
+import App from "./App.vue";
+
+createApp(App).mount("#app");
+```
+
+```ts
+// vite.config.ts
+import vue from "@vitejs/plugin-vue";
+import { defineConfig } from "vite";
+
+export default defineConfig({
+    plugins: [vue({ template: { compilerOptions: { isCustomElement: (tag) => tag.startsWith("pui-") } } })],
+});
+```
+
+In Nuxt, the same option is `vue.compilerOptions.isCustomElement` in `nuxt.config.ts`, and the register import goes in
+a client plugin (`plugins/properui.client.ts`).
+
+For typed templates (Volar / `vue-tsc` check every attribute and event), reference the typings once:
+
+```ts
+// src/env.d.ts
+/// <reference types="@properui/elements/vue" />
+```
+
+## Theme toggle
+
+```vue
+<template>
+    <pui-theme-toggle />
+</template>
+```
+
+It switches the `.dark-mode` class on `<html>`, which repoints every token, and remembers the choice in
+`localStorage` (`theme`), the same key the React `ThemeProvider` uses. To drive it from your own control, call
+`setTheme("light" | "dark" | "system")` from `@properui/elements`.
+
+## A button and a modal
+
+```vue
+<script setup lang="ts">
+import { ref } from "vue";
+
+const open = ref(false);
+const email = ref("");
+</script>
+
+<template>
+    <pui-button color="primary" @click="open = true">
+        Invite teammates
+    </pui-button>
+
+    <pui-modal :open="open" title="Invite teammates" description="They get an email with a link to join." size="sm" @pui-close="open = false">
+        <pui-input v-model="email" label="Email address" type="email" name="email" />
+        <div slot="footer">
+            <pui-button color="secondary" @click="open = false">Cancel</pui-button>
+            <pui-button :is-disabled="!email" @click="open = false">Send invite</pui-button>
+        </div>
+    </pui-modal>
+</template>
+```
+
+`:open` shows the modal; Escape, the close button and a backdrop click all end in `pui-close`, which is where the ref
+goes back to `false`. `v-model` on `pui-input` sets its `.value` and listens to `input`. A Vue boolean binding such as
+`:is-disabled="false"` is written as the string `"false"`, which the elements read as false.
+
+## The same markup without custom elements
+
+The elements render `@properui/html` markup. If you would rather write it yourself (or render it from a server
+template), this is the equivalent of the example above:
+
+```html
+<button class="pui-btn pui-btn--tertiary pui-btn--icon-only" type="button" data-pui="theme-toggle" aria-label="Dark theme">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M22 15.844A10.5 10.5 0 1 1 8.156 2 8 8 0 0 0 22 15.844Z" />
+    </svg>
+</button>
+
+<button class="pui-btn pui-btn--primary" type="button" data-pui-modal-open="invite">Invite teammates</button>
+
+<dialog class="pui-modal pui-modal--sm" id="invite" aria-labelledby="invite-title">
+    <div class="pui-modal__header">
+        <h2 class="pui-modal__title" id="invite-title">Invite teammates</h2>
+        <p class="pui-modal__description">They get an email with a link to join.</p>
+        <button class="pui-modal__close" type="button" aria-label="Close" data-pui-modal-close>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+    <div class="pui-modal__body">
+        <div class="pui-field">
+            <label class="pui-label" for="invite-email">Email address</label>
+            <input class="pui-input" id="invite-email" name="email" type="email" />
+        </div>
+    </div>
+    <div class="pui-modal__footer">
+        <button class="pui-btn pui-btn--secondary" type="button" data-pui-modal-close>Cancel</button>
+        <button class="pui-btn pui-btn--primary" type="button" data-pui-modal-close value="send">Send invite</button>
+    </div>
+</dialog>
+```
+
+`data-pui="theme-toggle"` and `data-pui-modal-open` are picked up by `init()` from `@properui/html` (`import { init }
+from "@properui/html"`, or the `data-auto-init` script tag). `init` is idempotent, so calling it again after new markup
+appears is safe.
+
+## What is React-only
+
+Proper UI is a React 19 library first. The React layer (`@properui/ui`) has 126 component groups on React Aria; the
+elements and the html layer cover a curated set: button, badge, avatar, input, textarea, select, checkbox, toggle,
+alert, tabs, dropdown menu, modal, tooltip, progress, skeleton, breadcrumbs, pagination, toasts and the theme toggle
+(plus radio, card, accordion, table and empty state as html markup). Date pickers, comboboxes, sliders, data tables,
+charts, the command menu, file upload, application shells, every marketing section and every page example are
+React-only today, and there is no Vue port of the React components. Keyboard and screen-reader support in this layer
+comes from native HTML and the ARIA the behaviours set, not from React Aria. The full matrix is on
+[Frameworks](/docs/frameworks); every element, attribute and event is in the [custom elements reference](/docs/elements).
+
+## Example app
+
+[`examples/vue-vite`](https://github.com/properui/properui/tree/main/examples/vue-vite) in the repository is a
+small, complete Vue app using the elements; its README has the one command to run it.
