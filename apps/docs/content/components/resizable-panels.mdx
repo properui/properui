@@ -1,0 +1,39 @@
+---
+title: Resizable panel components
+section: application
+description: Free and open-source React resizable panel components with keyboard-resizable handles, size limits and collapsible panels. Styled with Tailwind CSS.
+metaTitle: Free React resizable panel components | Proper UI
+metaDescription: Free and open-source React resizable panel components with horizontal and vertical layouts, min and max sizes, collapsible panels and accessible keyboard-resizable handles. Styled with Tailwind CSS.
+install: resizable
+source: packages/ui/src/components/application/resizable
+demoFile: resizable
+---
+
+<Preview id="resizable-example" title="Resizable example" height={400} demo="resizable:ResizableExample" />
+
+## Installation
+
+<Install slug="resizable" />
+
+## Vertical
+
+<Preview id="resizable-vertical" title="Vertical" height={400} demo="resizable:Vertical" />
+
+## Collapsible sidebar
+
+Mark a panel `collapsible` to let it snap shut when it is dragged past half its `minSize`, or when Enter is pressed on
+the handle. `collapsedSize` keeps room for an icon rail. `onLayoutChange` reports every panel's size in percent, ready to
+store and pass back as `defaultLayout`.
+
+<Preview id="resizable-collapsible-sidebar" title="Collapsible sidebar" height={440} demo="resizable:CollapsibleSidebar" />
+
+## Nested
+
+<Preview id="resizable-nested" title="Nested" height={400} demo="resizable:Nested" />
+
+## Usage notes
+
+`ResizablePanel` and `ResizableHandle` must be direct children of `ResizablePanelGroup`. Sizes are percentages of the
+group; panels without a `defaultSize` share whatever the others leave. Each handle is a focusable `separator` with
+`aria-valuenow`, `aria-valuemin` and `aria-valuemax`: the arrow keys move it by `keyboardStep` percent (mirrored in
+right-to-left layouts), Home and End jump to the limits, and Enter collapses or restores a collapsible neighbour.

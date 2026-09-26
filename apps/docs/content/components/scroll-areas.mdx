@@ -1,0 +1,35 @@
+---
+title: Scroll area components
+section: application
+description: Free and open-source React scroll area components with token-styled scrollbars, fade edges and native, accessible scrolling. Styled with Tailwind CSS.
+metaTitle: Free React scroll area components | Proper UI
+metaDescription: Free and open-source React scroll area components with custom scrollbars that appear on hover or scroll, vertical and horizontal scrolling, fade edges and native keyboard scrolling. Styled with Tailwind CSS.
+install: scroll-area
+source: packages/ui/src/components/application/scroll-area
+demoFile: scroll-area
+---
+
+<Preview id="scroll-area-example" title="Scroll area example" height={420} demo="scroll-area:ScrollAreaExample" />
+
+## Installation
+
+<Install slug="scroll-area" />
+
+## Horizontal
+
+<Preview id="scroll-area-horizontal" title="Horizontal" height={260} demo="scroll-area:Horizontal" />
+
+## Both axes
+
+<Preview id="scroll-area-both-axes" title="Both axes" height={380} demo="scroll-area:BothAxes" />
+
+## Fade edges
+
+<Preview id="scroll-area-fade-edges" title="Fade edges" height={360} demo="scroll-area:FadeEdges" />
+
+## Usage notes
+
+The viewport is a normal scrolling element: wheel, touch, keyboard and find-in-page all work, and it is focusable
+(`tabIndex={0}`) and exposed as a labelled `region`, so pass `aria-label` or `aria-labelledby`. The custom scrollbars
+are drawn on top and hidden from assistive technology. `type="hover"` shows them while the pointer is over the area or
+it is scrolling, `type="auto"` whenever the content overflows, and `type="always"` all the time.

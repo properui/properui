@@ -1,0 +1,33 @@
+---
+title: Sortable list components
+section: application
+description: Free and open-source React sortable list components with drag handles and keyboard reordering. Built with React Aria and styled with Tailwind CSS.
+metaTitle: Free React sortable list components | Proper UI
+metaDescription: Free and open-source React sortable list components with drag handles, keyboard reordering and screen reader announcements. Built with React Aria and styled with Tailwind CSS.
+install: sortable-list
+source: packages/ui/src/components/application/sortable-list
+demoFile: sortable-list
+---
+
+<Preview id="sortable-list-example" title="Sortable list example" height={360} demo="sortable-list:SortableListExample" />
+
+## Installation
+
+<Install slug="sortable-list" />
+
+## Settings sections
+
+Rows accept an icon, a description and trailing content such as a toggle, which stays operable while the row is sortable.
+
+<Preview id="sortable-list-settings-sections" title="Settings sections" height={560} demo="sortable-list:SettingsSections" />
+
+## Cards variant
+
+<Preview id="sortable-list-cards-variant" title="Cards variant" height={360} demo="sortable-list:CardsVariant" />
+
+## Usage notes
+
+`onReorder` receives the items in their new order, so `onReorder={setItems}` is enough for local state. The raw React
+Aria reorder event is passed as the second argument, and `reorderItems(items, event)` is exported for use in your own
+state logic. Keyboard users focus a row, press the right arrow to reach its handle, press Enter, move with the arrow
+keys and press Enter again to drop.
