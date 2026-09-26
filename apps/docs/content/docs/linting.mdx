@@ -1,0 +1,90 @@
+---
+title: Linting
+section: docs
+description: "@properui/eslint-plugin: the ESLint 9 flat-config plugin that flags raw Tailwind palette classes, arbitrary values, dark: variants and physical directional properties inline, with an autofix for the last one."
+metaTitle: Linting | Proper UI
+metaDescription: "@properui/eslint-plugin catches raw Tailwind palette classes, arbitrary values, dark: variants and physical directional utilities as you type, with an autofix to logical properties."
+---
+
+## Why this exists
+
+`bg-purple-600 dark:bg-black` lints clean under a default ESLint setup: nothing in Tailwind CSS or a stock ESLint config knows that this kit's [token layer](/docs/theming) exists, so a raw palette class or a hardcoded `dark:` variant compiles, renders, and passes every other check. [`properui check`](/docs/cli#check-command) catches it too, but as a separate command you have to remember to run, against a whole file at a time, after the fact. `@properui/eslint-plugin` runs the same detection inline, in the editor, as part of `pnpm lint`, and adds two things a whole-file text scan can't: a `no-physical-properties` rule with an autofix, and per-string, per-token diagnostics instead of a flat list of grep hits.
+
+## Install
+
+```bash
+npm install -D @properui/eslint-plugin
+```
+
+```js
+// eslint.config.mjs
+import properui from "@properui/eslint-plugin";
+
+export default [
+    // ...your other config
+    {
+        files: ["**/*.{ts,tsx,js,jsx}"],
+        ...properui.configs.recommended,
+    },
+];
+```
+
+`configs.recommended` is a self-contained flat config object — it carries its own `plugins` entry, so spreading it into a config block is enough. It turns on all four rules: `no-raw-palette`, `no-dark-variant` and `no-physical-properties` as `"error"`, `no-arbitrary-values` as `"warn"` (arbitrary values are sometimes the right call — a one-off `grid-template-columns`, say — where a raw palette colour essentially never is).
+
+This repository runs it on itself: the root [`eslint.config.mjs`](https://github.com/properui/properui/blob/main/eslint.config.mjs) applies all four rules to `packages/ui/src/components/**`.
+
+## What each rule catches
+
+Every rule scans JSX `className`/`class` attribute values, template literals, and the arguments of `cx()`/`cn()`/`clsx()`/`sortCx()` calls — including object keys and values, so both clsx's conditional-object form (`{ "bg-red-500": isActive }`) and this kit's own `sortCx({ base: "...", size: { sm: "..." } })` variant-map form are covered — wherever those strings are nested inside a ternary, `&&`, an array, or a further call.
+
+| Rule                     | Flags                                                                                                                              | Default severity | Autofix |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- | ---------------- | ------- |
+| `no-raw-palette`         | `bg-red-500`, `text-gray-900`, `border-purple-200`, `from-blue-50`, with any variant/prefix (`hover:`, `md:`, `group-hover:`, `!`) | `error`          | No      |
+| `no-arbitrary-values`    | `bg-[#7f56d9]`, `p-[13px]`, `text-[13px]`, `w-[calc(100%_-_1rem)]`                                                                 | `warn`           | No      |
+| `no-dark-variant`        | Any `dark:` utility, anywhere in the variant chain                                                                                 | `error`          | No      |
+| `no-physical-properties` | `ml-`/`mr-`/`pl-`/`pr-`, `left-`/`right-`, `text-left`/`text-right`, `rounded-l-`/`rounded-r-`, `border-l-`/`border-r-`            | `error`          | Yes     |
+
+`no-raw-palette`'s own semantic-colour utilities (`outline-utility-blue-500`, say) are exempt — those are this kit's tokens, not raw usage. `no-arbitrary-values` allows a bare arbitrary **property** by default (`[mask-image:linear-gradient(...)]`, or `sm:[mask-image:...]` once its variant prefix is stripped): that syntax isn't standing in for a missing token, it's setting a CSS property Tailwind has no utility for at all.
+
+`no-raw-palette` and `no-arbitrary-values` both take an `allow: string[]` option — regex patterns (as strings) for tokens to exempt, past the built-in exemptions above.
+
+## The autofix
+
+`no-physical-properties` is the one rule with `eslint --fix`, because every mapping it knows is 1:1 — the physical utility and its logical equivalent always take the same value, so there's no judgement call to make the way there is picking a semantic token for a raw colour:
+
+```jsx
+// before
+<div className="ml-4 pr-2 text-left rounded-l-lg" />
+
+// after `eslint --fix`
+<div className="ms-4 pe-2 text-start rounded-s-lg" />
+```
+
+See [RTL support](/docs/rtl) for why logical properties are the house rule.
+
+## Relationship to `properui check`
+
+`properui check` (see the [CLI guide](/docs/cli#check-command)) and this plugin's `no-raw-palette`/`no-dark-variant`/`no-arbitrary-values` rules detect the same three things, deliberately: the plugin's detection logic is copied from `check`'s, not reimplemented independently, so the two never quietly drift apart on what counts as a violation. Use `check` when ESLint isn't part of a project's toolchain (a plain Vite app that hasn't set one up yet) or for a one-off CI gate over a directory; use the plugin when ESLint already runs, for inline feedback and for `no-physical-properties`'s autofix, which `check` doesn't have — picking a semantic token is a judgement call, but swapping `ml-4` for `ms-4` never is.
+
+## FAQs
+
+<FAQs
+    items={[
+        {
+            question: "Does this replace properui check?",
+            answer: "No. Both exist: check is a standalone CLI scan with no ESLint dependency, useful in a project that doesn't run ESLint or as a quick one-off. The plugin runs the same three detections inline as part of eslint, plus a fourth rule (no-physical-properties) with an autofix that check doesn't have.",
+        },
+        {
+            question: "Why is no-arbitrary-values a warning instead of an error?",
+            answer: "An arbitrary value is sometimes the right call (a one-off grid-template-columns value, say), where a raw palette colour or a dark: variant essentially never is. configs.recommended reflects that: the other three rules default to error, this one to warn.",
+        },
+        {
+            question: "Can I allow a specific class through no-raw-palette or no-arbitrary-values?",
+            answer: "Yes, both rules take an allow option: an array of regex patterns (as strings) tested against the offending token. Anything matching is skipped.",
+        },
+        {
+            question: "Does it work with plain JavaScript, not just TypeScript?",
+            answer: "Yes. The rules operate on JSX and call-expression AST nodes ESLint's parser already produces; nothing in the plugin depends on TypeScript's type checker.",
+        },
+    ]}
+/>
