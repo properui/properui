@@ -1,0 +1,53 @@
+---
+title: Stepper components
+section: application
+description: Powerful and customizable React stepper components built for modern applications and websites. These form steppers are built using React Aria and styled with Tailwind CSS.
+metaTitle: React stepper components | Proper UI
+metaDescription: Powerful and customizable React stepper components built for modern applications and websites. These stepper components are built using React Aria and styled with Tailwind CSS.
+install: stepper
+source: packages/ui/src/components/application/stepper
+demoFile: stepper
+---
+
+<Preview id="checkout-example" title="Checkout example" height={520} demo="stepper:CheckoutExample" />
+
+## Installation
+
+<Install slug="stepper" />
+
+## Stepper examples
+
+<Preview id="vertical-layout" title="Vertical layout" height={420} demo="stepper:VerticalLayout" />
+
+<Preview id="non-linear" title="Non-linear" height={360} demo="stepper:NonLinear" />
+
+## FAQs
+
+<FAQs
+    items={[
+        {
+            question: "How is Stepper different from ProgressSteps?",
+            answer: "ProgressSteps is a purely decorative status display driven entirely by the status you pass it. Stepper owns the active step itself — it renders each step's content, wires up Back/Next/Finish, and can gate advancing with canAdvance — for an actual multi-step form, not just a progress indicator.",
+        },
+        {
+            question: "How do I validate a step before Next advances past it?",
+            answer: "Pass canAdvance, a function called with the current step's index right before Next moves forward. Return false to block the advance — e.g. because that step's required fields haven't been filled in yet.",
+        },
+        {
+            question: "What's the difference between linear and non-linear?",
+            answer: "In linear mode (the default), the only way through the wizard is Stepper.Controls' Back/Next — a step's header is not clickable. With linear={false}, a step that's already been completed can be clicked directly to jump back to it; upcoming steps stay inert either way.",
+        },
+        {
+            question: "Can I control the active step myself?",
+            answer: "Yes — pass activeStep and onStepChange to drive it from your own state instead of letting Stepper manage it internally with defaultActiveStep.",
+        },
+        {
+            question: "How do I mark a step as optional?",
+            answer: 'Pass optional to that Stepper.Step — it renders a muted "(optional)" next to its title. It\'s a visual label only; pair it with your own canAdvance logic if an optional step should be skippable without being filled in.',
+        },
+        {
+            question: "Does it set aria-current correctly?",
+            answer: 'Yes — the current step\'s <li> gets aria-current="step", matching every other step indicator in the library (ProgressSteps included).',
+        },
+    ]}
+/>

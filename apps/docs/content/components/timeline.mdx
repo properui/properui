@@ -1,0 +1,51 @@
+---
+title: Timeline components
+section: application
+description: Powerful and customizable React timeline components built for modern applications and websites. These timelines are built using React Aria patterns and styled with Tailwind CSS.
+metaTitle: React timeline components | Proper UI
+metaDescription: Powerful and customizable React timeline components built for modern applications and websites. These timeline components are styled with Tailwind CSS and use semantic color tokens.
+install: timeline
+source: packages/ui/src/components/application/timeline
+demoFile: timeline
+---
+
+<Preview id="order-tracking" title="Order tracking" height={420} demo="timeline:OrderTracking" />
+
+## Installation
+
+<Install slug="timeline" />
+
+## Timeline examples
+
+<Preview id="release-history" title="Release history" height={480} demo="timeline:ReleaseHistory" />
+
+<Preview id="horizontal" title="Horizontal" height={240} demo="timeline:Horizontal" />
+
+<Preview id="plain-dots" title="Plain dots" height={320} demo="timeline:PlainDots" />
+
+## FAQs
+
+<FAQs
+    items={[
+        {
+            question: "What variants are available?",
+            answer: 'variant="vertical" (the default) is a single column, "alternating" zigzags each entry left and right of a center line, and "horizontal" lays the entries out in a row.',
+        },
+        {
+            question: "How does status affect the dot's color?",
+            answer: 'status="completed" is a solid success color, "current" is a solid brand color with a focus ring around it, and "upcoming" (the default) is a dim, outlined circle. Pass an explicit color ("brand", "success", "warning", "error" or "gray") to override the color regardless of status.',
+        },
+        {
+            question: "How do I hide the connector after the last item?",
+            answer: "You don't need to — the last Timeline.Item in a Timeline hides its own trailing connector automatically via a CSS group-last selector, so adding or removing items never leaves a dangling line.",
+        },
+        {
+            question: "Can an item show an icon instead of a plain dot?",
+            answer: "Yes — pass icon, a component reference like icon={Truck01}, and it renders inside a larger dot instead of a plain filled circle.",
+        },
+        {
+            question: "What's rendered for the alternating variant under the hood?",
+            answer: "Each item's content is rendered on both sides of the center line; only the side matching that item's position (odd/even) is shown, switched purely with CSS so no JavaScript needs to track which side an item falls on.",
+        },
+    ]}
+/>

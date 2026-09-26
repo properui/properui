@@ -1,0 +1,55 @@
+---
+title: Number input components
+section: base
+description: Free and open-source React number input components built for modern applications and websites. These number inputs are built using React Aria and styled with Tailwind CSS.
+metaTitle: Free React number input components | Proper UI
+metaDescription: Free and open-source React number input components built for modern applications and websites. These number input components are built using React Aria and styled with Tailwind CSS.
+install: number-input
+source: packages/ui/src/components/base/number-input
+demoFile: number-input
+---
+
+<Preview id="number-input-example" title="Number input example" height={200} demo="number-input:NumberInputExample" />
+
+## Installation
+
+<Install slug="number-input" />
+
+## Number input examples
+
+<Preview id="format-options" title="Format options" height={320} demo="number-input:FormatOptions" />
+
+<Preview id="inline-buttons" title="Inline buttons" height={260} demo="number-input:InlineButtons" />
+
+<Preview id="sizes" title="Sizes" height={280} demo="number-input:Sizes" />
+
+<Preview id="min-max-step" title="Min, max and step" height={200} demo="number-input:MinMaxStep" />
+
+<Preview id="states" title="States" height={320} demo="number-input:States" />
+
+## FAQs
+
+<FAQs
+    items={[
+        {
+            question: "What's the difference between the stacked and inline button variants?",
+            answer: 'buttonVariant="stacked" (the default) puts a chevron-up/chevron-down pair at the end of the field, like a native spinner. buttonVariant="inline" puts a full-height minus button before the value and a plus button after it.',
+        },
+        {
+            question: "How do I format the value as currency, a percentage, or a unit?",
+            answer: 'Pass formatOptions, a plain Intl.NumberFormatOptions object, e.g. formatOptions={{ style: "currency", currency: "USD" }}. The displayed text is formatted, but the value itself (in onChange, defaultValue, value) stays a plain number.',
+        },
+        {
+            question: "How do I constrain the value?",
+            answer: "Pass minValue, maxValue and step. The increment/decrement buttons clamp to those bounds and disable themselves once they're reached; typing or pasting an out-of-range value is clamped on blur.",
+        },
+        {
+            question: "Is it keyboard operable without the buttons?",
+            answer: "Yes — the field itself responds to the Up and Down arrow keys (and Page Up/Page Down for larger steps), in addition to typing a value directly.",
+        },
+        {
+            question: "How do I show a validation error?",
+            answer: "Pass isInvalid and a hint — the hint switches to the error color automatically, the same as Input.",
+        },
+    ]}
+/>
