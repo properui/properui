@@ -1,0 +1,150 @@
+---
+title: Design tokens (CSS)
+section: docs
+description: Use the Proper UI tokens and a prebuilt stylesheet in any project, with or without Tailwind and with or without React.
+metaTitle: Design tokens as CSS | Proper UI
+metaDescription: "@properui/tokens ships the Proper UI design tokens as plain CSS: a Tailwind v4 theme, a framework-free CSS-variables file, every theme preset, and a prebuilt properui.css you can link from a CDN."
+---
+
+`@properui/tokens` is the Proper UI token layer as plain CSS files, for projects that are not using the React components: a Vue, Angular, Svelte or
+Astro app, a server-rendered site, or a single HTML page. The same colours, type scale, radii, shadows and dark mode as the React library, from the
+same source. The files are generated at build time from `packages/ui/src/styles` (`theme.css`, `typography.css`, `globals.css` and the presets), so
+they never drift from what the components use.
+
+React remains the primary, fullest layer. This package is only the tokens and a base stylesheet; for components outside React see
+[Frameworks](/docs/frameworks).
+
+## What each file is for
+
+| File                                | Use it when                                                                                                                                                  |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `properui.min.css` / `properui.css` | You have no build step. A prebuilt stylesheet: Tailwind's preflight, every token, the dark-mode block, and the `@properui/html` component classes.           |
+| `tokens.css`                        | You have a build step but no Tailwind. Every token as a plain CSS custom property: light values on `:root`, dark values on `.dark-mode`. No Tailwind syntax. |
+| `theme.css`                         | You use Tailwind CSS v4 in any framework. The `@theme` token layer and prose styles, so `bg-primary`, `text-tertiary` and `text-display-lg` work.            |
+| `presets/<name>.css`                | You use `theme.css` and want one of the shipped presets. A `@theme` override block.                                                                          |
+| `presets/plain/<name>.css`          | You use `tokens.css` or `properui.css` and want a preset. The same override as a plain `:root` block.                                                        |
+
+Presets: `brand` (the default purple), `blue`, `indigo`, `teal`, `green`, `orange`, `rose` and `slate-mono`.
+
+## No build step: link the prebuilt stylesheet
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@properui/tokens/dist/properui.min.css" />
+```
+
+The same file is served at `https://properui.dev/css/properui.min.css` and on unpkg at `https://unpkg.com/@properui/tokens`. Pin a version in
+production (`@properui/tokens@0.1.0`) so a release never changes a live page underneath you.
+
+The stylesheet only contains the utilities the `@properui/html` snippets use, not all of Tailwind. For your own styles, read the tokens with `var()`:
+
+```css
+.panel {
+    background: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border-secondary);
+    border-radius: var(--radius-xl);
+    padding: calc(var(--spacing) * 4);
+    font-size: var(--text-md);
+    line-height: var(--text-md--line-height);
+}
+```
+
+It does not load a web font. `--font-body` asks for Inter first and falls back to the system stack, so load Inter yourself if you want it.
+
+## Without Tailwind: `tokens.css`
+
+Install the package and import the file once, wherever your framework takes global CSS:
+
+```bash
+npm install @properui/tokens
+```
+
+```ts
+// Vue (main.ts), Svelte (+layout.svelte), Astro (a layout's frontmatter), plain Vite (main.ts)
+import "@properui/tokens/tokens.css";
+```
+
+```json
+// Angular: angular.json, projects.<app>.architect.build.options
+"styles": ["node_modules/@properui/tokens/dist/tokens.css", "src/styles.css"]
+```
+
+Every token is then a CSS variable on `:root`: `--color-bg-primary`, `--color-text-secondary`, `--color-fg-brand-primary`,
+`--color-border-tertiary`, `--text-sm` and `--text-sm--line-height`, `--radius-lg`, `--shadow-md`, and the rest. The Tailwind defaults a token reads
+(`--spacing` and the stock colour ramps some utility colours point at) are included, so the file stands on its own. Utility classes like
+`bg-primary` are Tailwind's and are not part of this file; write your CSS against the variables.
+
+## With Tailwind v4: `theme.css`
+
+```css
+@import "tailwindcss";
+@import "@properui/tokens/theme.css";
+
+@custom-variant dark (&:where(.dark-mode, .dark-mode *));
+```
+
+The `@custom-variant` line is the one `globals.css` declares for the React library: it points Tailwind's `dark` variant at the `.dark-mode` class
+instead of the media query, so anything built on it (including `@properui/html`) follows the same toggle. This is the same `@theme` layer the React
+components are written against, so every semantic utility (`bg-primary`, `text-tertiary`, `border-secondary`, `bg-brand-solid`) and every typography
+token (`text-display-lg`, `text-md`) works in your markup, in any framework. The same rules apply as in React: semantic tokens only, no `dark:`
+utilities, logical properties for anything directional.
+
+## Adding a preset
+
+Load the preset after the token file it overrides. With Tailwind:
+
+```css
+@import "tailwindcss";
+@import "@properui/tokens/theme.css";
+@import "@properui/tokens/presets/teal.css";
+```
+
+Without Tailwind, or with the prebuilt stylesheet, use the plain version:
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@properui/tokens/dist/properui.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@properui/tokens/dist/presets/plain/teal.css" />
+```
+
+```ts
+import "@properui/tokens/presets/plain/teal.css";
+import "@properui/tokens/tokens.css";
+```
+
+A preset only redeclares primitives: the brand ramp (`--color-brand-*`), the neutral ramp (`--color-neutral-*`, which every gray token reads), the
+radius scale and, when set, the fonts. Both modes read those ramps, so a preset applies to dark mode as well. For a custom brand colour, build a
+preset in the [theme generator](/docs/theme-generator) and copy its CSS; for the plain-CSS form, change `@theme` to `:root` in what it gives you.
+
+## Dark mode
+
+Dark mode is class-based, exactly as in React: add `dark-mode` to an ancestor, usually `<html>`, and every token switches.
+
+```html
+<html class="dark-mode"></html>
+```
+
+```js
+document.documentElement.classList.toggle("dark-mode", window.matchMedia("(prefers-color-scheme: dark)").matches);
+```
+
+Any subtree works too (`<section class="dark-mode">`), which is how a dark hero sits on a light page. See [Dark mode](/docs/dark-mode) for the
+full strategy.
+
+## FAQs
+
+<FAQs
+    items={[
+        {
+            question: "Are these files a copy of the tokens that can drift?",
+            answer: "No. They are generated from packages/ui/src/styles by the package's build script on every release: theme.css is a verbatim copy, tokens.css is parsed out of theme.css, the presets come from generateThemeCss(), and properui.css is compiled with Tailwind from the same sources.",
+        },
+        {
+            question: "Why does properui.css not contain every Tailwind utility?",
+            answer: "Tailwind only emits the utilities it finds in source files, and the prebuilt file is compiled against the @properui/html snippets. Every token is emitted regardless, so your own CSS can use var(--color-...) for anything else, or you can switch to theme.css and your own Tailwind build.",
+        },
+        {
+            question: "Can I use tokens.css and theme.css together?",
+            answer: "There is no need. theme.css already emits the same variables through Tailwind; tokens.css is for projects that do not run Tailwind at all.",
+        },
+    ]}
+/>

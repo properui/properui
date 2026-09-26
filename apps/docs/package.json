@@ -36,6 +36,7 @@
     "devDependencies": {
         "@opennextjs/cloudflare": "^1.20.6",
         "@properui/registry": "workspace:*",
+        "@properui/tokens": "workspace:*",
         "@tailwindcss/postcss": "^4.3.3",
         "@tailwindcss/typography": "^0.5.20",
         "@types/mdx": "^2.0.13",
