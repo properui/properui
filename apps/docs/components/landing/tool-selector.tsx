@@ -2,10 +2,10 @@
 
 import { useRef, useState } from "react";
 import { CopyButton } from "~/components/landing/copy-button";
-import { TOOL_ORDER, TOOL_SETUPS, type ToolKey } from "~/components/landing/tool-setup";
+import { TOOL_ORDER, TOOL_SETUPS, type ToolKey, createsLabel } from "~/components/landing/tool-setup";
 
 /**
- * Hero interactive block (brief Priority 1): the CTA row, the microproof line, the four-tool
+ * Hero interactive block (brief Priority 1): the CTA row, the microproof line, the five-tool
  * radiogroup and the setup preview card that updates with it. Kept as one client component so
  * the primary CTA ("Set up your agent") can find and focus the fieldset's checked radio.
  *
@@ -13,7 +13,7 @@ import { TOOL_ORDER, TOOL_SETUPS, type ToolKey } from "~/components/landing/tool
  * tool live in the separate "setup" section (`sections/agent-setup.tsx`); the two intentionally
  * duplicate the same verified data from `tool-setup.ts` at different levels of detail.
  */
-export function ToolSelector() {
+export function ToolSelector({ microproof }: { microproof: string[] }) {
     const [selected, setSelected] = useState<ToolKey>("claude");
     const fieldsetRef = useRef<HTMLFieldSetElement>(null);
     const tool = TOOL_SETUPS[selected];
@@ -36,7 +36,16 @@ export function ToolSelector() {
                 </a>
             </div>
 
-            <p className="hero-microproof">React 19 · TypeScript · React Aria · Tailwind CSS v4 · MIT licensed</p>
+            <p className="hero-microproof">
+                {microproof.map((item, index) => (
+                    <span key={item}>
+                        <span className="hero-microproof-item">
+                            {item}
+                            {index < microproof.length - 1 ? " ·" : ""}
+                        </span>{" "}
+                    </span>
+                ))}
+            </p>
 
             <fieldset className="tool-selector" ref={fieldsetRef}>
                 <legend>Pick the tool you build with</legend>
@@ -87,7 +96,7 @@ export function ToolSelector() {
                     </div>
 
                     <p className="hero-setup-creates">
-                        {tool.mode === "url" ? "Destination: " : "Creates: "}
+                        {createsLabel(tool)}:{" "}
                         {tool.creates.map((entry, index) => (
                             <span key={entry.path}>
                                 {index > 0 ? "; " : ""}

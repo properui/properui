@@ -443,6 +443,10 @@
     color: var(--muted);
     font-size: 13px;
 }
+/* Each claim stays on one line; the line only wraps between claims. */
+.pui-landing .hero-microproof-item {
+    white-space: nowrap;
+}
 
 /* Tool selector (segmented radiogroup) */
 .pui-landing .tool-selector {
@@ -464,9 +468,9 @@
 }
 .pui-landing .tool-options {
     display: grid;
-    grid-template-columns: repeat(4, minmax(96px, 1fr));
+    grid-template-columns: repeat(5, minmax(96px, 1fr));
     gap: 8px;
-    max-width: 560px;
+    max-width: 700px;
     margin-inline: auto;
     padding: 6px;
     border: 1px solid var(--line-2);
@@ -805,6 +809,10 @@
     }
     .pui-landing .tool-options {
         grid-template-columns: repeat(2, 1fr);
+    }
+    /* Five tools on two columns: the last one (any MCP client) takes the full row. */
+    .pui-landing .tool-option:last-child {
+        grid-column: 1 / -1;
     }
     .pui-landing .proof-grid {
         grid-template-columns: repeat(2, 1fr);

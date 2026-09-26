@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { SetupAnimation } from "./animations/setup-animation";
 import { CopyButton } from "./copy-button";
 import { DIALOG_STEPS } from "./setup-guides";
-import { type ToolSetup } from "./tool-setup";
+import { type ToolSetup, createsLabel } from "./tool-setup";
 
 type SetupDialogProps = {
     tool: ToolSetup;
@@ -84,7 +84,7 @@ export function SetupDialog({ tool, openToken }: SetupDialogProps) {
                 </div>
                 {tool.note ? <p className="setup-note">{tool.note}</p> : null}
                 <p className="setup-dialog-creates">
-                    {tool.mode === "url" ? "Destination" : "Creates"}{" "}
+                    {createsLabel(tool)}{" "}
                     {tool.creates.map((entry, index) => (
                         <span key={entry.path}>
                             {index > 0 ? " and " : ""}

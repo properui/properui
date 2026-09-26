@@ -3,11 +3,13 @@
  * read from here so a command can never differ between two places on the page.
  *
  * Every value is verified against `packages/cli/src/commands/agent.ts` (`properui agent init
- * --client claude|codex|cursor|lovable|all`). Lovable runs in the browser and cannot read local
- * files, so it gets the public Skill URL and a Knowledge destination instead of a command.
+ * --client claude|codex|cursor|lovable|all`) and `packages/mcp` (`npx -y @properui/mcp`, a stdio
+ * server). Lovable runs in the browser and cannot read local files, so it gets the public Skill
+ * URL and a Knowledge destination instead of a command. The MCP entry's command is what the
+ * client runs, not something the visitor runs once, so its target is labelled "Add to".
  */
 
-export type ToolKey = "claude" | "codex" | "cursor" | "lovable";
+export type ToolKey = "claude" | "codex" | "cursor" | "lovable" | "mcp";
 
 export type ToolSetup = {
     key: ToolKey;
@@ -24,6 +26,8 @@ export type ToolSetup = {
     copyLabel: string;
     /** Files the command creates or updates in the project, or where to paste the URL. */
     creates: Array<{ path: string; note: string }>;
+    /** Overrides the "Creates" / "Destination" label in front of `creates`. */
+    createsLabel?: string;
     /** A one-line caveat shown under the value, or null. */
     note: string | null;
     /** A copyable example prompt to use after setup. */
@@ -44,6 +48,7 @@ export const TOOL_SETUPS: Record<ToolKey, ToolSetup> = {
         creates: [
             { path: ".claude/skills/properui/SKILL.md", note: "the Proper UI skill" },
             { path: "CLAUDE.md", note: "a short pointer appended, nothing replaced" },
+            { path: ".mcp.json", note: "the Proper UI MCP server, merged with any servers already there" },
         ],
         note: null,
         prompt: PROMPT,
@@ -71,7 +76,10 @@ export const TOOL_SETUPS: Record<ToolKey, ToolSetup> = {
         valueLabel: "Run in your project terminal",
         copyValue: "npx @properui/cli@latest agent init --client cursor",
         copyLabel: "Copy",
-        creates: [{ path: ".cursor/rules/properui.mdc", note: "an always-applied rule; Cursor does not read SKILL.md" }],
+        creates: [
+            { path: ".cursor/rules/properui.mdc", note: "an always-applied rule; Cursor does not read SKILL.md" },
+            { path: ".cursor/mcp.json", note: "the Proper UI MCP server, merged with any servers already there" },
+        ],
         note: null,
         prompt: PROMPT,
     },
@@ -87,9 +95,25 @@ export const TOOL_SETUPS: Record<ToolKey, ToolSetup> = {
         note: "Lovable runs in the browser and cannot read local project files, so it gets the same instructions through its Knowledge panel.",
         prompt: PROMPT,
     },
+    mcp: {
+        key: "mcp",
+        name: "Any MCP client",
+        logo: "/mcp.svg",
+        mode: "command",
+        valueLabel: "Add as a stdio MCP server in your client",
+        copyValue: "npx -y @properui/mcp",
+        copyLabel: "Copy",
+        creates: [{ path: "your client's MCP server list", note: "one stdio entry named properui; the command itself writes nothing" }],
+        createsLabel: "Add to",
+        note: "Works with any client that speaks MCP, such as Windsurf, VS Code, Zed or Gemini CLI. Your assistant gets search_components, get_component, add_component and four more tools.",
+        prompt: PROMPT,
+    },
 };
 
-export const TOOL_ORDER: ToolKey[] = ["claude", "codex", "cursor", "lovable"];
+export const TOOL_ORDER: ToolKey[] = ["claude", "codex", "cursor", "lovable", "mcp"];
+
+/** The label in front of a tool's `creates` list, shared by every place that renders it. */
+export const createsLabel = (tool: ToolSetup) => tool.createsLabel ?? (tool.mode === "url" ? "Destination" : "Creates");
 
 /** One command that installs the skill for every supported client at once. */
 export const UNIVERSAL_SETUP_COMMAND = "npx @properui/cli@latest agent init --client all";

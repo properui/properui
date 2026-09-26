@@ -17,9 +17,9 @@ import { Trust } from "~/components/landing/sections/trust";
 import { Workflow } from "~/components/landing/sections/workflow";
 import { SITE_NAME } from "~/lib/site";
 
-const TITLE = "Proper UI: The React design system for AI coding agents";
+const TITLE = "Proper UI: Your AI stops inventing UI. It installs real components.";
 const DESCRIPTION =
-    "Build consistent React interfaces with Claude Code, Codex, Cursor and Lovable. Proper UI gives AI agents searchable components, real source and durable project instructions.";
+    "The design system for AI coding agents. Claude Code, Codex, Cursor, Lovable and any MCP client search Proper UI's registry and install real, axe-tested React components, with tokens, HTML components and custom elements for Vue, Angular and plain HTML.";
 
 /** Canonical origin for the marketing site, which is not the docs origin in `~/lib/site`. */
 const CANONICAL = "https://properui.dev/";
