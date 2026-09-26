@@ -1,0 +1,57 @@
+---
+title: Tag input components
+section: base
+description: Free and open-source React tag input components built for modern applications and websites. These tag inputs are built using React Aria and styled with Tailwind CSS.
+metaTitle: Free React tag input components | Proper UI
+metaDescription: Free and open-source React tag input components built for modern applications and websites. These tag input components are built using React Aria and styled with Tailwind CSS.
+install: tag-input
+source: packages/ui/src/components/base/tag-input
+demoFile: tag-input
+---
+
+<Preview id="tag-input-example" title="Tag input example" height={220} demo="tag-input:TagInputExample" />
+
+## Installation
+
+<Install slug="tag-input" />
+
+## Tag input examples
+
+<Preview id="controlled" title="Controlled" height={220} demo="tag-input:Controlled" />
+
+<Preview id="max-tags-with-feedback" title="Max tags with feedback" height={240} demo="tag-input:MaxTagsWithFeedback" />
+
+<Preview id="with-validation" title="With validation" height={220} demo="tag-input:WithValidation" />
+
+<Preview id="states" title="States" height={320} demo="tag-input:States" />
+
+## FAQs
+
+<FAQs
+    items={[
+        {
+            question: "How do I add a tag?",
+            answer: 'Type a value and press Enter or , (comma) — both add the current input as a tag and clear the input. Pasting a comma-separated string (e.g. "foo, bar, baz") adds every complete piece as its own tag at once, leaving any trailing piece without a following comma in the input for further editing.',
+        },
+        {
+            question: "How do I remove a tag?",
+            answer: "Press Backspace with the input empty and the caret at the start to remove the last tag, or press the close button on any individual tag. ArrowLeft from an empty, caret-at-start input moves focus onto the last tag instead, so the arrow keys can be used to reach and remove an earlier tag.",
+        },
+        {
+            question: "How do I validate a candidate tag before it's added?",
+            answer: 'Pass validate, a function that returns true to accept a trimmed, non-empty candidate or false to reject it. Pair it with onInvalidTag to find out why a tag was rejected — "empty", "duplicate", "max-tags" or "invalid" — and surface feedback of your own.',
+        },
+        {
+            question: "How do I cap the number of tags?",
+            answer: 'Pass maxTags. Once reached, further additions are rejected (and reported through onInvalidTag with reason "max-tags") until a tag is removed.',
+        },
+        {
+            question: "What does isReadOnly do?",
+            answer: "It keeps the existing tags visible but removes the text input and every tag's remove button, so the value can be shown without being editable. Use isDisabled instead when the whole field should look and behave as disabled.",
+        },
+        {
+            question: "Can I control the tags myself?",
+            answer: "Yes — pass value and onChange to drive the array of tag strings from your own state instead of letting TagInput manage it internally.",
+        },
+    ]}
+/>

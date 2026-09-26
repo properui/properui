@@ -1,0 +1,53 @@
+---
+title: Menubar components
+section: base
+description: Free and open-source React menu bar components built for modern applications and websites. These menubars are built using React Aria and styled with Tailwind CSS.
+metaTitle: Free React menubar components | Proper UI
+metaDescription: Free and open-source React menu bar components built for modern applications and websites. These menubar components are built using React Aria and styled with Tailwind CSS.
+install: menubar
+source: packages/ui/src/components/base/menubar
+demoFile: menubar
+---
+
+<Preview id="menubar-example" title="Menubar example" height={360} demo="menubar:MenubarExample" />
+
+## Installation
+
+<Install slug="menubar" />
+
+## Menubar examples
+
+<Preview id="with-disabled-items" title="With disabled items" height={200} demo="menubar:WithDisabledItems" />
+
+<Preview id="minimal" title="Minimal" height={200} demo="menubar:Minimal" />
+
+## FAQs
+
+<FAQs
+    items={[
+        {
+            question: "How does keyboard navigation work?",
+            answer: "Menubar is built on React Aria's Toolbar, so the arrow keys move focus between the top-level menus (File, Edit, View, …) with a roving tabindex. Once a menu is open, Menu itself handles Up/Down/Enter/Escape and submenu navigation exactly as Dropdown does.",
+        },
+        {
+            question: "Why does hovering a sibling menu switch to it?",
+            answer: "Only once a menu is already open — hovering File before anything is open does nothing, matching a native application menu bar or a browser's own menu. Once File is open, hovering Edit switches straight to it without a click.",
+        },
+        {
+            question: "How do I add checkbox or radio items?",
+            answer: 'Wrap them in a Menubar.Section with selectionMode="multiple" (checkboxes) or "single" (radios), and set each Menubar.Item\'s selectionIndicator to "checkbox" or "radio" — the same API Dropdown uses.',
+        },
+        {
+            question: "How do I add a submenu?",
+            answer: "Wrap a Menubar.Item (the trigger) and a Dropdown.Popover containing a plain Dropdown.Menu in React Aria's SubmenuTrigger, re-exported as Menubar.SubmenuTrigger — identical to how Dropdown nests its own submenus.",
+        },
+        {
+            question: "How do I show a keyboard shortcut next to an item?",
+            answer: 'Pass addon to Menubar.Item, e.g. <Menubar.Item addon="⌘S">Save</Menubar.Item>.',
+        },
+        {
+            question: "Can a whole top-level menu be disabled?",
+            answer: "Yes — pass isDisabled to Menubar.Menu. Its trigger renders disabled and dimmed, and hovering or pressing it does nothing.",
+        },
+    ]}
+/>

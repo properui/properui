@@ -1,0 +1,51 @@
+---
+title: Code editor components
+section: application
+description: Free and open-source React code editor component with syntax highlighting, line numbers, indentation, bracket auto-close and diagnostics. No editor dependency; styled with Tailwind CSS.
+metaTitle: React code editor component | Proper UI
+metaDescription: Lightweight, accessible React code editor with syntax highlighting, line numbers, Tab indentation, auto-indent, bracket auto-close, read-only mode and error and warning decorations.
+install: code-editor
+source: packages/ui/src/components/application/code-editor
+demoFile: code-editor
+---
+
+<Preview id="code-editor-example" title="Code editor example" height={520} demo="code-editor:CodeEditorExample" />
+
+## Installation
+
+<Install slug="code-editor" />
+
+## Code editor examples
+
+<Preview id="json-editor" title="JSON editor" height={420} demo="code-editor:JsonEditor" />
+
+<Preview id="read-only-with-diagnostics" title="Read-only with diagnostics" height={480} demo="code-editor:ReadOnlyWithDiagnostics" />
+
+<Preview id="minimal" title="Minimal" height={200} demo="code-editor:Minimal" />
+
+## FAQs
+
+<FAQs
+    items={[
+        {
+            q: "How does it work without an editor library?",
+            a: "It uses the overlay technique: a transparent textarea sits exactly on top of a syntax-highlighted pre. The textarea owns the text, caret, selection, undo history and form value; the pre only paints the colours. Highlighting comes from the same dependency-free tokeniser as CodeSnippet, so the language prop accepts javascript, typescript, jsx, tsx, json, bash, shell and plaintext.",
+        },
+        {
+            q: "Tab indents, so how does a keyboard user leave the editor?",
+            a: "Press Escape, then Tab (or Shift+Tab). Escape arms a one-shot escape hatch so the next Tab moves focus instead of inserting indentation. The instruction is attached to the textarea with aria-describedby. In read-only mode Tab is never captured.",
+        },
+        {
+            q: "What editing helpers are included?",
+            a: "Tab and Shift+Tab indent and outdent the current line or every selected line, Enter keeps the current indentation and opens an indented block between brackets, and with autoCloseBrackets (on by default) opening brackets and quotes insert their pair, wrap a selection, and are stepped over when typed again.",
+        },
+        {
+            q: "How do diagnostics work?",
+            a: "Pass diagnostics as an array of { line, column?, severity, message }. Each line is tinted and marked in the gutter, the messages are listed under the code with their line numbers, the list is linked to the textarea with aria-describedby, and any error sets aria-invalid.",
+        },
+        {
+            q: "Is it controlled or uncontrolled?",
+            a: "Either. Pass value and onChange to control it, or defaultValue to let it manage its own state. minRows sets the minimum height and maxHeight caps it before the code area scrolls.",
+        },
+    ]}
+/>

@@ -1,0 +1,55 @@
+---
+title: Hover card components
+section: base
+description: Free and open-source React hover card components built for modern applications and websites. These hover cards are built using React Aria and styled with Tailwind CSS.
+metaTitle: Free React hover card components | Proper UI
+metaDescription: Free and open-source React hover card components built for modern applications and websites. These hover card components are built using React Aria and styled with Tailwind CSS.
+install: hover-card
+source: packages/ui/src/components/base/hover-card
+demoFile: hover-card
+---
+
+<Preview id="hover-card-example" title="Hover card example" height={280} demo="hover-card:HoverCardExample" />
+
+## Installation
+
+<Install slug="hover-card" />
+
+## Hover card examples
+
+<Preview id="with-interactive-content" title="With interactive content" height={280} demo="hover-card:WithInteractiveContent" />
+
+<Preview id="placements" title="Placements" height={400} demo="hover-card:Placements" />
+
+<Preview id="custom-delays" title="Custom delays" height={280} demo="hover-card:CustomDelays" />
+
+## FAQs
+
+<FAQs
+    items={[
+        {
+            question: "How is HoverCard different from Tooltip?",
+            answer: 'Tooltip renders a plain-text description with role="tooltip" and is meant to be glanced at, never interacted with. HoverCard renders arbitrary rich content — an avatar, a bio, a button — in a Popover/Dialog surface, so the content can include real interactive elements like a Follow button.',
+        },
+        {
+            question: "How do I make a non-interactive trigger keyboard reachable?",
+            answer: "Wrap it in HoverCardTrigger, which renders a focusable, unstyled button. Skip it when the trigger is already interactive on its own, such as a Link or a Button, since wrapping it again would add a redundant tab stop.",
+        },
+        {
+            question: "Does the card open only on hover?",
+            answer: "No — focusing the trigger (e.g. by pressing Tab) opens the card immediately, with no delay, so keyboard users reach the same content mouse users do.",
+        },
+        {
+            question: "How do I control the open and close delays?",
+            answer: "Pass openDelay (default 400ms) and closeDelay (default 200ms), both in milliseconds. The close delay gives the pointer time to travel from the trigger into the card itself without it closing first.",
+        },
+        {
+            question: "How does it dismiss?",
+            answer: "Like every other overlay in the library, pressing Escape or clicking outside the card closes it, in addition to moving the pointer (or focus) away.",
+        },
+        {
+            question: "Can I control the open state myself?",
+            answer: "Yes — pass isOpen and onOpenChange to drive it externally instead of letting it manage its own state.",
+        },
+    ]}
+/>

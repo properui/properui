@@ -1,0 +1,51 @@
+---
+title: Gantt chart components
+section: application
+description: Free and open-source React Gantt chart components with grouped tasks, drag to move and resize, keyboard editing, dependency arrows and milestones. Built with React Aria and styled with Tailwind CSS.
+metaTitle: React Gantt chart components | Proper UI
+metaDescription: Accessible React Gantt chart with day, week and month zoom, drag and keyboard editing, dependency arrows, milestones and weekend shading. Built with React Aria and Tailwind CSS.
+install: gantt
+source: packages/ui/src/components/application/gantt
+demoFile: gantt
+---
+
+<Preview id="gantt-example" title="Gantt example" height={680} demo="gantt:GanttExample" />
+
+## Installation
+
+<Install slug="gantt" />
+
+## Gantt examples
+
+<Preview id="day-zoom" title="Day zoom" height={620} demo="gantt:DayZoom" />
+
+<Preview id="month-zoom-with-markers" title="Month zoom with markers" height={620} demo="gantt:MonthZoomWithMarkers" />
+
+<Preview id="read-only" title="Read-only" height={620} demo="gantt:ReadOnly" />
+
+## FAQs
+
+<FAQs
+    items={[
+        {
+            q: "How do the parts fit together?",
+            a: "Gantt.Provider takes the groups, the date range (CalendarDate values from @internationalized/date), the zoom level and the callbacks. Inside it, Gantt.Sidebar renders the grouped task list and Gantt.Timeline renders the date header and one Gantt.Feature bar per task. Pass a function as the Timeline's children to customise individual bars.",
+        },
+        {
+            q: "Does the chart move bars by itself?",
+            a: "No. It is controlled: onMove and onResize receive the feature id and the proposed startAt and endAt, and the bar moves when you update the groups you pass in. Drag previews are shown while the pointer is down, and the callback fires once on release.",
+        },
+        {
+            q: "How does it work with a keyboard?",
+            a: "The timeline is one tab stop. Up and Down arrows (and Home and End) move between bars. Left and Right arrows move the focused bar by one zoom unit (a day, a week or a month) and Shift plus Left or Right changes its end date. Every bar's accessible name includes its name, dates, progress and owner, and each change is announced through a live region.",
+        },
+        {
+            q: "How are the header and the rows kept in sync when scrolling?",
+            a: "The sidebar, the date header and the rows share a single scroll container. The header is sticky to the top and the sidebar is sticky to the inline start, so horizontal and vertical scrolling can never drift apart. Set maxHeight on the Provider to cap the height.",
+        },
+        {
+            q: "Which colours can a bar use, and does it work in dark mode and right-to-left?",
+            a: 'color accepts brand, blue, green, orange, pink, purple and gray, each mapped to the semantic utility tokens, so dark mode needs no extra classes. Positions use logical inset-inline-start, and pointer and arrow-key directions flip under dir="rtl".',
+        },
+    ]}
+/>

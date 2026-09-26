@@ -1,0 +1,54 @@
+---
+title: Kanban board components
+section: application
+description: Free and open-source React kanban board components with drag and drop between columns, keyboard moves and collapsible columns. Built with React Aria and styled with Tailwind CSS.
+metaTitle: Free React kanban board components | Proper UI
+metaDescription: Free and open-source React kanban board components with accessible drag and drop, keyboard reordering, collapsible columns and custom cards. Built with React Aria and styled with Tailwind CSS.
+install: kanban
+source: packages/ui/src/components/application/kanban
+demoFile: kanban
+---
+
+<Preview id="kanban-example" title="Kanban example" height={560} demo="kanban:KanbanExample" />
+
+## Installation
+
+<Install slug="kanban" />
+
+## Custom cards
+
+Pass `renderCard` to replace the default card content. The card shell, its drag handle and the drop indicators stay the same.
+
+<Preview id="kanban-custom-cards" title="Custom cards" height={460} demo="kanban:CustomCards" />
+
+## Collapsible columns
+
+Return your own `Kanban.Column` from the board's render function to add `isCollapsible`, `onAddCard` or an icon. The second argument of `onChange` describes the move.
+
+<Preview id="kanban-collapsible-columns" title="Collapsible columns" height={480} demo="kanban:CollapsibleColumns" />
+
+## Usage notes
+
+`Kanban.Board` is controlled by `columns` and `onChange`, or uncontrolled with `defaultColumns`. Each column is a React
+Aria `GridList` with drag and drop hooks, so cards can be dragged with a pointer, and moved with the keyboard: focus a
+card, press the right arrow to reach its drag handle, press Enter to pick it up, use the arrow keys to choose a slot and
+Tab to jump to another column, then press Enter to drop or Escape to cancel. Screen readers announce every step.
+
+## FAQs
+
+<FAQs
+    items={[
+        {
+            question: "Does the board need a drag and drop library?",
+            answer: "No. It uses the drag and drop hooks that ship with React Aria Components, which cover pointer, touch, keyboard and screen reader interaction.",
+        },
+        {
+            question: "How do I save the new order?",
+            answer: "onChange receives the full next columns array and a move event with the card ids, the source and target column ids and the new index. Store the array, or send the move event to your API.",
+        },
+        {
+            question: "Can I drag cards between two different boards?",
+            answer: "Cards carry a private drag type, so each board only accepts its own cards. Move cards between boards with onChange on both boards if you need that.",
+        },
+    ]}
+/>
