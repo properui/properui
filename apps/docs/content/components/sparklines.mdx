@@ -1,0 +1,74 @@
+---
+title: Sparkline components
+section: application
+description: Free and open-source React sparkline components for metric cards and table cells, built using Recharts and styled with Tailwind CSS.
+metaTitle: Free React sparkline components | Proper UI
+metaDescription: Free and open-source React sparkline components for metric cards and table cells. Built using React Aria v1.20 and styled with Tailwind CSS 4.3.
+install: sparklines
+source: packages/ui/src/components/application/charts
+demoFile: sparklines
+---
+
+<Preview id="sparkline-example" title="Sparkline example" height={120} demo="sparklines:SparklineExample" />
+
+## Installation
+
+<Install slug="sparklines" />
+
+## Sparkline examples
+
+<Preview id="line-sparkline" title="Line sparkline" height={120} demo="sparklines:LineSparkline" />
+
+<Preview id="area-sparkline" title="Area sparkline" height={120} demo="sparklines:AreaSparkline" />
+
+<Preview id="bar-sparkline" title="Bar sparkline" height={120} demo="sparklines:BarSparkline" />
+
+<Preview id="negative-trend-sparkline" title="Negative-trend sparkline" height={120} demo="sparklines:NegativeTrendSparkline" />
+
+<Preview id="sparkline-table-cells" title="Sparklines in table cells" height={376} demo="sparklines:SparklineTableCells" />
+
+<Preview id="sparkline-in-metric-cards" title="Sparklines in metric cards" height={216} demo="sparklines:SparklineInMetricCards" />
+
+## `Sparkline` props
+
+`Sparkline` is a standalone component (`sparkline.tsx`), separate from the chart demos above, meant to be
+dropped into a metric card's footer or a table cell rather than copied per use.
+
+| Prop       | Type                              | Default       | Description                                                                                                                 |
+| ---------- | --------------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `data`     | `number[] \| { value: number }[]` | —             | Points to plot, left to right. Plain numbers are wrapped into `{ value }` automatically.                                    |
+| `type`     | `"line" \| "area" \| "bar"`       | `"line"`      | Visual form of the chart.                                                                                                   |
+| `color`    | `string`                          | `"brand-600"` | A key into `theme.css`'s utility color scale, e.g. `"green-500"`, `"red-500"` — resolved to `var(--color-utility-<color>)`. |
+| `showLast` | `boolean`                         | `false`       | Marks the final point: a ringed dot for `line`/`area`, full opacity for `bar` (the rest are dimmed).                        |
+| `height`   | `number`                          | `32`          | Pixel height of the chart. Width fills its container.                                                                       |
+
+## Chart colours
+
+Every chart in this section colors its series from the same ordered token list, `chartColorTokens` /
+`chartColors`, exported from `charts-base`:
+
+```tsx
+import { chartColorTokens, chartColors, sequentialScale } from "@properui/ui/components/application/charts/charts-base";
+```
+
+- **`chartColorTokens`** is the ordered list of utility color keys to assign to an unknown number of
+  categorical series by index — `chartColorTokens[i % chartColorTokens.length]` — starting with
+  `brand-600` for the primary series, then alternating cool and warm hues so adjacent series never
+  sit close on the color wheel. `red-*`, `slate-*` and `neutral-*` are deliberately left out: red is
+  reserved for negative values and errors elsewhere in the library, and slate/neutral read as muted
+  or disabled. `Sparkline`'s own `color` prop takes a bare key from this same scale, e.g.
+  `chartColorTokens[0]`, or an explicit `"green-500"`/`"red-500"` for a metric whose direction of
+  change carries meaning.
+- **`chartColors`** is the same list already resolved to CSS variables (`"var(--color-utility-brand-600)"`,
+  …), for a chart that assigns color in a loop instead of one hand-picked `className` per series.
+- **`sequentialScale(tokenPrefix)`** builds a light-to-dark scale from one utility color family, for
+  a series that is ordered or quantitative rather than categorical.
+
+A raw palette class (`bg-purple-600`) or an arbitrary value (`fill-[#7f56d9]`) is never correct here,
+even inside a chart: reach for a token, either as a Tailwind utility (`text-utility-brand-600`, paired
+with `stroke="currentColor"`/`fill="currentColor"`) or as the CSS variable from `chartColors` above.
+
+Charts never use a `dark:` utility. A `.dark-mode` class on an ancestor repoints every
+`--color-utility-*` variable these charts read from, in both the `className`+`currentColor` pattern
+and the `chartColors` CSS-variable values — a chart built from these tokens is already correct in
+both themes.

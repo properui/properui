@@ -1,10 +1,65 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import type { TooltipProps } from "recharts";
 import type { Props as LegendContentProps } from "recharts/types/component/DefaultLegendContent";
 import type { NameType, ValueType } from "recharts/types/component/DefaultTooltipContent";
 import type { Props as DotProps } from "recharts/types/shape/Dot";
 import { cx } from "../../../utils/cx";
+
+/**
+ * Ordered semantic color tokens (bare keys into `theme.css`'s utility color scale, e.g.
+ * `"brand-600"` resolves to `--color-utility-brand-600`) for coloring an unknown number of
+ * categorical chart series. Assign colors by index — `chartColorTokens[i % chartColorTokens.length]`
+ * — rather than hand-picking one token per series.
+ *
+ * The order is deliberate:
+ * 1. `brand-600` leads: a chart's first, "primary" series should read as the product's own color.
+ * 2. The rest alternate a cool hue with a warm one (blue, purple, orange, green, pink, indigo,
+ *    amber, sky, fuchsia), so two adjacent series never sit close on the color wheel.
+ * 3. `red-*` is deliberately left out of this order. Red is reserved for negative values, errors
+ *    and destructive actions elsewhere in the library (`text-fg-error-secondary`, `border-error`,
+ *    …), so a chart that truly needs a danger-coded series should reach for it explicitly instead
+ *    of it being whatever color a loop happens to land on.
+ * 4. `slate`/`neutral` are left out too. They read as muted or disabled (the same
+ *    `text-utility-neutral-*` tokens color gridlines and axes throughout this folder), so pull one
+ *    in only for an explicit "other"/"unknown" bucket, never as one of the numbered series.
+ */
+export const chartColorTokens = [
+    "brand-600",
+    "blue-500",
+    "purple-500",
+    "orange-500",
+    "green-500",
+    "pink-500",
+    "indigo-500",
+    "amber-500",
+    "sky-500",
+    "fuchsia-500",
+] as const;
+
+/**
+ * `chartColorTokens`, each resolved to its CSS variable reference (e.g.
+ * `"var(--color-utility-brand-600)"`). Use these directly as a `fill`/`stroke` SVG attribute or an
+ * inline `style.color`, for charts that assign color programmatically — a variable number of
+ * scatter categories, funnel stages, a small-multiples grid — rather than one `<Area>`/`<Bar>` per
+ * series with a fixed, hand-picked `className`. Reading the variable at paint time is what re-tints
+ * the color under `.dark-mode`, the same as any `bg-*`/`text-*` utility class does.
+ */
+export const chartColors: string[] = chartColorTokens.map((token) => `var(--color-utility-${token})`);
+
+/**
+ * Builds a single-hue, light-to-dark color scale from one of `theme.css`'s utility color
+ * families, for a series that is ordered or quantitative rather than categorical — small
+ * multiples of the same metric, a funnel's stages.
+ * @param tokenPrefix - The utility color family, e.g. `"blue"`, `"brand"`.
+ * @param shades - Which shade steps to include, lightest to darkest. Defaults to the six shades
+ * every utility family has (`brand` and `neutral` go further in `theme.css`; pass a longer list to
+ * reach those).
+ * @returns CSS variable references, e.g. `["var(--color-utility-blue-200)", …]`.
+ */
+export const sequentialScale = (tokenPrefix: string, shades: number[] = [200, 300, 400, 500, 600, 700]): string[] =>
+    shades.map((shade) => `var(--color-utility-${tokenPrefix}-${shade})`);
 
 /**
  * Selects evenly spaced items from an array. Used for rendering
@@ -58,17 +113,24 @@ export const ChartLegendContent = ({ reversed, payload, align, layout, className
                 className,
             )}
         >
-            {payload?.map((entry, index) => (
-                <li className="text-tertiary flex items-center gap-2 text-sm" key={index}>
-                    <span
-                        className={cx(
-                            "block size-2 rounded-full bg-current ring-[0.5px] ring-black/10 ring-inset",
-                            (entry.payload as { className?: string })?.className,
-                        )}
-                    />
-                    {entry.value}
-                </li>
-            ))}
+            {payload?.map((entry, index) => {
+                // A series colored through `chartColorTokens`/`chartColors` (an unknown number of
+                // categorical entries) carries its swatch color as an inline style rather than a
+                // fixed `className`; a series colored with a hand-picked `text-utility-*` class
+                // carries `className` instead. Either is read here so both patterns render a
+                // correctly tinted swatch.
+                const swatchPayload = entry.payload as { className?: string; style?: CSSProperties } | undefined;
+
+                return (
+                    <li className="text-tertiary flex items-center gap-2 text-sm" key={index}>
+                        <span
+                            className={cx("block size-2 rounded-full bg-current ring-[0.5px] ring-black/10 ring-inset", swatchPayload?.className)}
+                            style={swatchPayload?.style?.color ? { color: swatchPayload.style.color } : undefined}
+                        />
+                        {entry.value}
+                    </li>
+                );
+            })}
         </ul>
     );
 };

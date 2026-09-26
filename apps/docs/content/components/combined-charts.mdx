@@ -1,0 +1,62 @@
+---
+title: Combined chart components
+section: application
+description: Free and open-source React combined chart components — bar + line combos, dual y-axes, waterfalls and funnels — built for modern applications and websites using Recharts and Tailwind CSS.
+metaTitle: Free React combined chart components | Proper UI
+metaDescription: Free and open-source React combined chart components built for modern applications and websites. These chart components are built using React Aria v1.20 and styled with Tailwind CSS 4.3.
+install: combined-charts
+source: packages/ui/src/components/application/charts
+demoFile: combined-charts
+---
+
+<Preview id="combined-chart-example" title="Combined chart example" height={456} demo="combined-charts:CombinedChartExample" />
+
+## Installation
+
+<Install slug="combined-charts" />
+
+## Chart examples
+
+<Preview id="bar-line-composed" title="Bar + line composed" height={456} demo="combined-charts:BarLineComposed" />
+
+<Preview id="dual-axis-chart" title="Dual y-axes" height={456} demo="combined-charts:DualAxisChart" />
+
+<Preview id="bar-with-target-line" title="Bar with target line" height={456} demo="combined-charts:BarWithTargetLine" />
+
+<Preview id="waterfall-chart" title="Waterfall chart" height={456} demo="combined-charts:WaterfallChart" />
+
+<Preview id="funnel-chart" title="Funnel chart" height={496} demo="combined-charts:FunnelChartExample" />
+
+The waterfall chart has no dedicated Recharts component: each step is two stacked bars, an invisible
+`base` floating a colored `total` at the right height, built by `buildWaterfallData` in the demo file.
+
+## Chart colours
+
+Every chart in this section colors its series from the same ordered token list, `chartColorTokens` /
+`chartColors`, exported from `charts-base`:
+
+```tsx
+import { chartColorTokens, chartColors, sequentialScale } from "@properui/ui/components/application/charts/charts-base";
+```
+
+- **`chartColorTokens`** is the ordered list of utility color keys to assign to an unknown number of
+  categorical series by index — `chartColorTokens[i % chartColorTokens.length]` — starting with
+  `brand-600` for the primary series, then alternating cool and warm hues so adjacent series never
+  sit close on the color wheel. `red-*`, `slate-*` and `neutral-*` are deliberately left out: red is
+  reserved for negative values and errors elsewhere in the library, and slate/neutral read as muted
+  or disabled — the waterfall chart above reaches for `var(--color-utility-red-500)` explicitly for
+  its decreasing steps for exactly that reason.
+- **`chartColors`** is the same list already resolved to CSS variables (`"var(--color-utility-brand-600)"`,
+  …), for a chart that assigns color in a loop instead of one hand-picked `className` per series — the
+  funnel's per-stage colors and the target-line bar's per-bar `Cell`s both read from it this way.
+- **`sequentialScale(tokenPrefix)`** builds a light-to-dark scale from one utility color family, for
+  a series that is ordered or quantitative rather than categorical.
+
+A raw palette class (`bg-purple-600`) or an arbitrary value (`fill-[#7f56d9]`) is never correct here,
+even inside a chart: reach for a token, either as a Tailwind utility (`text-utility-brand-600`, paired
+with `stroke="currentColor"`/`fill="currentColor"`) or as the CSS variable from `chartColors` above.
+
+Charts never use a `dark:` utility. A `.dark-mode` class on an ancestor repoints every
+`--color-utility-*` variable these charts read from, in both the `className`+`currentColor` pattern
+and the `chartColors` CSS-variable values — a chart built from these tokens is already correct in
+both themes.

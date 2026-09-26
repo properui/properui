@@ -162,6 +162,32 @@ export type {
     ActivityFeedSlotProps,
     ActivityFeedType,
 } from "./components/application/activity-feed/activity-feed";
+export { AIBranch } from "./components/application/ai-elements/ai-branch";
+export type { AIBranchProps } from "./components/application/ai-elements/ai-branch";
+export { AIConversation } from "./components/application/ai-elements/ai-conversation";
+export type { AIConversationContentProps, AIConversationProps, AIConversationScrollButtonProps } from "./components/application/ai-elements/ai-conversation";
+export { AIMessage, AIStreamingCaret } from "./components/application/ai-elements/ai-message";
+export type {
+    AIMessageActionProps,
+    AIMessageActionsProps,
+    AIMessageProps,
+    AIMessageRole,
+    AIStreamingCaretProps,
+} from "./components/application/ai-elements/ai-message";
+export { AIModelSelector } from "./components/application/ai-elements/ai-model-selector";
+export type { AIModel, AIModelBadge, AIModelSelectorProps } from "./components/application/ai-elements/ai-model-selector";
+export { AIPromptInput } from "./components/application/ai-elements/ai-prompt-input";
+export type { AIAttachment, AIPromptInputProps, AIPromptInputStatus, AIPromptSubmission } from "./components/application/ai-elements/ai-prompt-input";
+export { AIReasoning } from "./components/application/ai-elements/ai-reasoning";
+export type { AIReasoningProps } from "./components/application/ai-elements/ai-reasoning";
+export { AIResponse } from "./components/application/ai-elements/ai-response";
+export type { AIResponseProps } from "./components/application/ai-elements/ai-response";
+export { AISources } from "./components/application/ai-elements/ai-sources";
+export type { AISourcesContentProps, AISourcesProps, AISourcesSourceProps, AISourcesTriggerProps } from "./components/application/ai-elements/ai-sources";
+export { AISuggestions } from "./components/application/ai-elements/ai-suggestions";
+export type { AISuggestionsItemProps, AISuggestionsProps } from "./components/application/ai-elements/ai-suggestions";
+export { AIToolCall } from "./components/application/ai-elements/ai-tool-call";
+export type { AIToolCallProps, AIToolCallStatus } from "./components/application/ai-elements/ai-tool-call";
 export { Alert } from "./components/application/alerts/alerts";
 export type { AlertProps } from "./components/application/alerts/alerts";
 export {
@@ -211,6 +237,8 @@ export { CardHeader } from "./components/application/card-headers/card-headers";
 export type { CardHeaderProps } from "./components/application/card-headers/card-headers";
 export { Carousel, CarouselContext } from "./components/application/carousel/carousel-base";
 export { ChartActiveDot, ChartLegendContent, ChartTooltipContent } from "./components/application/charts/charts-base";
+export { Sparkline } from "./components/application/charts/sparkline";
+export type { SparklineDatum, SparklineProps, SparklineType } from "./components/application/charts/sparkline";
 export { CodeEditor } from "./components/application/code-editor/code-editor";
 export type { CodeEditorDiagnostic, CodeEditorDiagnosticSeverity, CodeEditorProps } from "./components/application/code-editor/code-editor";
 export { CodeSnippet, CodeSnippetTabs } from "./components/application/code-snippet/code-snippet";
@@ -247,6 +275,46 @@ export { ConfirmDialog } from "./components/application/confirm-dialog/confirm-d
 export type { ConfirmDialogProps } from "./components/application/confirm-dialog/confirm-dialog";
 export { ContentDivider } from "./components/application/content-divider/content-divider";
 export type { ContentDividerProps } from "./components/application/content-divider/content-divider";
+export { DataTableColumnMenu } from "./components/application/data-table/data-table-column-menu";
+export type { DataTableColumnMenuProps } from "./components/application/data-table/data-table-column-menu";
+export {
+    DataTableDensityToggle,
+    DataTableFacetedFilter,
+    DataTableFilterField,
+    DataTableToolbar,
+    DataTableViewOptions,
+} from "./components/application/data-table/data-table-toolbar";
+export type {
+    DataTableDensityToggleProps,
+    DataTableFacetedFilterProps,
+    DataTableFilterFieldProps,
+    DataTableToolbarProps,
+    DataTableViewOptionsProps,
+} from "./components/application/data-table/data-table-toolbar";
+export { DataTable } from "./components/application/data-table/data-table";
+export type { DataTableBulkActionsContext, DataTableProps } from "./components/application/data-table/data-table";
+export type {
+    DataTableCellContext,
+    DataTableColumn,
+    DataTableColumnFilters,
+    DataTableColumnPinning,
+    DataTableDateRange,
+    DataTableDensity,
+    DataTableFacet,
+    DataTableFilter,
+    DataTableFilterOption,
+    DataTableFilterValue,
+    DataTableInstance,
+    DataTableNumberRange,
+    DataTablePagination,
+    DataTableQuery,
+    DataTableRow,
+    DataTableSort,
+    DataTableSortDirection,
+    DataTableState,
+    DataTableVisibleColumn,
+    UseDataTableOptions,
+} from "./components/application/data-table/use-data-table";
 export { CalendarAppHeader, EventChip, EventDetailPanel, HOURS, TODAY, WeekStripNav } from "./components/application/date-picker/calendar-app-shared";
 export type { CalendarAppEvent, EventColor } from "./components/application/date-picker/calendar-app-shared";
 export { Calendar, CalendarContextProvider } from "./components/application/date-picker/calendar";
