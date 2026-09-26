@@ -19,14 +19,19 @@ import {
     aliasBaseDir,
     collectSnapshot,
     configPath,
+    configPlatform,
     detectPackageManager,
+    entryPlatforms,
     entryVersion,
     installCommand,
     installSpec,
+    isHtmlEntry,
+    matchesPlatform,
     missingDependencies,
     nearestNames,
     prepareFile,
     readConfig,
+    resolveForPlatform,
     scanForViolations,
     scoreEntry,
     writeConfig,
@@ -47,6 +52,8 @@ export interface ComponentSummary {
     type: string;
     title: string;
     description: string;
+    /** Where it runs: `["react","next"]` for TSX entries, `["html","vue","angular","svelte","astro","vanilla"]` for html entries. */
+    platforms: string[];
 }
 
 const summarize = (entry: RegistryIndexEntry): ComponentSummary => ({
@@ -55,6 +62,7 @@ const summarize = (entry: RegistryIndexEntry): ComponentSummary => ({
     type: entry.type,
     title: entry.title,
     description: entry.description,
+    platforms: entryPlatforms(entry),
 });
 
 /** Did-you-mean hint for a name that is not in the index. */
@@ -73,6 +81,8 @@ function unknownName(name: string, index: RegistryIndexEntry[]): ToolError {
 export interface ListInput {
     layer?: string;
     type?: string;
+    /** Only entries that run on this platform: react, next, html, vue, angular, svelte, astro, vanilla. */
+    platform?: string;
     limit?: number;
     offset?: number;
     cwd?: string;
@@ -83,6 +93,7 @@ export async function listComponents(ctx: ServerContext, input: ListInput) {
     let entries = await registry.index();
     if (input.layer) entries = entries.filter((entry) => entry.layer === input.layer);
     if (input.type) entries = entries.filter((entry) => entry.type === input.type);
+    if (input.platform) entries = entries.filter((entry) => matchesPlatform(entry, input.platform));
     // A 0-file entry is a docs-only stub: there is nothing add_component could install for it.
     entries = entries.filter((entry) => entry.fileCount > 0);
 
@@ -105,6 +116,8 @@ export interface SearchInput {
     query: string;
     limit?: number;
     type?: string;
+    /** Only entries that run on this platform: react, next, html, vue, angular, svelte, astro, vanilla. */
+    platform?: string;
     cwd?: string;
 }
 
@@ -115,7 +128,7 @@ export async function searchComponents(ctx: ServerContext, input: SearchInput) {
     const limit = Math.max(1, input.limit ?? 10);
 
     const matches = index
-        .filter((entry) => entry.fileCount > 0 && (!input.type || entry.type === input.type))
+        .filter((entry) => entry.fileCount > 0 && (!input.type || entry.type === input.type) && matchesPlatform(entry, input.platform))
         .map((entry) => scoreEntry(entry, input.query, exportsIndex?.[entry.name]))
         .filter((match) => match.score >= SEARCH_THRESHOLD)
         .sort((a, b) => b.score - a.score || a.entry.name.localeCompare(b.entry.name))
@@ -159,6 +172,7 @@ export async function getComponent(ctx: ServerContext, input: GetInput) {
         files,
         ...(omitted > 0 ? { omittedDemoFiles: omitted } : {}),
         docsUrl: entry.docs ? `${ctx.siteUrl(registry)}${entry.docs}` : null,
+        platforms: entryPlatforms(entry),
         install: `npx @properui/cli@latest add ${entry.type === "example" ? `example ${entry.name}` : entry.name}`,
     };
 }
@@ -263,7 +277,8 @@ function filesForEntry(entry: RegistryEntry, withDemos: boolean): RegistryFile[]
 
 /**
  * `properui add`, minus the terminal: same resolution (`registryDependencies`, optional ones by
- * default), same target paths and `@/` rewriting, same skip-unless-overwrite rule, same
+ * default, and on an html-platform project `<name>` -> `<name>-html` with React-only entries
+ * refused), same target paths and `@/` rewriting, same skip-unless-overwrite rule, same
  * `installed` manifest in components.json. Returns what happened instead of printing it.
  */
 export async function addComponents(ctx: ServerContext, input: AddInput) {
@@ -281,12 +296,21 @@ export async function addComponents(ctx: ServerContext, input: AddInput) {
 
     const registry = ctx.registry(cwd);
     const index = await registry.index();
-    const known = new Set(index.map((entry) => entry.name));
-    const unknown = requested.filter((name) => !known.has(name));
-    if (unknown.length > 0) throw new ToolError(unknown.map((name) => unknownName(name, index).message).join("\n"));
+    const platform = configPlatform(config);
+    const targets: string[] = [];
+    const problems: string[] = [];
+    const resolvedFrom: Record<string, string> = {};
+    for (const name of requested) {
+        const resolution = resolveForPlatform(name, index, platform);
+        if (resolution.ok) {
+            targets.push(resolution.name);
+            if (resolution.resolvedFrom) resolvedFrom[resolution.resolvedFrom] = resolution.name;
+        } else problems.push(resolution.reason === "unknown" ? unknownName(name, index).message : resolution.message);
+    }
+    if (problems.length > 0) throw new ToolError(problems.join("\n"));
 
     const withDemos = Boolean(input.withDemos);
-    const { entries, optional } = await registry.resolveTree(requested, input.optional !== false);
+    const { entries, optional } = await registry.resolveTree(targets, input.optional !== false);
 
     const resolveOptions = { cwd, aliasBase: aliasBaseDir(cwd, config), pathOverride: input.path };
     const writeOptions = { cwd, overwrite: Boolean(input.overwrite), dryRun: Boolean(input.dryRun) };
@@ -356,10 +380,13 @@ export async function addComponents(ctx: ServerContext, input: AddInput) {
         cwd,
         registry: registry.describe(),
         config: path.relative(cwd, configPath(cwd)) || "components.json",
+        platform,
+        ...(Object.keys(resolvedFrom).length > 0 ? { resolvedFrom } : {}),
         dryRun: Boolean(input.dryRun),
         summary,
         entries: results.map(({ entry, writes }) => ({
             name: entry.name,
+            ...(isHtmlEntry(entry) ? { html: true } : {}),
             optional: optional.has(entry.name),
             files: writes.map((write) => ({ path: toPosix(write.file), status: write.status })),
         })),

@@ -1,14 +1,17 @@
 /**
- * `properui list [--layer base]` — available components with layer and description.
+ * `properui list [--layer base] [--platform html]` — available components with layer and description.
  */
 import path from "node:path";
 import { readConfig } from "../config.js";
+import { PLATFORM_FILTERS, isPlatformFilter, matchesPlatform } from "../platform.js";
 import { Registry, RegistryError, type RegistryIndexEntry, resolveRegistrySource } from "../registry.js";
 import { kleur, log } from "../ui.js";
 
 export interface ListOptions {
     layer?: string;
     type?: string;
+    /** `--platform`: only entries that run on this platform (react, next, html, vue, angular, svelte, astro, vanilla). */
+    platform?: string;
     json?: boolean;
     registry?: string;
     cwd?: string;
@@ -21,6 +24,12 @@ export async function runList(options: ListOptions): Promise<void> {
     const cwd = path.resolve(options.cwd ?? process.cwd());
     const registry = new Registry(resolveRegistrySource(options.registry, readConfig(cwd)?.registry));
 
+    if (options.platform && !isPlatformFilter(options.platform)) {
+        log.error(`Unknown --platform "${options.platform}". Use one of: ${PLATFORM_FILTERS.join(", ")}.`);
+        process.exitCode = 1;
+        return;
+    }
+
     let entries: RegistryIndexEntry[];
     try {
         entries = await registry.index();
@@ -32,6 +41,7 @@ export async function runList(options: ListOptions): Promise<void> {
 
     if (options.layer) entries = entries.filter((entry) => entry.layer === options.layer);
     if (options.type) entries = entries.filter((entry) => entry.type === options.type);
+    if (options.platform) entries = entries.filter((entry) => matchesPlatform(entry, options.platform));
     // A 0-file entry (a docs-only stub like `typography`) has nothing `add` could install.
     entries = entries.filter((entry) => entry.fileCount > 0);
 

@@ -53,6 +53,7 @@ npx @properui/cli@latest init
 | `--no-providers`       | Skip copying and wiring `ThemeProvider` (and, on Next App Router, `RouterProvider`) entirely.                  |
 | `--no-tooling-ignores` | Skip adding the ESLint/Prettier ignore entries for vendored component directories.                             |
 | `--overwrite`          | Replace `components.json` and any files that already exist.                                                    |
+| `--platform <p>`       | `react` or `html`: override the detected platform (see [Non-React projects](#non-react-projects)).             |
 | `--registry <source>`  | Registry directory or base URL for this run (see below).                                                       |
 | `-y, --yes`            | Accept every default; never prompt.                                                                            |
 | `--cwd <path>`         | Run against a directory other than the current one.                                                            |
@@ -217,11 +218,12 @@ npx @properui/cli@latest list --json
 
 ### Command options
 
-| Option        | Description                                                                                                                                                 |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `--layer <l>` | Filter by layer, e.g. `base`, `application`, `marketing`, `app-examples`, `marketing-examples`, `foundations`, `shared-assets`, `hooks`, `utils`, `styles`. |
-| `--type <t>`  | Filter by type: `component`, `example`, `util`, `hook`, `style`.                                                                                            |
-| `--json`      | Print the raw index rows, for scripting.                                                                                                                    |
+| Option           | Description                                                                                                                                                         |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--layer <l>`    | Filter by layer, e.g. `base`, `application`, `marketing`, `app-examples`, `marketing-examples`, `foundations`, `shared-assets`, `hooks`, `utils`, `styles`, `html`. |
+| `--type <t>`     | Filter by type: `component`, `example`, `util`, `hook`, `style`, `html`.                                                                                            |
+| `--platform <p>` | Only entries that run on `react`, `next`, `html`, `vue`, `angular`, `svelte`, `astro` or `vanilla`.                                                                 |
+| `--json`         | Print the raw index rows, for scripting.                                                                                                                            |
 
 ## Search command
 
@@ -232,14 +234,15 @@ npx @properui/cli@latest search "pricing"
 npx @properui/cli@latest search "empty state" --limit 5
 ```
 
-Each line of output shows the matched name, its layer, its title, and how many docs pages have a worked example using it, sorted by score. The match runs over export names as well as entry names and titles, so searching for a named export (`ComboBox`, say) finds the entry it lives in even when the entry itself is named something else. When nothing scores, it prints `No match` plainly rather than a low-confidence guess; treat that as a reason to check the registry index directly, not as proof the component doesn't exist (see the [AI agents guide](/docs/agents)).
+Each line of output shows the matched name, its platform (`react` or `html`), its layer, its title, and how many docs pages have a worked example using it, sorted by score. The match runs over export names as well as entry names and titles, so searching for a named export (`ComboBox`, say) finds the entry it lives in even when the entry itself is named something else. When nothing scores, it prints `No match` plainly rather than a low-confidence guess; treat that as a reason to check the registry index directly, not as proof the component doesn't exist (see the [AI agents guide](/docs/agents)).
 
 ### Command options
 
-| Option                | Description                                              |
-| --------------------- | -------------------------------------------------------- |
-| `--limit <n>`         | Maximum results (default `20`).                          |
-| `--registry <source>` | Registry directory or base URL for this run (see below). |
+| Option                | Description                                                 |
+| --------------------- | ----------------------------------------------------------- |
+| `--limit <n>`         | Maximum results (default `20`).                             |
+| `--platform <p>`      | Only entries for this platform (`react`, `html`, `vue`, …). |
+| `--registry <source>` | Registry directory or base URL for this run (see below).    |
 
 ## Diff command
 
@@ -292,6 +295,29 @@ Run with no `--token` in an interactive terminal and it prompts you to paste one
 | `--token <t>`         | Use this token instead of prompting for one.               |
 | `--registry <source>` | Registry directory or base URL to store the token against. |
 | `-y, --yes`           | Never prompt: fails with an error if no token is given.    |
+
+## Non-React projects
+
+The TSX components are the primary, fullest layer. For Vue, Nuxt, Angular, Svelte, SvelteKit, Astro and plain HTML, the registry also carries a curated set of **html entries**: `@properui/html` snippets named `<component>-html` (`buttons-html`, `modal-html`, ...), `type: "html"`, `layer: "html"`, with `platforms: ["html", "vue", "angular", "svelte", "astro", "vanilla"]`. The [frameworks page](/docs/frameworks) lists which components exist there.
+
+`init` detects the platform from `package.json` and config files (`nuxt.config.*`, `angular.json`, `svelte.config.js`, `astro.config.*`, a `vite.config.*` using `@vitejs/plugin-vue` or `@sveltejs/vite-plugin-svelte`). No `package.json`, or no known framework, means plain HTML. On the html platform it writes `"platform": "html"` into `components.json`, skips `utils/cx.ts`, the providers and the TSX `@source` line, and either wires `@import "@properui/tokens/theme.css"; @import "@properui/html/css";` plus an `@source` for the snippets into a Tailwind v4 stylesheet or, with no such stylesheet, prints the no-build lines:
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@properui/tokens/dist/properui.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/@properui/html/dist/properui-html.iife.js" data-auto-init defer></script>
+```
+
+The last line it prints is the install: `npm i @properui/tokens @properui/html @properui/elements`. Pass `--platform react` or `--platform html` to override detection.
+
+On an html project, `add buttons` installs `buttons-html`: the `.html` snippets land in `<components alias>/buttons/` and are recorded in `components.json` like any other entry. A React-only entry fails with one line that names the HTML alternative when there is one:
+
+```bash
+npx @properui/cli@latest add data-table
+# error "data-table" is React-only and this project's components.json platform is "html".
+#       Use the HTML equivalent instead: properui add table (installs table-html).
+```
+
+`info --json` reports `platform`, `framework` and `installedHtml`, which is what an agent should read before deciding between TSX and HTML.
 
 ## Pointing at another registry
 

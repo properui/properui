@@ -1,194 +1,316 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "$id": "https://properui.dev/schema.json",
-    "title": "Proper UI registry entry",
-    "description": "One component, example, util, hook or stylesheet as served from /r/<name>.json.",
-    "type": "object",
-    "required": [
-        "name",
-        "layer",
-        "type",
-        "title",
-        "files",
-        "registryDependencies",
-        "optionalRegistryDependencies",
-        "dependencies",
-        "cssVars",
-        "examples",
-        "changelog"
+    "title": "Proper UI schema",
+    "description": "A Proper UI registry entry (/r/<name>.json) or a project's components.json.",
+    "anyOf": [
+        {
+            "$ref": "#/definitions/registryEntry"
+        },
+        {
+            "$ref": "#/definitions/componentsJson"
+        }
     ],
-    "additionalProperties": false,
-    "properties": {
-        "name": {
-            "type": "string",
-            "pattern": "^[a-z0-9][a-z0-9-]*$"
-        },
-        "layer": {
-            "type": "string",
-            "enum": [
-                "base",
-                "application",
-                "marketing",
-                "app-examples",
-                "marketing-examples",
-                "foundations",
-                "shared-assets",
-                "utils",
-                "hooks",
-                "styles"
-            ]
-        },
-        "type": {
-            "type": "string",
-            "enum": [
-                "component",
-                "example",
-                "util",
-                "hook",
-                "style"
-            ]
-        },
-        "title": {
-            "type": "string"
-        },
-        "description": {
-            "type": "string"
-        },
-        "docs": {
-            "type": "string"
-        },
-        "files": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "required": [
-                    "path",
-                    "target",
-                    "type",
-                    "content",
-                    "dependencies"
-                ],
-                "additionalProperties": false,
-                "properties": {
-                    "path": {
-                        "type": "string"
-                    },
-                    "target": {
-                        "type": "string"
-                    },
-                    "type": {
-                        "type": "string",
-                        "enum": [
-                            "component",
-                            "util",
-                            "hook",
-                            "style"
-                        ]
-                    },
-                    "content": {
-                        "type": "string"
-                    },
-                    "dependencies": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
+    "definitions": {
+        "registryEntry": {
+            "title": "Proper UI registry entry",
+            "description": "One component, example, util, hook or stylesheet as served from /r/<name>.json.",
+            "type": "object",
+            "required": [
+                "name",
+                "layer",
+                "type",
+                "title",
+                "files",
+                "registryDependencies",
+                "optionalRegistryDependencies",
+                "dependencies",
+                "cssVars",
+                "examples",
+                "platforms",
+                "changelog"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9][a-z0-9-]*$"
+                },
+                "layer": {
+                    "type": "string",
+                    "enum": [
+                        "base",
+                        "application",
+                        "marketing",
+                        "app-examples",
+                        "marketing-examples",
+                        "foundations",
+                        "shared-assets",
+                        "utils",
+                        "hooks",
+                        "styles",
+                        "html"
+                    ]
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "component",
+                        "example",
+                        "util",
+                        "hook",
+                        "style",
+                        "html"
+                    ]
+                },
+                "title": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "docs": {
+                    "type": "string"
+                },
+                "files": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "path",
+                            "target",
+                            "type",
+                            "content",
+                            "dependencies"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                            "path": {
+                                "type": "string"
+                            },
+                            "target": {
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "component",
+                                    "util",
+                                    "hook",
+                                    "style",
+                                    "html"
+                                ]
+                            },
+                            "content": {
+                                "type": "string"
+                            },
+                            "dependencies": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "kind": {
+                                "type": "string",
+                                "enum": [
+                                    "demo"
+                                ]
+                            }
                         }
-                    },
-                    "kind": {
+                    }
+                },
+                "registryDependencies": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "optionalRegistryDependencies": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "dependencies": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "cssVars": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "examples": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "platforms": {
+                    "type": "array",
+                    "items": {
                         "type": "string",
                         "enum": [
-                            "demo"
+                            "react",
+                            "next",
+                            "html",
+                            "vue",
+                            "angular",
+                            "svelte",
+                            "astro",
+                            "vanilla"
                         ]
+                    }
+                },
+                "intent": {
+                    "type": "string"
+                },
+                "avoid_when": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "composes_with": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "a11y_contract": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "responsive_contract": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "token_contract": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "requires_data": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "changelog": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "version",
+                            "changes"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                            "version": {
+                                "type": "string"
+                            },
+                            "changes": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            }
+                        }
                     }
                 }
             }
         },
-        "registryDependencies": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
-        },
-        "optionalRegistryDependencies": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
-        },
-        "dependencies": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
-        },
-        "cssVars": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
-        },
-        "examples": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
-        },
-        "intent": {
-            "type": "string"
-        },
-        "avoid_when": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
-        },
-        "composes_with": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
-        },
-        "a11y_contract": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
-        },
-        "responsive_contract": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
-        },
-        "token_contract": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
-        },
-        "requires_data": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
-        },
-        "changelog": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "required": [
-                    "version",
-                    "changes"
-                ],
-                "additionalProperties": false,
-                "properties": {
-                    "version": {
-                        "type": "string"
-                    },
-                    "changes": {
-                        "type": "array",
-                        "items": {
+        "componentsJson": {
+            "type": "object",
+            "required": [
+                "tailwind",
+                "aliases"
+            ],
+            "properties": {
+                "$schema": {
+                    "type": "string"
+                },
+                "style": {
+                    "type": "string"
+                },
+                "platform": {
+                    "type": "string",
+                    "enum": [
+                        "react",
+                        "html"
+                    ],
+                    "default": "react",
+                    "description": "Which registry layer `properui add` installs from: react (TSX components) or html (@properui/html snippets, for Vue, Angular, Svelte, Astro and plain HTML). Absent means react."
+                },
+                "tsx": {
+                    "type": "boolean"
+                },
+                "tailwind": {
+                    "type": "object",
+                    "properties": {
+                        "css": {
+                            "type": "string",
+                            "description": "Global stylesheet, relative to the project root."
+                        },
+                        "theme": {
+                            "type": "string",
+                            "description": "Theme token file (react) or the @properui/tokens import (html)."
+                        },
+                        "prefix": {
                             "type": "string"
+                        }
+                    }
+                },
+                "aliases": {
+                    "type": "object",
+                    "required": [
+                        "components"
+                    ],
+                    "properties": {
+                        "components": {
+                            "type": "string"
+                        },
+                        "utils": {
+                            "type": "string"
+                        },
+                        "ui": {
+                            "type": "string"
+                        },
+                        "hooks": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "registry": {
+                    "type": "string",
+                    "description": "Registry base URL or local directory."
+                },
+                "installed": {
+                    "type": "object",
+                    "description": "Entries `properui add` has written, keyed by registry name.",
+                    "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                            "version": {
+                                "type": "string"
+                            },
+                            "files": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "installedAt": {
+                                "type": "string"
+                            }
                         }
                     }
                 }

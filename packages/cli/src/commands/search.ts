@@ -6,10 +6,13 @@
  * A real score threshold means most typos and unrelated queries get an honest "no match"
  * instead of a list of loosely-related noise, and entries with 0 files (docs-only stubs like
  * `typography`) are never shown — there is nothing `add` could install for them.
+ *
+ * Every row shows its platform (`react` or `html`); `--platform` narrows the search to one.
  */
 import path from "node:path";
 import { readConfig } from "../config.js";
 import { fuzzyScore } from "../fuzzy.js";
+import { PLATFORM_FILTERS, entryPlatform, isPlatformFilter, matchesPlatform } from "../platform.js";
 import { type ExportsIndex, Registry, RegistryError, type RegistryFile, type RegistryIndexEntry, exportNames, resolveRegistrySource } from "../registry.js";
 import { kleur, log } from "../ui.js";
 import { runIcons } from "./icons.js";
@@ -18,6 +21,8 @@ export interface SearchOptions {
     limit?: string;
     registry?: string;
     cwd?: string;
+    /** `--platform`: only entries that run on this platform (react, next, html, vue, ...). */
+    platform?: string;
     /** `--icons`: delegate to the icon-name search instead of the component index. */
     icons?: boolean;
 }
@@ -77,6 +82,12 @@ export async function runSearch(query: string, options: SearchOptions): Promise<
     const cwd = path.resolve(options.cwd ?? process.cwd());
     const registry = new Registry(resolveRegistrySource(options.registry, readConfig(cwd)?.registry));
 
+    if (options.platform && !isPlatformFilter(options.platform)) {
+        log.error(`Unknown --platform "${options.platform}". Use one of: ${PLATFORM_FILTERS.join(", ")}.`);
+        process.exitCode = 1;
+        return;
+    }
+
     let entries: RegistryIndexEntry[];
     let exportsIndex: ExportsIndex | null;
     try {
@@ -88,7 +99,7 @@ export async function runSearch(query: string, options: SearchOptions): Promise<
         return;
     }
 
-    const visible = entries.filter((entry) => entry.fileCount > 0);
+    const visible = entries.filter((entry) => entry.fileCount > 0 && matchesPlatform(entry, options.platform));
 
     const limit = Number(options.limit ?? 20);
     const matches = visible
@@ -120,6 +131,8 @@ export async function runSearch(query: string, options: SearchOptions): Promise<
         const examples = entry.examples.length > 0 ? kleur.dim(` · ${entry.examples.length} docs examples`) : "";
         const files = kleur.dim(` · ${entry.fileCount} file${entry.fileCount === 1 ? "" : "s"}`);
         const exportHit = matchedExport ? kleur.dim(` · ${matchedExport.name}${matchedExport.file ? ` in ${matchedExport.file}` : ""}`) : "";
-        log.plain(`  ${kleur.bold(entry.name.padEnd(width))}  ${kleur.dim(entry.layer.padEnd(18))}  ${entry.title}${examples}${files}${exportHit}`);
+        log.plain(
+            `  ${kleur.bold(entry.name.padEnd(width))}  ${entryPlatform(entry).padEnd(5)}  ${kleur.dim(entry.layer.padEnd(18))}  ${entry.title}${examples}${files}${exportHit}`,
+        );
     }
 }

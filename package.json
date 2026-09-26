@@ -20,7 +20,7 @@
     "scripts": {
         "dev": "turbo run dev --filter=docs",
         "build": "turbo run build",
-        "build:packages": "turbo run build --filter=@properui/ui --filter=@properui/cli --filter=@properui/mcp",
+        "build:packages": "turbo run build --filter=@properui/ui --filter=@properui/cli --filter=@properui/mcp --filter=@properui/tokens",
         "test": "turbo run test",
         "lint": "turbo run lint",
         "type-check": "turbo run type-check",

@@ -150,6 +150,9 @@ importers:
       '@properui/registry':
         specifier: workspace:*
         version: link:../../packages/registry
+      '@properui/tokens':
+        specifier: workspace:*
+        version: link:../../packages/tokens
       '@tailwindcss/postcss':
         specifier: ^4.3.3
         version: 4.3.3
@@ -212,6 +215,28 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
+  packages/elements:
+    dependencies:
+      '@properui/html':
+        specifier: workspace:*
+        version: link:../html
+    devDependencies:
+      axe-core:
+        specifier: ^4.10.2
+        version: 4.13.0
+      jsdom:
+        specifier: ^25.0.1
+        version: 25.0.1
+      tsup:
+        specifier: ^8.3.5
+        version: 8.5.1(jiti@2.7.0)(postcss@8.5.28)(tsx@4.23.13)(typescript@5.9.3)(yaml@2.9.0)
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.8
+        version: 2.1.9(@types/node@22.20.1)(jsdom@25.0.1)(lightningcss@1.32.0)(terser@5.16.9)
+
   packages/eslint-plugin:
     devDependencies:
       '@types/node':
@@ -223,6 +248,39 @@ importers:
       tsup:
         specifier: ^8.3.5
         version: 8.5.1(jiti@2.7.0)(postcss@8.5.28)(tsx@4.23.13)(typescript@5.9.3)(yaml@2.9.0)
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.8
+        version: 2.1.9(@types/node@22.20.1)(jsdom@25.0.1)(lightningcss@1.32.0)(terser@5.16.9)
+
+  packages/html:
+    devDependencies:
+      '@tailwindcss/postcss':
+        specifier: ^4.3.3
+        version: 4.3.3
+      '@types/node':
+        specifier: ^22.9.0
+        version: 22.20.1
+      axe-core:
+        specifier: ^4.13.0
+        version: 4.13.0
+      jsdom:
+        specifier: ^25.0.1
+        version: 25.0.1
+      postcss:
+        specifier: ^8.5.28
+        version: 8.5.28
+      tailwindcss:
+        specifier: ^4.3.3
+        version: 4.3.3
+      tsup:
+        specifier: ^8.3.5
+        version: 8.5.1(jiti@2.7.0)(postcss@8.5.28)(tsx@4.23.13)(typescript@5.9.3)(yaml@2.9.0)
+      tsx:
+        specifier: ^4.19.2
+        version: 4.23.13
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -257,6 +315,33 @@ importers:
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
+
+  packages/tokens:
+    devDependencies:
+      '@tailwindcss/postcss':
+        specifier: ^4.3.3
+        version: 4.3.3
+      '@types/node':
+        specifier: ^22.9.0
+        version: 22.20.1
+      lightningcss:
+        specifier: ^1.32.0
+        version: 1.32.0
+      postcss:
+        specifier: ^8.5.28
+        version: 8.5.28
+      tailwindcss:
+        specifier: ^4.3.3
+        version: 4.3.3
+      tsx:
+        specifier: ^4.19.2
+        version: 4.23.13
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.8
+        version: 2.1.9(@types/node@22.20.1)(jsdom@25.0.1)(lightningcss@1.32.0)(terser@5.16.9)
 
   packages/ui:
     dependencies:

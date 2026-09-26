@@ -283,6 +283,49 @@ function writeBareRegistry(source: string, dest: string): void {
     }
 }
 
+/**
+ * A four-entry registry for the html-platform scenario: `buttons` and `data-table` (React) plus
+ * `buttons-html` and `table-html` (`type: "html"` snippet entries, shaped like the ones
+ * packages/registry/src/build.ts emits from packages/html/src/components). Generated here so
+ * the scenario never depends on packages/html existing.
+ */
+const HTML_BUTTON_SNIPPET = '<!-- description: Buttons for actions. -->\n<button type="button" class="pui-btn pui-btn--primary pui-btn--md">Save</button>\n';
+
+function writeHtmlRegistry(dir: string): void {
+    rmSync(dir, { recursive: true, force: true });
+    mkdirSync(dir, { recursive: true });
+    const write = (name: string, data: unknown) => writeFileSync(path.join(dir, name), `${JSON.stringify(data, null, 2)}\n`);
+    const base = { registryDependencies: [], optionalRegistryDependencies: [], dependencies: [], cssVars: [], examples: [] };
+    const reactEntry = (name: string, layer: string, file: string) => ({
+        name,
+        layer,
+        type: "component",
+        title: name,
+        description: `${name} for React.`,
+        ...base,
+        platforms: ["react", "next"],
+        files: [{ path: file, target: file, type: "component", content: "export const X = () => null;\n", dependencies: [] }],
+    });
+    const htmlEntry = (component: string, snippet: string, content: string) => ({
+        name: `${component}-html`,
+        layer: "html",
+        type: "html",
+        title: component,
+        description: `${component} markup for @properui/html.`,
+        ...base,
+        platforms: ["html", "vue", "angular", "svelte", "astro", "vanilla"],
+        files: [{ path: `components/${component}/${snippet}`, target: `components/${component}/${snippet}`, type: "html", content, dependencies: [] }],
+    });
+    const entries = [
+        reactEntry("buttons", "base", "components/base/buttons/button.tsx"),
+        reactEntry("data-table", "application", "components/application/data-table/data-table.tsx"),
+        htmlEntry("buttons", "primary.html", HTML_BUTTON_SNIPPET),
+        htmlEntry("table", "basic.html", '<table class="pui-table"></table>\n'),
+    ];
+    for (const entry of entries) write(`${entry.name}.json`, entry);
+    write("index.json", { components: entries.map(({ files, ...rest }) => ({ ...rest, fileCount: files.length })) });
+}
+
 function main(): void {
     if (!existsSync(CLI)) throw new Error(`${CLI} not found — run \`pnpm -F properui build\` first.`);
     if (!existsSync(REGISTRY)) throw new Error(`${REGISTRY} not found — the registry has to be built first.`);
@@ -632,6 +675,7 @@ function main(): void {
     const infoJson = run(app, ["info", "--json", "--registry", REGISTRY]);
     const info = JSON.parse(infoJson.slice(infoJson.indexOf("{")));
     check("info reports the detected framework", info.framework === "vite", String(info.framework));
+    check("info reports the react platform", info.platform === "react", String(info.platform));
     check("info reports Tailwind v4", info.tailwindVersion === 4, String(info.tailwindVersion));
     check("info reports the components.json aliases", info.config.aliases?.components === "@/components", JSON.stringify(info.config.aliases));
     check("info reports the theme CSS path", info.config.theme === "src/styles/theme.css", String(info.config.theme));
@@ -815,6 +859,104 @@ function main(): void {
 
     const unknownTemplate = run(SCRATCH, ["create", "bad-template-app", "--template", "sveltekit", "--registry", REGISTRY]);
     check("create rejects an unknown --template", lastStatus !== 0 && unknownTemplate.toLowerCase().includes("template"));
+
+    // -------------------------------------------------------------- html platform
+    section("Scenario 7 — html platform: a bare folder with index.html");
+    const HTML_REGISTRY = path.join(SCRATCH, "html-registry");
+    writeHtmlRegistry(HTML_REGISTRY);
+
+    const htmlApp = path.join(SCRATCH, "html-app");
+    rmSync(htmlApp, { recursive: true, force: true });
+    mkdirSync(htmlApp, { recursive: true });
+    writeFileSync(path.join(htmlApp, "index.html"), '<!doctype html>\n<html lang="en">\n<head><title>Plain</title></head>\n<body></body>\n</html>\n');
+
+    const htmlInit = run(htmlApp, ["init", "--yes", "--registry", HTML_REGISTRY]);
+    check("html init exits 0", lastStatus === 0, String(lastStatus));
+    const htmlConfig = JSON.parse(readFileSync(path.join(htmlApp, "components.json"), "utf8")) as { platform?: string };
+    check('html init writes components.json with platform "html"', htmlConfig.platform === "html", String(htmlConfig.platform));
+    check("html init logs the platform", /Platform\s+html/.test(htmlInit));
+    check("html init prints the CDN stylesheet <link>", htmlInit.includes('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@properui/tokens/'));
+    check("html init prints the behaviours <script>", htmlInit.includes("@properui/html/dist/") && htmlInit.includes("data-auto-init"));
+    check("html init prints the npm install line", htmlInit.includes("npm i @properui/tokens @properui/html @properui/elements"));
+    check(
+        "html init skips the React-only files (no cx util, no providers)",
+        !existsSync(path.join(htmlApp, "utils")) && !existsSync(path.join(htmlApp, "providers")),
+    );
+
+    const htmlInfoOut = run(htmlApp, ["info", "--json", "--registry", HTML_REGISTRY]);
+    const htmlInfo = JSON.parse(htmlInfoOut.slice(htmlInfoOut.indexOf("{"))) as { platform: string; framework: string };
+    check(
+        "info --json reports platform html and framework html",
+        htmlInfo.platform === "html" && htmlInfo.framework === "html",
+        `${htmlInfo.platform}/${htmlInfo.framework}`,
+    );
+
+    const htmlAdd = run(htmlApp, ["add", "buttons", "--registry", HTML_REGISTRY]);
+    const snippet = path.join(htmlApp, "components", "buttons", "primary.html");
+    check("add buttons on an html project exits 0", lastStatus === 0, String(lastStatus));
+    check("add buttons resolves to buttons-html", htmlAdd.includes("buttons -> buttons-html"));
+    check("add buttons writes the .html snippet under the components alias", existsSync(snippet) && readFileSync(snippet, "utf8") === HTML_BUTTON_SNIPPET);
+    check("add buttons writes no React file", !existsSync(path.join(htmlApp, "components", "base")));
+    const htmlInstalled = (JSON.parse(readFileSync(path.join(htmlApp, "components.json"), "utf8")) as { installed?: Record<string, { files: string[] }> })
+        .installed;
+    check(
+        "add records buttons-html in components.json",
+        htmlInstalled?.["buttons-html"]?.files.includes("components/buttons/primary.html") === true,
+        JSON.stringify(htmlInstalled),
+    );
+
+    const htmlInfoAfter = run(htmlApp, ["info", "--json", "--registry", HTML_REGISTRY]);
+    check(
+        "info --json lists the installed html entry",
+        (JSON.parse(htmlInfoAfter.slice(htmlInfoAfter.indexOf("{"))) as { installedHtml: string[] }).installedHtml.includes("buttons-html"),
+    );
+
+    const refused = run(htmlApp, ["add", "data-table", "--registry", HTML_REGISTRY]);
+    check("add data-table on an html project fails", lastStatus !== 0);
+    check(
+        "add data-table explains the platform in one line and names the html alternative",
+        /React-only.*platform is "html".*table-html/.test(refused),
+        refused,
+    );
+    check("add data-table writes nothing", !existsSync(path.join(htmlApp, "components", "application")));
+
+    const htmlList = run(htmlApp, ["list", "--platform", "html", "--registry", HTML_REGISTRY]);
+    check(
+        "list --platform html shows only html entries",
+        htmlList.includes("buttons-html") && !/^\s+buttons\s/m.test(htmlList) && !htmlList.includes("data-table"),
+    );
+    const htmlSearch = run(htmlApp, ["search", "buttons", "--registry", HTML_REGISTRY]);
+    check("search shows a platform column", /buttons-html\s+html\s/.test(htmlSearch) && /buttons\s+react\s/.test(htmlSearch), htmlSearch);
+
+    section("Scenario 7b — platform detection and --platform override");
+    const vueApp = path.join(SCRATCH, "vue-app");
+    rmSync(vueApp, { recursive: true, force: true });
+    mkdirSync(path.join(vueApp, "src"), { recursive: true });
+    writeFileSync(
+        path.join(vueApp, "package.json"),
+        `${JSON.stringify({ name: "vue-app", private: true, dependencies: { vue: "^3.5.0" }, devDependencies: { vite: "^6.0.0", "@vitejs/plugin-vue": "^5.0.0", tailwindcss: "^4.1.0" } }, null, 2)}\n`,
+    );
+    writeFileSync(
+        path.join(vueApp, "vite.config.ts"),
+        'import vue from "@vitejs/plugin-vue";\nimport { defineConfig } from "vite";\n\nexport default defineConfig({ plugins: [vue()] });\n',
+    );
+    writeFileSync(path.join(vueApp, "src", "style.css"), '@import "tailwindcss";\n');
+    const vueInit = run(vueApp, ["init", "--yes", "--registry", HTML_REGISTRY]);
+    check("a Vite + Vue project detects as Vue", vueInit.includes("Framework       Vue"));
+    const vueCss = readFileSync(path.join(vueApp, "src", "style.css"), "utf8");
+    check(
+        "html init wires the tokens + html CSS into a Tailwind v4 stylesheet",
+        vueCss.includes('@import "@properui/tokens/theme.css";') && vueCss.includes('@import "@properui/html/css";') && vueCss.includes("**/*.html"),
+        vueCss,
+    );
+    check("html init never touches vite.config.ts on the html platform", !readFileSync(path.join(vueApp, "vite.config.ts"), "utf8").includes("tailwindcss()"));
+
+    const forced = path.join(SCRATCH, "vite-app-forced-html");
+    scaffold(forced, "@/");
+    run(forced, ["init", "--yes", "--platform", "html", "--registry", HTML_REGISTRY]);
+    const forcedConfig = JSON.parse(readFileSync(path.join(forced, "components.json"), "utf8")) as { platform?: string };
+    check("init --platform html overrides a React detection", forcedConfig.platform === "html");
+    check("the React scaffold still detects as Vite + react without the override", info.framework === "vite");
 
     console.log(`\n${failures === 0 ? "PASS" : "FAIL"} — ${checks - failures}/${checks} checks passed.`);
     if (failures > 0) process.exitCode = 1;

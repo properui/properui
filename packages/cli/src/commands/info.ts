@@ -1,6 +1,7 @@
 /**
  * `properui info [--json]` — everything an agent (or a human) needs to know about this
- * project's Proper UI setup before touching UI code: framework, Tailwind version,
+ * project's Proper UI setup before touching UI code: framework, platform (`react` or `html`:
+ * which registry layer `add` installs from), Tailwind version,
  * `components.json` aliases, the theme CSS path, which registry entries are already
  * installed, and the installed package versions.
  *
@@ -20,6 +21,7 @@ import path from "node:path";
 import { type ComponentsConfig, aliasBaseDir, configPath, readConfig } from "../config.js";
 import { allDependencies, detectProject, readPackageJson } from "../detect.js";
 import { prepareFile } from "../files.js";
+import { isHtmlEntry } from "../platform.js";
 import { Registry, RegistryError, type RegistryIndexEntry, resolveRegistrySource } from "../registry.js";
 import { kleur, log } from "../ui.js";
 
@@ -43,17 +45,28 @@ interface InstalledSnapshotEntry {
     installedAt: string;
     layer?: string;
     type?: string;
+    /** `react` or `html`, when the registry index knows the entry. */
+    platform?: "react" | "html";
 }
 
 export interface ProjectSnapshot {
     cwd: string;
     framework: string;
+    /**
+     * Which registry layer this project installs from: components.json's `platform` when it is
+     * set, otherwise what detection says (`react` for the React frameworks, `html` for the rest).
+     */
+    platform: "react" | "html";
+    /** What detection alone says, even when components.json overrides it. */
+    detectedPlatform: "react" | "html";
     typescript: boolean;
     tailwindVersion: number | null;
     packageManager: string;
     config: {
         present: boolean;
         file: string;
+        /** components.json's own `platform` field; null when absent (which means `react`). */
+        platform: ComponentsConfig["platform"] | null;
         aliases: ComponentsConfig["aliases"] | null;
         theme: string | null;
         css: string | null;
@@ -62,10 +75,16 @@ export interface ProjectSnapshot {
     packages: {
         "@properui/ui": PackageVersions;
         "@properui/cli": PackageVersions;
+        /** The html-platform packages (see docs/frameworks.md). */
+        "@properui/tokens": PackageVersions;
+        "@properui/html": PackageVersions;
+        "@properui/elements": PackageVersions;
     };
     registrySource: string;
     registryReachable: boolean;
     installed: Record<string, InstalledSnapshotEntry>;
+    /** Names from `installed` that are `@properui/html` snippet entries (`<component>-html`). */
+    installedHtml: string[];
 }
 
 /** Reads a package's declared version from package.json and its actually-installed version from node_modules. */
@@ -107,7 +126,8 @@ export async function collectSnapshot(options: InfoOptions): Promise<ProjectSnap
         if (Object.keys(manifest).length > 0) {
             for (const [name, record] of Object.entries(manifest)) {
                 const meta = index.find((entry) => entry.name === name);
-                installed[name] = { ...record, layer: meta?.layer, type: meta?.type };
+                const isHtml = meta ? isHtmlEntry(meta) : name.endsWith("-html");
+                installed[name] = { ...record, layer: meta?.layer, type: meta?.type, platform: isHtml ? "html" : "react" };
             }
         } else if (registryReachable) {
             const aliasBase = aliasBaseDir(cwd, config);
@@ -124,6 +144,7 @@ export async function collectSnapshot(options: InfoOptions): Promise<ProjectSnap
                             installedAt: "unknown",
                             layer: meta.layer,
                             type: meta.type,
+                            platform: isHtmlEntry(meta) ? "html" : "react",
                         };
                     }
                 } catch {
@@ -136,12 +157,15 @@ export async function collectSnapshot(options: InfoOptions): Promise<ProjectSnap
     return {
         cwd,
         framework: project.framework,
+        platform: config?.platform ?? project.platform,
+        detectedPlatform: project.platform,
         typescript: project.typescript,
         tailwindVersion: project.tailwindVersion,
         packageManager: project.packageManager,
         config: {
             present: Boolean(config),
             file: path.relative(cwd, configPath(cwd)) || "components.json",
+            platform: config?.platform ?? null,
             aliases: config?.aliases ?? null,
             theme: config?.tailwind.theme ?? null,
             css: config?.tailwind.css ?? null,
@@ -150,10 +174,16 @@ export async function collectSnapshot(options: InfoOptions): Promise<ProjectSnap
         packages: {
             "@properui/ui": packageVersions(cwd, "@properui/ui", deps),
             "@properui/cli": packageVersions(cwd, "@properui/cli", deps),
+            "@properui/tokens": packageVersions(cwd, "@properui/tokens", deps),
+            "@properui/html": packageVersions(cwd, "@properui/html", deps),
+            "@properui/elements": packageVersions(cwd, "@properui/elements", deps),
         },
         registrySource,
         registryReachable,
         installed,
+        installedHtml: Object.keys(installed)
+            .filter((name) => installed[name]?.platform === "html")
+            .sort(),
     };
 }
 
@@ -166,11 +196,19 @@ function formatVersions(versions: PackageVersions): string {
 function printHuman(snapshot: ProjectSnapshot): void {
     log.title("Proper UI project info");
     log.step(`Framework           ${snapshot.framework}`);
+    log.step(
+        `Platform            ${snapshot.platform}${snapshot.platform !== snapshot.detectedPlatform ? ` (components.json; detected ${snapshot.detectedPlatform})` : ""}`,
+    );
     log.step(`Language            ${snapshot.typescript ? "TypeScript" : "JavaScript"}`);
     log.step(`Tailwind            ${snapshot.tailwindVersion ? `v${snapshot.tailwindVersion}` : "not installed"}`);
     log.step(`Package manager     ${snapshot.packageManager}`);
     log.step(`@properui/ui      ${formatVersions(snapshot.packages["@properui/ui"])}`);
     log.step(`@properui/cli     ${formatVersions(snapshot.packages["@properui/cli"])}`);
+    if (snapshot.platform === "html") {
+        log.step(`@properui/tokens  ${formatVersions(snapshot.packages["@properui/tokens"])}`);
+        log.step(`@properui/html    ${formatVersions(snapshot.packages["@properui/html"])}`);
+        log.step(`@properui/elements ${formatVersions(snapshot.packages["@properui/elements"])}`);
+    }
     log.step(`Registry            ${snapshot.registrySource}`);
     log.step(`Registry reachable  ${snapshot.registryReachable ? "yes" : "no"}`);
     log.plain();

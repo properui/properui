@@ -43,6 +43,7 @@ const REGISTRY_URL_TEMPLATE = `${REGISTRY_HOMEPAGE}/r/shadcn/{name}.json`;
 // ---------------------------------------------------------------------------
 
 type NativeFileType = "component" | "util" | "hook" | "style";
+/** The React entry types. build.ts also emits `type: "html"` snippet entries, which `build` below skips before they reach these maps. */
 type NativeEntryType = "component" | "example" | "util" | "hook" | "style";
 
 type NativeFile = {
@@ -67,7 +68,7 @@ type NativeEntry = {
 };
 
 type NativeIndex = {
-    components: (Omit<NativeEntry, "files"> & { fileCount: number })[];
+    components: (Omit<NativeEntry, "files" | "type"> & { type: NativeEntryType | "html"; fileCount: number })[];
 };
 
 // ---------------------------------------------------------------------------
@@ -223,7 +224,13 @@ const build = () => {
     mkdirSync(OUT, { recursive: true });
 
     const items: ShadcnItem[] = [];
+    let skippedHtml = 0;
     for (const summary of index.components) {
+        // shadcn's registry is React-only: the html snippet entries stay on the native registry.
+        if (summary.type === "html") {
+            skippedHtml += 1;
+            continue;
+        }
         const entry = readNativeEntry(summary.name);
         items.push(toShadcnItem(entry));
     }
@@ -249,7 +256,9 @@ const build = () => {
     };
     writeFileSync(path.join(OUT, "registry.json"), `${JSON.stringify(registryJson, null, 2)}\n`);
 
-    console.log(`registry:shadcn — wrote ${items.length} item(s) + registry.json to ${path.relative(REPO, OUT)}`);
+    console.log(
+        `registry:shadcn — wrote ${items.length} item(s) + registry.json to ${path.relative(REPO, OUT)}${skippedHtml > 0 ? ` (skipped ${skippedHtml} html entries)` : ""}`,
+    );
     console.log(`registry:shadcn — namespace URL template: ${REGISTRY_URL_TEMPLATE}`);
 
     // Sanity check: every file this build wrote should be discoverable by generateStaticParams

@@ -4,7 +4,7 @@
  */
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { detectAlias, parseJsonc } from "./detect.js";
+import { type Platform, detectAlias, parseJsonc } from "./detect.js";
 
 export const CONFIG_FILE = "components.json";
 export const CONFIG_SCHEMA_URL = "https://properui.dev/schema.json";
@@ -25,6 +25,12 @@ export type InstalledManifest = Record<string, InstalledEntryRecord>;
 export interface ComponentsConfig {
     $schema: string;
     style: string;
+    /**
+     * Which registry layer `add` installs from: `react` (TSX components, the default when the
+     * field is absent) or `html` (`@properui/html` snippets, for Vue, Angular, Svelte, Astro and
+     * plain HTML projects). Written by `init`.
+     */
+    platform?: Platform;
     tsx: boolean;
     tailwind: {
         /** Global stylesheet, relative to the project root. */
@@ -53,6 +59,11 @@ export function readConfig(cwd: string): ComponentsConfig | null {
     const parsed = parseJsonc<ComponentsConfig>(readFileSync(file, "utf8"));
     if (!parsed?.aliases?.components) return null;
     return parsed;
+}
+
+/** The config's platform, defaulting to `react` for files written before the field existed. */
+export function configPlatform(config: Pick<ComponentsConfig, "platform"> | null | undefined): Platform {
+    return config?.platform === "html" ? "html" : "react";
 }
 
 export function writeConfig(cwd: string, config: ComponentsConfig): string {

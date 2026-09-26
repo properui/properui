@@ -116,6 +116,31 @@ Marketing and page-example layers get no hand-authored prose. Just the two field
 }
 ```
 
+## Platforms and html entries
+
+Every entry also carries `platforms`, the stacks it runs on. The TSX entries are `["react", "next"]`. Alongside them, the registry carries `@properui/html` snippet entries for projects that are not React: `type: "html"`, `layer: "html"`, named `<component>-html`, `platforms: ["html", "vue", "angular", "svelte", "astro", "vanilla"]`, one file per `.html` snippet, and no `dependencies` or `registryDependencies`. They are built from `packages/html/src/components/<component>/*.html` (title from the folder name, description from an optional leading `<!-- description: ... -->` comment in the first snippet) and carry none of the semantic manifest fields above, which describe React behaviour. `GET /r/buttons-html.json`:
+
+```json
+{
+    "name": "buttons-html",
+    "layer": "html",
+    "type": "html",
+    "platforms": ["html", "vue", "angular", "svelte", "astro", "vanilla"],
+    "files": [
+        {
+            "path": "components/buttons/primary.html",
+            "target": "components/buttons/primary.html",
+            "type": "html",
+            "content": "<button class=\"pui-btn pui-btn--primary\">…</button>"
+        }
+    ],
+    "registryDependencies": [],
+    "dependencies": []
+}
+```
+
+An agent should read the project's platform first (`properui info --json` or the MCP `get_project_info` tool) and only then choose between a TSX entry and its `-html` counterpart; `list --platform html` and the MCP `platform` filter show what exists. The html set is a curated subset of the React library: see [Frameworks](/docs/frameworks). The shadcn mirror at `/r/shadcn/` carries only the React entries.
+
 ## Coverage
 
 The manifest is hand-authored for the 19 base and 32 application component groups, the entries most often chosen from scratch. `token_contract` is derived for every entry that references at least one semantic token (777 of 797 at last build); a handful of entries (styles, hooks, and a few purely structural components) reference none and omit the field. `composes_with` is present wherever an entry either has a manifest that names it or has at least one `registryDependencies` entry to derive it from. `changelog` is derived for every entry; most carry `[]` today, since `CHANGELOG.md` only names the components a given release actually touched.

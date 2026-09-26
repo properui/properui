@@ -14,7 +14,8 @@ curl https://properui.dev/llms.txt          # index of every docs page, as plain
 curl https://properui.dev/r/index.json      # every registry entry: name, layer, type, dependencies
 curl https://properui.dev/r/buttons.json    # one entry, including its real source
 npx @properui/cli@latest add buttons date-picker # write the files, report what to install
-npx @properui/cli@latest info --json             # this project's setup: framework, aliases, installed entries
+npx @properui/cli@latest info --json             # this project's setup: framework, platform, aliases, installed entries
+npx @properui/cli@latest list --platform html    # the html entries (<component>-html) for non-React projects
 npx @properui/cli@latest agent init              # install the Proper UI Skill for Claude, Codex, Cursor and Lovable
 npx -y @properui/mcp                             # MCP server over stdio: the same registry and add, as tools
 ```
@@ -33,8 +34,17 @@ guidance automatically instead of relying on this file alone. It also registers 
 `.mcp.json` and `.cursor/mcp.json`; when an assistant has those tools (`search_components`, `get_component`,
 `add_component`, ...) connected, prefer them to shelling out to the CLI.
 
+`info --json` also reports `platform`. `react` (Next.js, Vite React, Remix, React) gets the TSX components. `html`
+(Vue, Nuxt, Angular, Svelte, SvelteKit, Astro, plain HTML, or `init --platform html`) makes `init` wire
+`@properui/tokens` + `@properui/html` instead of the React files, and makes `add <name>` install the `<name>-html`
+snippet entry; a React-only entry is refused with the HTML alternative named. See `docs/frameworks.md`.
+
 ## Writing component code
 
+- **Check the platform first.** On an html-platform project (`info --json` → `"platform": "html"`), write HTML on the
+  `pui-` classes from `@properui/html`, or `@properui/elements` tags (`<pui-button>`, `<pui-modal>`) in Vue, Angular,
+  Svelte and Astro templates. Never write TSX or React Aria code into those projects. The React rules below apply to
+  React projects; the token, no-`dark:` and logical-property rules apply everywhere.
 - **React Aria props, not DOM props.** `onPress` not `onClick`, `isDisabled` not `disabled`, `isSelected` not
   `checked`, `isReadOnly` not `readOnly`, `isRequired` not `required`. Interactive components wrap React Aria
   Components; the DOM prop is silently ignored, except `id` on `NativeSelect`, which is a real `<select>` and honours
@@ -93,4 +103,7 @@ Do not document or generate code against these, because they do not exist:
 - MCP tools beyond the seven `@properui/mcp` ships: `list_components`, `search_components`, `get_component`,
   `get_component_docs`, `add_component`, `get_project_info` and `check_tokens`. There is no `init` tool: run
   `npx @properui/cli@latest init` for that.
+- Vue, Angular or Svelte ports of the React components. Non-React projects get `@properui/tokens`, the
+  `@properui/html` classes and snippets, and the `@properui/elements` custom elements, which cover a curated subset
+  (about twenty components, listed in `docs/frameworks.md`), not the whole React library.
 - A paid or PRO tier. Everything in this repository is MIT licensed.

@@ -90,7 +90,14 @@ describe("tools", () => {
         expect(isError).toBe(false);
         expect(data.total).toBeGreaterThan(5);
         const buttons = data.components.find((row) => row.name === "buttons");
-        expect(buttons).toEqual({ name: "buttons", layer: "base", type: "component", title: expect.any(String), description: expect.any(String) });
+        expect(buttons).toEqual({
+            name: "buttons",
+            layer: "base",
+            type: "component",
+            title: expect.any(String),
+            description: expect.any(String),
+            platforms: ["react", "next"],
+        });
         expect(data.components.every((row) => row.layer === "base" && row.type === "component")).toBe(true);
     });
 
@@ -214,6 +221,161 @@ describe("tools", () => {
 
         const single = await call<{ ok: boolean }>("check_tokens", { cwd: project, path: "src/good.tsx" });
         expect(single.data.ok).toBe(true);
+    });
+});
+
+/**
+ * A four-entry registry in a temp dir: `buttons` and `data-table` (React) plus `buttons-html` and
+ * `table-html` (html snippets), shaped like packages/registry/dist, so the html-platform rules are
+ * tested without depending on packages/html existing.
+ */
+function writeHtmlFixtureRegistry(dir: string): void {
+    mkdirSync(dir, { recursive: true });
+    const react = (name: string, title: string, file: string) => ({
+        name,
+        layer: name === "buttons" ? "base" : "application",
+        type: "component",
+        title,
+        description: `${title} for React.`,
+        registryDependencies: [],
+        optionalRegistryDependencies: [],
+        dependencies: [],
+        cssVars: [],
+        examples: [],
+        platforms: ["react", "next"],
+        files: [{ path: file, target: file, type: "component", content: "export const X = () => null;\n", dependencies: [] }],
+    });
+    const html = (component: string, title: string, snippet: string) => ({
+        name: `${component}-html`,
+        layer: "html",
+        type: "html",
+        title,
+        description: `${title} markup for @properui/html.`,
+        registryDependencies: [],
+        optionalRegistryDependencies: [],
+        dependencies: [],
+        cssVars: [],
+        examples: [],
+        platforms: ["html", "vue", "angular", "svelte", "astro", "vanilla"],
+        files: [
+            {
+                path: `components/${component}/${snippet}`,
+                target: `components/${component}/${snippet}`,
+                type: "html",
+                content: `<!-- ${title} -->\n`,
+                dependencies: [],
+            },
+        ],
+    });
+    const entries = [
+        react("buttons", "Buttons", "components/base/buttons/button.tsx"),
+        react("data-table", "Data table", "components/application/data-table/data-table.tsx"),
+        html("buttons", "Buttons", "primary.html"),
+        html("table", "Table", "basic.html"),
+    ];
+    for (const entry of entries) writeFileSync(path.join(dir, `${entry.name}.json`), JSON.stringify(entry, null, 2));
+    writeFileSync(
+        path.join(dir, "index.json"),
+        JSON.stringify({ components: entries.map(({ files, ...rest }) => ({ ...rest, fileCount: files.length })) }, null, 2),
+    );
+}
+
+describe("html platform", () => {
+    let htmlClient: Client;
+    const htmlRegistry = path.join(scratch, "html-registry");
+
+    /** A no-framework project: index.html and a components.json with platform "html". */
+    function makeHtmlProject(name: string): string {
+        const dir = path.join(scratch, name);
+        mkdirSync(dir, { recursive: true });
+        writeFileSync(path.join(dir, "index.html"), "<!doctype html><title>t</title>\n");
+        writeFileSync(
+            path.join(dir, "components.json"),
+            JSON.stringify({
+                $schema: "https://properui.dev/schema.json",
+                style: "default",
+                platform: "html",
+                tsx: false,
+                tailwind: { css: "", theme: "@properui/tokens/theme.css", prefix: "" },
+                aliases: { components: "@/components", utils: "@/utils", ui: "@/components", hooks: "@/hooks" },
+                registry: htmlRegistry,
+            }),
+        );
+        return dir;
+    }
+
+    async function htmlCall<T = Record<string, unknown>>(name: string, args: Record<string, unknown> = {}) {
+        const result = (await htmlClient.callTool({ name, arguments: args })) as CallToolResult;
+        const first = result.content[0];
+        const text = first && first.type === "text" ? first.text : "";
+        return { isError: Boolean(result.isError), text, data: (result.isError ? {} : JSON.parse(text)) as T };
+    }
+
+    beforeAll(async () => {
+        writeHtmlFixtureRegistry(htmlRegistry);
+        const server = createServer({ registry: htmlRegistry, cwd: scratch });
+        const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
+        htmlClient = new Client({ name: "properui-mcp-html-test", version: "0.0.0" });
+        await Promise.all([server.connect(serverTransport), htmlClient.connect(clientTransport)]);
+    });
+
+    afterAll(async () => {
+        await htmlClient?.close();
+    });
+
+    it("list_components filters by platform", async () => {
+        const html = await htmlCall<{ components: { name: string; platforms: string[] }[] }>("list_components", { platform: "html" });
+        expect(html.data.components.map((row) => row.name).sort()).toEqual(["buttons-html", "table-html"]);
+        expect(html.data.components.every((row) => row.platforms.includes("vue"))).toBe(true);
+
+        const vue = await htmlCall<{ components: { name: string }[] }>("list_components", { platform: "vue" });
+        expect(vue.data.components).toHaveLength(2);
+
+        const react = await htmlCall<{ components: { name: string }[] }>("list_components", { platform: "react" });
+        expect(react.data.components.map((row) => row.name).sort()).toEqual(["buttons", "data-table"]);
+    });
+
+    it("search_components filters by platform", async () => {
+        const { data } = await htmlCall<{ matches: { name: string }[] }>("search_components", { query: "buttons", platform: "html" });
+        expect(data.matches.map((match) => match.name)).toEqual(["buttons-html"]);
+    });
+
+    it("get_project_info reports the html platform", async () => {
+        const project = makeHtmlProject("html-info-app");
+        const { data } = await htmlCall<{ platform: string; framework: string; config: { platform: string | null } }>("get_project_info", {
+            cwd: project,
+        });
+        expect(data.platform).toBe("html");
+        expect(data.framework).toBe("html");
+        expect(data.config.platform).toBe("html");
+    });
+
+    it("add_component resolves <name> to <name>-html and writes the snippet", async () => {
+        const project = makeHtmlProject("html-add-app");
+        const { isError, data, text } = await htmlCall<{ platform: string; filesWritten: string[]; resolvedFrom: Record<string, string> }>("add_component", {
+            names: ["buttons"],
+            cwd: project,
+        });
+        expect(isError, text).toBe(false);
+        expect(data.platform).toBe("html");
+        expect(data.resolvedFrom).toEqual({ buttons: "buttons-html" });
+        expect(data.filesWritten).toEqual(["components/buttons/primary.html"]);
+        expect(existsSync(path.join(project, "components", "buttons", "primary.html"))).toBe(true);
+
+        const config = JSON.parse(readFileSync(path.join(project, "components.json"), "utf8")) as { installed: Record<string, unknown> };
+        expect(Object.keys(config.installed)).toEqual(["buttons-html"]);
+
+        const info = await htmlCall<{ installedHtml: string[] }>("get_project_info", { cwd: project });
+        expect(info.data.installedHtml).toEqual(["buttons-html"]);
+    });
+
+    it("add_component refuses a React-only entry and names the html alternative", async () => {
+        const project = makeHtmlProject("html-refuse-app");
+        const { isError, text } = await htmlCall("add_component", { names: ["data-table"], cwd: project });
+        expect(isError).toBe(true);
+        expect(text).toMatch(/React-only/);
+        expect(text).toMatch(/table-html/);
+        expect(existsSync(path.join(project, "components"))).toBe(false);
     });
 });
 
