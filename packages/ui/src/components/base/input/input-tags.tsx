@@ -231,15 +231,15 @@ export const InputTags = ({
     const sizes = sortCx({
         sm: {
             root: cx("gap-2 px-3 py-2 text-sm", !isEmpty && "py-1.5 ps-2", hasTrailingIcon && "pe-9"),
-            iconTrailing: "right-3",
+            iconTrailing: "end-3",
         },
         md: {
             root: cx("gap-2 px-3 py-2 text-md", !isEmpty && "ps-2", hasTrailingIcon && "pe-9"),
-            iconTrailing: "right-3",
+            iconTrailing: "end-3",
         },
         lg: {
             root: cx("gap-2 px-3.5 py-2.5 text-md", !isEmpty && "ps-2.5", hasTrailingIcon && "pe-9.5"),
-            iconTrailing: "right-3.5",
+            iconTrailing: "end-3.5",
         },
     });
 

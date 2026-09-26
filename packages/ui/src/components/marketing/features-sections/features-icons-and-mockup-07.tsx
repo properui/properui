@@ -84,7 +84,7 @@ export const FeaturesIconsAndMockup07 = () => (
                             <CreditCard type="gray-dark" company="Proper UI" cardHolder={AVATARS[1].name} />
                         </div>
                         <div className={cx(styles.cardScale, "z-0")} style={{ transform: CARD_TRANSFORM }}>
-                            <div className="h-47.5 w-79 rounded-2xl bg-neutral-900 opacity-15 blur-md" />
+                            <div className="bg-primary-solid h-47.5 w-79 rounded-2xl opacity-15 blur-md" />
                         </div>
                     </div>
                 </div>

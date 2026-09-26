@@ -83,7 +83,7 @@ export const HeroIphoneMockup04 = () => (
                     />
 
                     <div className="relative flex h-104 w-max items-start justify-center md:h-140">
-                        <ul aria-hidden="true" className="absolute -bottom-3 left-[-218px] z-10 hidden flex-col gap-3 md:flex">
+                        <ul aria-hidden="true" className="absolute start-[-218px] -bottom-3 z-10 hidden flex-col gap-3 md:flex">
                             {notifications.map((item) => (
                                 <li
                                     key={item.avatar.name}

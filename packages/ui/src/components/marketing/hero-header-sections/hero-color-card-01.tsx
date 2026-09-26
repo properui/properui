@@ -98,10 +98,10 @@ export const HeroColorCard01 = () => (
         <HeaderDropdownSimple />
 
         <section className="relative overflow-hidden pb-16 md:pt-8 md:pb-24">
-            <div className="absolute top-1/2 left-[-98px] hidden -translate-y-1/2 md:block">
+            <div className="absolute start-[-98px] top-1/2 hidden -translate-y-1/2 md:block">
                 <Burst className="text-fg-brand-secondary hidden w-48.5 opacity-30 md:block md:w-74.5" />
             </div>
-            <div className="absolute right-12 bottom-9 max-md:hidden">
+            <div className="absolute end-12 bottom-9 max-md:hidden">
                 <Burst className="text-fg-brand-secondary hidden w-48.5 opacity-30 md:block md:w-74.5" />
             </div>
 
@@ -154,7 +154,7 @@ export const HeroColorCard01 = () => (
                         </ul>
                     </div>
 
-                    <div className="absolute -right-12 -bottom-10 md:right-[-65px] md:bottom-0">
+                    <div className="absolute -right-12 -bottom-10 md:end-[-65px] md:bottom-0">
                         <div className="relative flex size-[192px] items-center justify-center md:size-auto">
                             <ActiveUsersGauge className="h-full max-h-full w-full max-w-full" />
                             <div className="absolute flex flex-col items-center text-center md:gap-0.5">

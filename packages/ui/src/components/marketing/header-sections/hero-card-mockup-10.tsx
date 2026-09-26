@@ -68,7 +68,7 @@ export const HeroCardMockup10 = () => (
 
                 <div
                     aria-hidden="true"
-                    className="pointer-events-none absolute inset-x-0 bottom-0 overflow-hidden sm:pl-[30vw] md:inset-x-8 md:rounded-2xl md:ps-0"
+                    className="pointer-events-none absolute inset-x-0 bottom-0 overflow-hidden sm:ps-[30vw] md:inset-x-8 md:rounded-2xl md:ps-0"
                 >
                     <div
                         style={wallTransform}

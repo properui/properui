@@ -68,11 +68,11 @@ const rows: Row[] = [
                 <div className="bg-tertiary end-0 top-0 h-full md:absolute md:w-screen lg:overflow-hidden">
                     <IPhoneMockup
                         image={IMAGES.landscape[1].src}
-                        className="absolute top-28 right-1/2 hidden w-full translate-x-[30%] md:block md:w-78.5 md:max-w-none lg:right-62 lg:translate-x-0"
+                        className="absolute top-28 right-1/2 hidden w-full translate-x-[30%] md:block md:w-78.5 md:max-w-none lg:end-62 lg:translate-x-0"
                     />
                     <IPhoneMockup
                         image={IMAGES.landscape[2].src}
-                        className="drop-shadow-iphone-mockup top-12 right-1/2 mx-auto w-71 md:absolute md:mx-0 md:w-78.5 md:max-w-none md:translate-x-[70%] lg:right-12 lg:translate-x-0"
+                        className="drop-shadow-iphone-mockup top-12 right-1/2 mx-auto w-71 md:absolute md:mx-0 md:w-78.5 md:max-w-none md:translate-x-[70%] lg:end-12 lg:translate-x-0"
                     />
                 </div>
             </div>

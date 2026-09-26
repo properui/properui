@@ -56,7 +56,7 @@ export const HeroColorCard01 = () => (
         <MarketingHeader items={navItems} />
 
         <section className="relative overflow-hidden pb-16 md:pt-8 md:pb-24">
-            <div className="absolute top-1/2 left-[-98px] hidden -translate-y-1/2 md:block">
+            <div className="absolute start-[-98px] top-1/2 hidden -translate-y-1/2 md:block">
                 <HatchPattern className="text-fg-brand-secondary hidden w-48.5 opacity-30 md:block md:w-74.5" />
             </div>
             <div className="absolute end-12 bottom-9 max-md:hidden">

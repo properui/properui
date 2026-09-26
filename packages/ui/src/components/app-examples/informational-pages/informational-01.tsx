@@ -213,7 +213,7 @@ export const Informational01 = () => (
                         title="All trades"
                         badge="58 trades"
                         contentTrailing={
-                            <div className="absolute top-5 right-6 lg:static">
+                            <div className="absolute end-6 top-5 lg:static">
                                 <DropdownIconSimple />
                             </div>
                         }

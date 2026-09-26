@@ -30,7 +30,7 @@ export const CtaScreenMockup01 = () => (
 
             <div className="relative mx-auto w-full lg:h-128">
                 {/* Screen mockup bezel: outer frame, inner shadow ring, then the screen itself. */}
-                <div className="bg-primary ring-utility-neutral-300 top-0 left-0 w-full max-w-5xl rounded-[9.03px] p-[0.9px] shadow-lg ring-[0.56px] ring-inset md:rounded-[26.95px] md:p-[3.5px] md:ring-[1.68px] lg:absolute lg:w-max">
+                <div className="bg-primary ring-utility-neutral-300 start-0 top-0 w-full max-w-5xl rounded-[9.03px] p-[0.9px] shadow-lg ring-[0.56px] ring-inset md:rounded-[26.95px] md:p-[3.5px] md:ring-[1.68px] lg:absolute lg:w-max">
                     <div className="bg-primary shadow-modern-mockup-inner-md md:shadow-modern-mockup-inner-lg rounded-[7.9px] p-0.5 md:rounded-[23.58px] md:p-1">
                         <div className="bg-utility-neutral-50 ring-utility-neutral-200 relative overflow-hidden rounded-[6.77px] ring-[0.56px] md:rounded-[20.21px] md:ring-[1.68px]">
                             <img

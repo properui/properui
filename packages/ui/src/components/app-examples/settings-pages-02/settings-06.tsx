@@ -89,7 +89,7 @@ const PreviewRadio = ({ value, label, description, overlay, bordered, children }
                 >
                     {children}
                     {overlay}
-                    {isSelected && <RadioButtonBase isSelected size="md" className="absolute bottom-2 left-2 z-20" />}
+                    {isSelected && <RadioButtonBase isSelected size="md" className="absolute start-2 bottom-2 z-20" />}
                 </span>
 
                 <span className="block w-full">

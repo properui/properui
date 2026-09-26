@@ -36,7 +36,7 @@ export const Modal = (props: ModalProps) => (
         {...props}
         className={(state) =>
             cx(
-                "inset-y-0 right-0 h-full w-full max-w-100 shadow-xl transition",
+                "inset-y-0 end-0 h-full w-full max-w-100 shadow-xl transition",
                 state.isEntering && "animate-in slide-in-from-right duration-300",
                 state.isExiting && "animate-out slide-out-to-right duration-500",
                 typeof props.className === "function" ? props.className(state) : props.className,
@@ -95,7 +95,7 @@ const Header = ({ className, children, onClose, ...props }: SlideoutHeaderProps)
     return (
         <header {...props} className={cx("relative z-1 w-full px-4 pt-6 md:px-6", className)}>
             {children}
-            <CloseButton size="sm" className="absolute top-3 right-3 shrink-0" onClick={onClose} />
+            <CloseButton size="sm" className="absolute end-3 top-3 shrink-0" onClick={onClose} />
         </header>
     );
 };

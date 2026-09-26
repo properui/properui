@@ -2,7 +2,6 @@
 
 import type { CSSProperties, ReactNode } from "react";
 import { useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
 import { SearchLg } from "@properui/icons";
 import { cx } from "../../../../utils/cx";
 import { Input } from "../../../base/input/input";
@@ -118,27 +117,26 @@ export const SidebarNavigationDualTier = ({
     );
 
     const secondarySidebar = (
-        <AnimatePresence initial={false}>
-            {isSecondarySidebarVisible && currentItem?.items && (
-                <motion.div
-                    initial={{ width: 0, borderColor: "var(--color-border-secondary)" }}
-                    animate={{ width: SECONDARY_SIDEBAR_WIDTH, borderColor: "var(--color-border-secondary)" }}
-                    exit={{ width: 0, borderColor: "rgba(0,0,0,0)", transition: { borderColor: { type: "tween", delay: 0.05 } } }}
-                    transition={{ type: "spring", damping: 26, stiffness: 220, bounce: 0 }}
-                    className={cx("bg-primary relative h-full overflow-x-hidden overflow-y-auto", !hideBorder && "box-content border-e-[1.5px]")}
-                >
-                    <ul style={{ width: SECONDARY_SIDEBAR_WIDTH }} className="flex h-full flex-col p-4 pt-5">
-                        {currentItem.items.map((item) => (
-                            <li key={item.label + item.href} className="py-px">
-                                <NavItemBase current={activeUrl === item.href} href={item.href} icon={item.icon} badge={item.badge} type="link">
-                                    {item.label}
-                                </NavItemBase>
-                            </li>
-                        ))}
-                    </ul>
-                </motion.div>
+        <div
+            inert={!isSecondarySidebarVisible}
+            aria-hidden={!isSecondarySidebarVisible}
+            style={{ width: isSecondarySidebarVisible ? SECONDARY_SIDEBAR_WIDTH : 0 }}
+            className={cx(
+                "bg-primary relative h-full overflow-x-hidden overflow-y-auto border-transparent transition-[width,border-color] duration-300 ease-out",
+                !hideBorder && "box-content border-e-[1.5px]",
+                isSecondarySidebarVisible && !hideBorder && "border-secondary",
             )}
-        </AnimatePresence>
+        >
+            <ul style={{ width: SECONDARY_SIDEBAR_WIDTH }} className="flex h-full flex-col p-4 pt-5">
+                {currentItem?.items?.map((item) => (
+                    <li key={item.label + item.href} className="py-px">
+                        <NavItemBase current={activeUrl === item.href} href={item.href} icon={item.icon} badge={item.badge} type="link">
+                            {item.label}
+                        </NavItemBase>
+                    </li>
+                ))}
+            </ul>
+        </div>
     );
 
     return (
@@ -148,7 +146,7 @@ export const SidebarNavigationDualTier = ({
 
             {/* Desktop sidebar navigation */}
             <div
-                className="z-50 hidden lg:fixed lg:inset-y-0 lg:left-0 lg:flex"
+                className="z-50 hidden lg:fixed lg:inset-y-0 lg:start-0 lg:flex"
                 onPointerEnter={() => setIsHovering(true)}
                 onPointerLeave={() => setIsHovering(false)}
             >
@@ -161,7 +159,7 @@ export const SidebarNavigationDualTier = ({
                 style={{
                     paddingLeft: MAIN_SIDEBAR_WIDTH,
                 }}
-                className="invisible hidden lg:sticky lg:top-0 lg:bottom-0 lg:left-0 lg:block"
+                className="invisible hidden lg:sticky lg:start-0 lg:top-0 lg:bottom-0 lg:block"
             />
         </>
     );

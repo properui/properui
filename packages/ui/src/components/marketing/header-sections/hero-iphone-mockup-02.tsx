@@ -42,12 +42,12 @@ export const HeroIphoneMockup02 = () => (
                     <img
                         alt={IMAGES.landscape[2].alt}
                         src={IMAGES.landscape[2].src}
-                        className="shadow-3xl ring-screen-mockup-border absolute top-0 left-24 h-128 max-w-3xl rounded-[10px] object-cover ring-4 max-lg:hidden"
+                        className="shadow-3xl ring-screen-mockup-border absolute start-24 top-0 h-128 max-w-3xl rounded-[10px] object-cover ring-4 max-lg:hidden"
                     />
 
                     <IPhoneMockup
                         image={IMAGES.square[0].src}
-                        className="drop-shadow-iphone-mockup top-18 left-0 h-[579px] w-71 lg:absolute lg:h-auto lg:w-61 lg:drop-shadow-none"
+                        className="drop-shadow-iphone-mockup start-0 top-18 h-[579px] w-71 lg:absolute lg:h-auto lg:w-61 lg:drop-shadow-none"
                     />
                 </div>
             </div>

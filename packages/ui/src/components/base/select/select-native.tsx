@@ -92,9 +92,9 @@ export const NativeSelect = ({ label, hint, options, className, selectClassName,
 
                         styles[size].icon,
                         // Styles for the icon when the select is within an `InputGroup`
-                        "in-data-input-wrapper:right-0 in-data-input-wrapper:size-4 in-data-input-wrapper:stroke-[2.625px]",
+                        "in-data-input-wrapper:end-0 in-data-input-wrapper:size-4 in-data-input-wrapper:stroke-[2.625px]",
                         // For "trailing" dropdown within `InputGroup`
-                        "in-data-input-wrapper:in-data-trailing:in-data-[input-size=md]:right-3 in-data-input-wrapper:in-data-trailing:in-data-[input-size=sm]:right-3",
+                        "in-data-input-wrapper:in-data-trailing:in-data-[input-size=md]:end-3 in-data-input-wrapper:in-data-trailing:in-data-[input-size=sm]:end-3",
                     )}
                 />
             </div>

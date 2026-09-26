@@ -83,7 +83,7 @@ export const FeaturesTabsMockup11 = () => (
                             <div className={cx(cardTransform, "z-0")}>
                                 {/* Decorative cast shadow under the fanned cards. Raw palette on purpose: it must stay the same
                                     ink in both themes, exactly like the gradients inside `shared-assets/credit-card`. */}
-                                <div className="h-47.5 w-79 rounded-2xl bg-neutral-900 opacity-15 blur-md" />
+                                <div className="bg-primary-solid h-47.5 w-79 rounded-2xl opacity-15 blur-md" />
                             </div>
                         </div>
                     </AriaTabPanel>

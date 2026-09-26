@@ -1,0 +1,66 @@
+{
+    "name": "@properui/eslint-plugin",
+    "version": "0.1.0",
+    "description": "ESLint rules that keep AI- and human-written Proper UI code on semantic tokens: raw Tailwind palette classes, arbitrary values, dark: variants and physical directional properties.",
+    "keywords": [
+        "eslint",
+        "eslintplugin",
+        "eslint-plugin",
+        "tailwindcss",
+        "design-system",
+        "properui",
+        "lint",
+        "a11y",
+        "rtl"
+    ],
+    "license": "MIT",
+    "author": "Ayman Shabaro (https://github.com/aymanshabaro)",
+    "homepage": "https://github.com/properui/properui#readme",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/properui/properui.git",
+        "directory": "packages/eslint-plugin"
+    },
+    "bugs": {
+        "url": "https://github.com/properui/properui/issues"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "type": "module",
+    "engines": {
+        "node": ">=20"
+    },
+    "main": "./dist/index.cjs",
+    "module": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js",
+            "require": "./dist/index.cjs"
+        },
+        "./package.json": "./package.json"
+    },
+    "files": [
+        "dist",
+        "README.md",
+        "LICENSE"
+    ],
+    "scripts": {
+        "build": "tsup src/index.ts --format esm,cjs --dts --clean",
+        "lint": "eslint src",
+        "type-check": "tsc --noEmit",
+        "test": "vitest run"
+    },
+    "peerDependencies": {
+        "eslint": "^9.0.0"
+    },
+    "devDependencies": {
+        "@types/node": "^22.9.0",
+        "eslint": "^9.15.0",
+        "tsup": "^8.3.5",
+        "typescript": "^5.9.3",
+        "vitest": "^2.1.8"
+    }
+}

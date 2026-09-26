@@ -30,7 +30,7 @@ export const DropdownAccountCardSM = () => {
 
                 <p className="text-primary text-sm font-semibold">{primaryAccount.name}</p>
 
-                <div className="absolute top-2 right-2 flex size-7 items-center justify-center rounded-md">
+                <div className="absolute end-2 top-2 flex size-7 items-center justify-center rounded-md">
                     <ChevronDown className="text-fg-quaternary size-4 shrink-0 stroke-[2.25px]" />
                 </div>
             </AriaButton>

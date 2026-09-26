@@ -68,7 +68,7 @@ export const DropdownAccountBreadcrumb = () => {
                                             <p className="text-tertiary truncate text-sm">{account.email}</p>
                                         </figcaption>
                                     </figure>
-                                    <RadioButtonBase isSelected={isSelected} className="absolute top-2 right-2" />
+                                    <RadioButtonBase isSelected={isSelected} className="absolute end-2 top-2" />
                                 </>
                             )}
                         </AriaMenuItem>

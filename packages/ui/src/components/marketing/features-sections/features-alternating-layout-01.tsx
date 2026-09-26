@@ -69,7 +69,7 @@ export const FeaturesAlternatingLayout01 = () => (
                         </div>
 
                         <div className="relative w-full flex-1 lg:h-128">
-                            <ScreenMockup className={cx("lg:absolute lg:w-auto lg:max-w-none", isReversed ? "lg:right-0" : "lg:left-0")}>
+                            <ScreenMockup className={cx("lg:absolute lg:w-auto lg:max-w-none", isReversed ? "lg:end-0" : "lg:start-0")}>
                                 <img src={feature.image.src} alt={feature.image.alt} className="size-full object-contain lg:w-auto lg:max-w-none" />
                             </ScreenMockup>
                         </div>

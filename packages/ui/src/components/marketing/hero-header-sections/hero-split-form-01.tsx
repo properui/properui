@@ -62,7 +62,7 @@ export const HeroSplitForm01 = () => (
 
                 <div className="bg-secondary relative w-full px-4 pt-12 pb-16 md:max-w-110 md:rounded-2xl md:px-10 md:py-8">
                     <LoopingArrow className="text-fg-brand-secondary absolute hidden xl:bottom-12 xl:block xl:-translate-x-[107%]" />
-                    <LoopingArrow className="text-fg-brand-secondary absolute top-0 right-0 hidden translate-x-48 -translate-y-32 -scale-x-100 -rotate-90 md:block lg:hidden" />
+                    <LoopingArrow className="text-fg-brand-secondary absolute end-0 top-0 hidden translate-x-48 -translate-y-32 -scale-x-100 -rotate-90 md:block lg:hidden" />
 
                     <Form>
                         <div className="flex flex-col items-center gap-6">

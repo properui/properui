@@ -19,11 +19,11 @@ export const CtaIphoneMockup03 = () => (
             <div className="bg-tertiary relative -mx-4 min-h-90 w-screen overflow-hidden md:mx-0 md:min-h-128 md:w-full">
                 <IPhoneMockup
                     image={IMAGES.square[2].src}
-                    className="drop-shadow-iphone-mockup absolute top-14 left-[47%] w-full max-w-67 -translate-x-[60%] sm:top-28 md:max-w-78.5 lg:left-12 lg:translate-x-0"
+                    className="drop-shadow-iphone-mockup absolute start-[47%] top-14 w-full max-w-67 -translate-x-[60%] sm:top-28 md:max-w-78.5 lg:start-12 lg:translate-x-0"
                 />
                 <IPhoneMockup
                     image={IMAGES.square[3].src}
-                    className="drop-shadow-iphone-mockup absolute top-6 right-[47%] w-full max-w-67 translate-x-[60%] sm:top-12 md:max-w-78.5 lg:right-12 lg:translate-x-0"
+                    className="drop-shadow-iphone-mockup absolute end-[47%] top-6 w-full max-w-67 translate-x-[60%] sm:top-12 md:max-w-78.5 lg:end-12 lg:translate-x-0"
                 />
             </div>
         </div>

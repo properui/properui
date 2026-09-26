@@ -111,7 +111,7 @@ export const Informational06 = () => (
                             </div>
                         </div>
 
-                        <div className="absolute top-4 right-4 md:top-5 md:right-5">
+                        <div className="absolute end-4 top-4 md:end-5 md:top-5">
                             <DropdownIconSimple />
                         </div>
                     </div>
@@ -134,7 +134,7 @@ export const Informational06 = () => (
                             </div>
                         </div>
 
-                        <div className="absolute top-4 right-4 md:top-5 md:right-5">
+                        <div className="absolute end-4 top-4 md:end-5 md:top-5">
                             <DropdownIconSimple />
                         </div>
                     </div>
@@ -156,7 +156,7 @@ export const Informational06 = () => (
                             </div>
                         </div>
 
-                        <div className="absolute top-4 right-4 md:top-5 md:right-5">
+                        <div className="absolute end-4 top-4 md:end-5 md:top-5">
                             <DropdownIconSimple />
                         </div>
                     </div>
@@ -174,7 +174,7 @@ export const Informational06 = () => (
                         Download all
                     </Button>
 
-                    <div className="absolute top-0 right-0 lg:hidden">
+                    <div className="absolute end-0 top-0 lg:hidden">
                         <DropdownIconSimple />
                     </div>
                 </div>

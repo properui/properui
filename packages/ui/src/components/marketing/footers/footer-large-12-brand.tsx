@@ -84,7 +84,7 @@ export const FooterLarge12Brand = () => {
                 </div>
 
                 {/* Absolutely positioned so the rule spans the band without adding a border box. */}
-                <div className="bg-border-brand_alt absolute bottom-0 left-0 h-px w-full" />
+                <div className="bg-border-brand_alt absolute start-0 bottom-0 h-px w-full" />
             </div>
 
             <div className="max-w-container mx-auto px-4 py-12 md:px-8 md:pt-16">

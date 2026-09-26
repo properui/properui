@@ -56,7 +56,7 @@ const PreviewCardRadio = ({ value, label, hint, preview }: { value: string; labe
                         isSelected={isSelected}
                         isDisabled={isDisabled}
                         isFocusVisible={isFocusVisible}
-                        className="absolute bottom-2 left-2"
+                        className="absolute start-2 bottom-2"
                     />
                 </span>
                 <span className="flex w-full flex-col gap-0.5">
