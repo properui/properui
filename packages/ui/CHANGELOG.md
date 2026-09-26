@@ -1,5 +1,79 @@
 # @properui/ui
 
+## 0.3.0
+
+### Minor Changes
+
+- 5e99b0e: Add the `ai-elements` group for AI chat interfaces: `AIConversation` (stick-to-bottom log with a scroll-to-latest button), `AIMessage` (user and assistant messages with avatar, timestamp, actions and a streaming shimmer and caret), `AIResponse` (a small built-in markdown renderer with highlighted code blocks), `AIReasoning`, `AIToolCall`, `AISources`, `AISuggestions`, `AIPromptInput` (auto-growing, Enter to send, attachments, model selector and counter slots, Stop while streaming), `AIModelSelector` and `AIBranch`. They take plain props and callbacks, so they work with any streaming source and need no AI SDK.
+- 6db077e: Adds six new component groups. Under `base/`: `HoverCard` (a rich hover/focus-triggered preview built on
+  `Popover`, for things a plain `Tooltip` can't hold, like a profile card with a Follow button), `Menubar` (an
+  application-style `File`/`Edit`/`View` menu bar built on React Aria's `Toolbar` plus the same `Menu`/`MenuTrigger`
+  primitives `Dropdown` uses, with hover-switching between open menus, submenus, and checkbox/radio items),
+  `NumberInput` (a `NumberField`-based numeric input with stacked or inline increment/decrement buttons and
+  `formatOptions` for currency/percent/unit display), and `TagInput` (type-to-add tags on Enter/comma, paste-splits-
+  on-commas, `maxTags`, a `validate` callback, and `isReadOnly`). Under `application/`: `Stepper` (a controlled
+  multi-step form wizard — distinct from the purely decorative `ProgressSteps` — with `canAdvance` validation, linear
+  and non-linear navigation, and horizontal/vertical layouts) and `Timeline` (vertical, alternating and horizontal
+  status timelines with `completed`/`current`/`upcoming` coloring).
+- 564d586: Adds four chart groups to round out coverage against the top component libraries: `area-charts`
+  (stacked, gradient, stepped, a brush range selector, small multiples), `scatter-bubble-charts`
+  (scatter, a z-axis-sized bubble chart, a fitted regression line, categorical colors), `sparklines`
+  (a standalone `Sparkline` primitive for metric cards and table cells, plus demos dropping it into
+  existing `MetricSimple` cards and a `Table`), and `combined-charts` (bar + line, dual y-axes, a bar
+  with a target `ReferenceLine`, a waterfall built from stacked bars, and a `Funnel`).
+
+    Also adds `chartColorTokens`, `chartColors` and `sequentialScale` to `charts-base`: an ordered,
+    documented categorical color list (and a single-hue scale builder) for charts that assign color to
+    an unknown number of series, resolved from the same `--color-utility-*` tokens every chart already
+    uses. `ChartLegendContent`'s swatch now also reads a series' `style.color`, alongside the existing
+    `className` support, so a series colored this way still gets a correctly tinted legend swatch.
+
+    The four new chart docs pages each cover their own examples, and a "Chart colours" section explaining
+    the ordering and dark-mode behavior was added to all eight chart docs pages (`line-bar-charts`,
+    `pie-charts`, `radar-charts`, `activity-gauges`, and the four new ones).
+
+- c661b87: Add `DataTable` and `useDataTable` (`application/data-table`): sorting with optional multi-column stacking, search, faceted, text, number-range and date-range filters, column visibility, pinning and resizing, row selection with a bulk-action bar, client-side pagination, a `manual` server-side mode driven by `onQueryChange`, density toggle, loading skeleton rows, empty state, sticky header and virtualization through React Aria's `Virtualizer` and `TableLayout`. `Table` is unchanged and remains the styling primitive.
+- 73b1016: Add four application component groups: `Kanban` (board, columns and cards with drag and drop between columns, keyboard moves, collapsible columns and custom card rendering), `SortableList` (vertical reordering with drag handles and keyboard support), `ResizablePanelGroup` / `ResizablePanel` / `ResizableHandle` (horizontal and vertical layouts, min and max sizes, collapsible panels and keyboard-resizable separators) and `ScrollArea` (native scrolling with token-styled scrollbars, `auto` / `always` / `hover` visibility and fade edges). Drag and drop uses React Aria's built-in hooks; no new dependencies.
+- 367d1b2: Add `Gantt` (application/gantt): a grouped Gantt chart with day, week and month zoom, a sticky sidebar with owner avatars, a synced date header, weekend shading, a today line, date markers, milestones, dependency arrows, and drag or keyboard move and resize (`onMove`, `onResize`). Add `CodeEditor` (application/code-editor): a dependency-free editable code area with syntax highlighting, line numbers, current-line highlight, Tab/Shift+Tab indentation, auto-indent, bracket auto-close, read-only mode, a toolbar slot with a copy button, and error and warning diagnostics. Press Escape, then Tab, to move focus out of the editor.
+- 95470ee: Adds `withProperUI`, exported from `@properui/ui/next`, for the one line of `next.config.ts` every
+  Next.js consumer of this package needs: `withProperUI(nextConfig)` appends `@properui/ui` to
+  `transpilePackages`, deduplicated, preserving whatever else the config already sets.
+
+    ```ts
+    // next.config.ts
+    import type { NextConfig } from "next";
+    import { withProperUI } from "@properui/ui/next";
+
+    const nextConfig: NextConfig = {};
+
+    export default withProperUI(nextConfig);
+    ```
+
+    This does not remove the need for `transpilePackages` — Next.js still won't compile this package's
+    TSX from `node_modules` without it — it's a shorter way to write it. The manual snippet keeps
+    working unchanged.
+
+- 7a583e0: Add theme presets. `@properui/ui/styles/presets` ships eight presets (`brand`, `blue`, `indigo`, `teal`, `green`,
+  `orange`, `rose`, `slate-mono`), each a brand ramp plus a base gray (`gray`, `slate`, `zinc`, `neutral`, `stone`), a
+  radius scale (`none` to `xl`) and optional fonts, together with `generateThemeCss()` (the `@theme` override block to
+  append after the Proper UI stylesheet), `scaleFromHue()`/`scaleFromHex()` (an 11-step brand ramp derived in OKLCH from
+  one colour), and `encodePreset()`/`decodePreset()` (short url-safe preset codes). `theme.css` now pins Tailwind's
+  `--radius-xs` … `--radius-4xl` scale so presets have a documented radius hook; values are unchanged.
+
+    The CLI gains `properui theme list`, `properui theme apply <preset|code> [--css <file>] [--dry-run]` (writes or
+    replaces a marked `/* properui:theme-preset */` block in the global stylesheet, idempotently) and `init --preset
+<name|code>`. The docs add a theme generator page (/docs/theme-generator) that previews real components with any preset
+    or hex colour and prints the CSS, the preset code and the `theme apply` command.
+
+### Patch Changes
+
+- 37f0dc3: Replace the `motion` runtime with CSS transitions in the dual-tier and slim sidebar navigations'
+  secondary panel (width/border-color, previously a Framer spring inside `AnimatePresence`). Visual
+  behavior is unchanged; `motion` is no longer imported by `app-navigation`, so consumers of that
+  registry entry no longer pull in the `motion` package. `file-upload` (drag physics in
+  `draggable.tsx`, FLIP list-reorder animation in `file-upload-base.tsx`) still depends on `motion`
+  for cases CSS genuinely can't express.
+
 ## 0.2.0
 
 ### Minor Changes

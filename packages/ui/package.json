@@ -1,6 +1,6 @@
 {
     "name": "@properui/ui",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "description": "Accessible React 19 component library built on React Aria Components and Tailwind CSS v4, shipped as source TSX.",
     "keywords": [
         "react",
