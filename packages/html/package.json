@@ -1,0 +1,79 @@
+{
+    "name": "@properui/html",
+    "version": "0.1.0",
+    "description": "Proper UI without React: CSS component classes on the same semantic tokens, small dependency-free vanilla-JS behaviours, and copy-paste HTML snippets.",
+    "keywords": [
+        "html",
+        "css",
+        "vanilla-js",
+        "tailwindcss",
+        "design-system",
+        "components",
+        "ui",
+        "accessibility"
+    ],
+    "license": "MIT",
+    "author": "Ayman Shabaro (https://github.com/aymanshabaro)",
+    "homepage": "https://github.com/properui/properui#readme",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/properui/properui.git",
+        "directory": "packages/html"
+    },
+    "bugs": {
+        "url": "https://github.com/properui/properui/issues"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "type": "module",
+    "engines": {
+        "node": ">=20"
+    },
+    "sideEffects": [
+        "*.css",
+        "./dist/properui-html.iife.js"
+    ],
+    "main": "./dist/index.js",
+    "module": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "unpkg": "./dist/properui-html.iife.js",
+    "jsdelivr": "./dist/properui-html.iife.js",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        },
+        "./css": "./src/index.css",
+        "./properui.css": "./dist/properui.css",
+        "./dist/properui-html.iife.js": "./dist/properui-html.iife.js",
+        "./components/*": "./src/components/*",
+        "./package.json": "./package.json"
+    },
+    "files": [
+        "dist",
+        "src/index.css",
+        "src/css",
+        "src/components",
+        "README.md",
+        "LICENSE"
+    ],
+    "scripts": {
+        "build": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && tsup && tsx scripts/build-css.ts",
+        "lint": "eslint src scripts",
+        "type-check": "tsc --noEmit",
+        "test": "vitest run"
+    },
+    "devDependencies": {
+        "@tailwindcss/postcss": "^4.3.3",
+        "@types/node": "^22.9.0",
+        "axe-core": "^4.13.0",
+        "jsdom": "^25.0.1",
+        "postcss": "^8.5.28",
+        "tailwindcss": "^4.3.3",
+        "tsup": "^8.3.5",
+        "tsx": "^4.19.2",
+        "typescript": "^5.9.3",
+        "vitest": "^2.1.8"
+    }
+}

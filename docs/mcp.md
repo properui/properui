@@ -16,15 +16,15 @@ writes is byte-for-byte what `properui add` would have written.
 
 ## Tools
 
-| Tool                 | CLI equivalent        | What it does                                                                                          |
-| -------------------- | --------------------- | ----------------------------------------------------------------------------------------------------- |
-| `list_components`    | `list --json`         | Registry entries (name, layer, type, title, description), filtered by `layer` / `type`, paginated     |
-| `search_components`  | `search <query>`      | Fuzzy search over names, titles, descriptions, docs example names and exported symbols                |
-| `get_component`      | `curl /r/<name>.json` | The full entry: every file with its source, npm and registry dependencies, usage guidance, docs URL   |
-| `get_component_docs` | `curl /<route>.md`    | The entry's docs page as markdown (the MDX source when the registry is a local checkout)              |
-| `add_component`      | `add <names...>`      | Writes the files, resolves `registryDependencies`, rewrites `@/` imports, returns the install command |
-| `get_project_info`   | `info --json`         | Framework, Tailwind, aliases, theme path, registry reachability, installed entries                    |
-| `check_tokens`       | `check [dir]`         | Raw palette classes, `dark:` variants and arbitrary colour values in a file or directory              |
+| Tool                 | CLI equivalent        | What it does                                                                                                                                     |
+| -------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `list_components`    | `list --json`         | Registry entries (name, layer, type, title, description, platforms), filtered by `layer` / `type` / `platform`, paginated                        |
+| `search_components`  | `search <query>`      | Fuzzy search over names, titles, descriptions, docs example names and exported symbols; `platform` filter                                        |
+| `get_component`      | `curl /r/<name>.json` | The full entry: every file with its source, npm and registry dependencies, usage guidance, docs URL                                              |
+| `get_component_docs` | `curl /<route>.md`    | The entry's docs page as markdown (the MDX source when the registry is a local checkout)                                                         |
+| `add_component`      | `add <names...>`      | Writes the files, resolves `registryDependencies`, rewrites `@/` imports, returns the install command; `<name>-html` on an html-platform project |
+| `get_project_info`   | `info --json`         | Framework, platform, Tailwind, aliases, theme path, registry reachability, installed entries                                                     |
+| `check_tokens`       | `check [dir]`         | Raw palette classes, `dark:` variants and arbitrary colour values in a file or directory                                                         |
 
 Every tool that touches a project takes an optional `cwd`; it defaults to the directory the server was started in,
 which is the project root for every client below. `add_component` needs `components.json`, so run

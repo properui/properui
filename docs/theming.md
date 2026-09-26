@@ -134,6 +134,13 @@ instead of `.dark-mode`.
 
 Override any of them in an `@theme` block of your own; the last declaration wins.
 
+## Non-React projects
+
+The same tokens ship as plain CSS in [`@properui/tokens`](./tokens.md): `tokens.css` (CSS variables on `:root` and
+`.dark-mode`, no Tailwind needed) for Vue, Angular, Svelte or Astro apps, `theme.css` for Tailwind projects in any
+framework, every preset as a file, and a prebuilt `properui.min.css` a plain HTML page can link from a CDN. Everything
+on this page applies to them unchanged: re-brand by redeclaring the same variables after the file you load.
+
 ## FAQ
 
 **Do I need to restart the dev server after editing tokens?** No. Tailwind's dev server picks up CSS variable changes

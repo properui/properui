@@ -12,12 +12,17 @@ Or `pnpm dlx properui@latest ...`, `yarn dlx properui@latest ...`, `bunx properu
 
 Requires Node 20+.
 
+On a non-React project (Vue, Nuxt, Angular, Svelte, SvelteKit, Astro or plain HTML) the same commands work on the
+**html platform**: `init` wires `@properui/tokens` and `@properui/html` instead of the React files, and `add` installs
+HTML snippets instead of `.tsx`. See [Platforms](#platforms) and [frameworks.md](./frameworks.md).
+
 ## Commands
 
 | Command               | What it does                                                             |
 | --------------------- | ------------------------------------------------------------------------ |
 | `create <dir>`        | Scaffold a new Next.js or Vite project, then `init` and `add` into it    |
 | `init`                | Configure this project: `components.json`, tokens, `cx`, `ThemeProvider` |
+| `info`                | Report framework, platform, Tailwind, aliases and installed entries      |
 | `add <components...>` | Copy components (and their dependencies) into the project                |
 | `add example <name>`  | Copy a whole page example plus everything it uses                        |
 | `list`                | List registry entries with layer and description                         |
@@ -58,8 +63,10 @@ the network: the command only writes files, and prints the install command to ru
 npx @properui/cli@latest init
 ```
 
-Detects your framework (Next.js App Router, Next.js Pages Router, Vite, plain React), whether you use TypeScript, whether
-you have a `src/` directory, your `tsconfig.json` path alias, your Tailwind version and your package manager, then:
+Detects your framework (Next.js App Router, Next.js Pages Router, Vite, Remix, plain React; or Vue, Nuxt, Angular,
+Svelte, SvelteKit, Astro and plain HTML, which put the project on the [html platform](#platforms)), whether you use
+TypeScript, whether you have a `src/` directory, your `tsconfig.json` path alias, your Tailwind version and your package
+manager, then, on a React project:
 
 - writes `components.json`,
 - copies the theme token file,
@@ -76,6 +83,7 @@ v4 `@theme` syntax.
 | `--vite`      | Treat the project as Vite instead of auto-detecting        |
 | `--manual`    | Write the files but leave the app entry point alone        |
 | `--overwrite` | Replace `components.json` and any files that already exist |
+| `--platform`  | `react` or `html`: override the detected platform          |
 | `-y, --yes`   | Accept every default; never prompt                         |
 
 `--preset <name|code>` also applies a theme preset to the global stylesheet as part of `init`, exactly as
@@ -89,6 +97,7 @@ Written by `init`, read by every other command:
 {
     "$schema": "https://properui.dev/schema.json",
     "style": "default",
+    "platform": "react",
     "tsx": true,
     "tailwind": {
         "css": "app/globals.css",
@@ -106,7 +115,8 @@ Written by `init`, read by every other command:
 ```
 
 Edit `aliases` to control where files land and how imports are rewritten; edit `registry` to point at a different
-source permanently.
+source permanently. `platform` (`react` or `html`, `react` when absent) decides which registry entries `add` installs;
+see [Platforms](#platforms).
 
 ## `add`
 
@@ -160,11 +170,12 @@ npx @properui/cli@latest list --type component
 npx @properui/cli@latest list --json
 ```
 
-| Option        | Description                                                                                                                          |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `--layer <l>` | `base`, `application`, `marketing`, `app-examples`, `marketing-examples`, `foundations`, `shared-assets`, `hooks`, `utils`, `styles` |
-| `--type <t>`  | `component`, `example`, `util`, `hook`, `style`                                                                                      |
-| `--json`      | Print the raw index rows, for scripting                                                                                              |
+| Option           | Description                                                                                                                                  |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--layer <l>`    | `base`, `application`, `marketing`, `app-examples`, `marketing-examples`, `foundations`, `shared-assets`, `hooks`, `utils`, `styles`, `html` |
+| `--type <t>`     | `component`, `example`, `util`, `hook`, `style`, `html`                                                                                      |
+| `--platform <p>` | `react`, `next`, `html`, `vue`, `angular`, `svelte`, `astro`, `vanilla`: only entries that run there                                         |
+| `--json`         | Print the raw index rows, for scripting                                                                                                      |
 
 ## `search`
 
@@ -175,9 +186,12 @@ npx @properui/cli@latest search "pricing"
 npx @properui/cli@latest search "empty state" --limit 5
 ```
 
-| Option        | Description                    |
-| ------------- | ------------------------------ |
-| `--limit <n>` | Maximum results (default `20`) |
+Each result shows its platform (`react` or `html`).
+
+| Option           | Description                                                             |
+| ---------------- | ----------------------------------------------------------------------- |
+| `--limit <n>`    | Maximum results (default `20`)                                          |
+| `--platform <p>` | Only entries for this platform (`react`, `html`, `vue`, `angular`, ...) |
 
 ## `diff`
 
@@ -246,6 +260,42 @@ same preset twice leaves the file byte-for-byte unchanged.
 | -------------- | ----------------------------------------------------------------------------------------------------------- |
 | `--css <file>` | Stylesheet to write to. Default: `tailwind.css` from `components.json`, else the detected global stylesheet |
 | `--dry-run`    | Print the block without writing anything                                                                    |
+
+## Platforms
+
+Every registry entry declares the `platforms` it runs on. The TSX components are `["react", "next"]`. The
+`@properui/html` snippet entries (`type: "html"`, `layer: "html"`, named `<component>-html`, e.g. `buttons-html`) are
+`["html", "vue", "angular", "svelte", "astro", "vanilla"]`. They are a curated subset of the React library: see the
+per-component table in [frameworks.md](./frameworks.md).
+
+`init` detects the platform from `package.json` and config files: `react` for Next.js, Vite + React, Remix and React;
+`html` for Vue (`vue`, or `@vitejs/plugin-vue` in `vite.config.*`), Nuxt (`nuxt.config.*`), Angular (`angular.json`),
+Svelte (`@sveltejs/vite-plugin-svelte`) and SvelteKit (`@sveltejs/kit`), Astro (`astro.config.*`), and anything with no
+`package.json` or no known framework. `--platform react|html` overrides it. On `html`, `init`:
+
+- writes `components.json` with `"platform": "html"`,
+- skips `utils/cx.ts`, the providers, the TSX `@source` line and the Vite alias wiring,
+- with a global stylesheet and Tailwind v4, adds `@import "@properui/tokens/theme.css";`,
+  `@import "@properui/html/css";` and an `@source` line for the snippets folder,
+- without one, prints the no-build lines instead:
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@properui/tokens/dist/properui.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/@properui/html/dist/properui-html.iife.js" data-auto-init defer></script>
+```
+
+- and prints `npm i @properui/tokens @properui/html @properui/elements` last.
+
+Then `add <name>` on an html project installs `<name>-html` when it exists (also under its singular/plural spelling,
+so `add button` and `add buttons` both work), writing the `.html` snippets to `<components alias>/<component>/` and
+recording them in `components.json` like any other entry. A React-only entry fails with one line that names the HTML
+alternative when there is one:
+
+```text
+error "data-table" is React-only and this project's components.json platform is "html". Use the HTML equivalent instead: properui add table (installs table-html).
+```
+
+`info --json` reports `platform`, `framework` and `installedHtml` (the installed html entries).
 
 ## Pointing at another registry
 

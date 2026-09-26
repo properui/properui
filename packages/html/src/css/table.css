@@ -1,0 +1,111 @@
+/*
+ * Table. Mirrors `TableCard`, `Table.Header`, `Table.Head`, `Table.Row` and `Table.Cell` in
+ * packages/ui/src/components/application/table/table.tsx, on a real `<table>` (so it is
+ * `role="table"`, not the React grid; there is no keyboard grid navigation here).
+ *
+ * <div class="pui-table__card">
+ *     <div class="pui-table__header"><h2 class="pui-table__title">Team</h2></div>
+ *     <table class="pui-table">...</table>
+ * </div>
+ */
+@layer components {
+    .pui-table__card {
+        @apply bg-primary ring-secondary w-full overflow-x-auto rounded-xl shadow-xs ring-1;
+    }
+
+    .pui-table__header {
+        @apply border-secondary relative flex flex-col items-start gap-4 border-b px-4 py-5 md:flex-row md:items-center md:px-6;
+    }
+
+    .pui-table__heading {
+        @apply flex flex-1 flex-col gap-0.5;
+    }
+
+    .pui-table__title {
+        @apply text-md text-primary m-0 flex items-center gap-2 font-semibold;
+    }
+
+    .pui-table__description {
+        @apply text-tertiary m-0 text-sm;
+    }
+
+    .pui-table {
+        @apply w-full border-collapse text-start;
+
+        & > caption {
+            @apply text-tertiary px-6 py-4 text-start text-sm;
+        }
+
+        & > thead > tr {
+            @apply bg-secondary h-11;
+        }
+
+        & > thead th {
+            @apply border-secondary text-quaternary relative border-b px-6 py-2 text-start align-middle text-xs font-semibold whitespace-nowrap;
+        }
+
+        & > tbody > tr {
+            @apply hover:bg-secondary h-18 transition-colors;
+        }
+
+        & > tbody td,
+        & > tbody th {
+            @apply border-secondary text-tertiary relative border-b px-6 py-4 text-start align-middle text-sm font-normal;
+        }
+
+        & > tbody > tr:last-child > td,
+        & > tbody > tr:last-child > th {
+            @apply border-b-0;
+        }
+
+        /* The row-header cell (usually a name), in the primary text colour. */
+        & > tbody th[scope="row"] {
+            @apply text-primary font-medium;
+
+            & > .pui-avatar {
+                @apply me-3;
+            }
+        }
+
+        /* A narrow leading checkbox column. */
+        & .pui-table__select {
+            @apply w-11 pe-0;
+        }
+    }
+
+    .pui-table__row--selected,
+    .pui-table > tbody > tr:has(> .pui-table__select input:checked) {
+        @apply bg-secondary;
+    }
+
+    .pui-table--sm {
+        & > thead > tr {
+            @apply h-9;
+        }
+
+        & > thead th {
+            @apply px-5;
+        }
+
+        & > tbody > tr {
+            @apply h-14;
+        }
+
+        & > tbody td,
+        & > tbody th {
+            @apply px-5 py-3;
+        }
+
+        & .pui-table__select {
+            @apply w-9;
+        }
+    }
+
+    .pui-table__footer {
+        @apply border-secondary border-t px-4 py-3 md:px-6 md:pt-3 md:pb-4;
+
+        & > .pui-pagination {
+            @apply border-t-0 pt-0;
+        }
+    }
+}

@@ -1,0 +1,74 @@
+/*
+ * Tabs. Mirrors packages/ui/src/components/application/tabs/tabs.tsx: the `underline` type (the
+ * default here) and `button-brand` (`--button`), size sm. The JS (`data-pui="tabs"`) sets the
+ * roles, `aria-selected`, `aria-controls` and the roving tabindex; selection is styled from
+ * `aria-selected`, so server-rendered markup can mark the initial tab itself.
+ *
+ * <div class="pui-tabs" data-pui="tabs">
+ *     <div class="pui-tabs__list" aria-label="Settings">
+ *         <button class="pui-tab" type="button" aria-selected="true">Account</button>
+ *         <button class="pui-tab" type="button">Billing</button>
+ *     </div>
+ *     <div class="pui-tabs__panel">...</div>
+ *     <div class="pui-tabs__panel" hidden>...</div>
+ * </div>
+ */
+@layer components {
+    .pui-tabs {
+        @apply flex w-full flex-col gap-6;
+    }
+
+    .pui-tabs__list {
+        @apply relative flex gap-3 overflow-x-auto;
+        @apply before:bg-border-secondary before:pointer-events-none before:absolute before:inset-x-0 before:bottom-0 before:h-px;
+        scrollbar-width: none;
+    }
+
+    .pui-tab {
+        @apply text-quaternary outline-focus-ring z-10 flex h-max shrink-0 cursor-pointer items-center justify-center gap-1 rounded-md border-0 bg-transparent text-sm font-semibold whitespace-nowrap no-underline transition duration-100 ease-linear focus-visible:outline-2 focus-visible:-outline-offset-2;
+        /* underline type */
+        @apply rounded-none border-b-2 border-solid border-transparent px-1 pt-0 pb-2.5;
+
+        & > svg {
+            @apply text-fg-quaternary size-4 shrink-0;
+        }
+
+        &:hover,
+        &[aria-selected="true"] {
+            @apply border-fg-brand-primary_alt text-brand-secondary;
+
+            & > svg {
+                @apply text-fg-brand-secondary_hover;
+            }
+        }
+
+        &:disabled,
+        &[aria-disabled="true"] {
+            @apply cursor-not-allowed opacity-50;
+        }
+    }
+
+    .pui-tabs--underline {
+        /* The default; the class exists so markup can say so explicitly. */
+    }
+
+    /* button-brand */
+    .pui-tabs--button {
+        & .pui-tabs__list {
+            @apply gap-1 before:hidden;
+        }
+
+        & .pui-tab {
+            @apply rounded-md border-0 px-3 py-2;
+
+            &:hover,
+            &[aria-selected="true"] {
+                @apply bg-brand-primary_alt text-brand-secondary;
+            }
+        }
+    }
+
+    .pui-tabs__panel {
+        @apply outline-focus-ring rounded-md focus-visible:outline-2 focus-visible:outline-offset-2;
+    }
+}

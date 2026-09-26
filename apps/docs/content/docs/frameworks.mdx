@@ -1,0 +1,133 @@
+---
+title: Frameworks
+section: docs
+description: Which Proper UI layer to use in React, Next.js, Vue, Angular, Svelte, Astro, plain HTML and vanilla JS, and exactly which components exist outside React.
+metaTitle: Frameworks and platforms | Proper UI
+metaDescription: Proper UI is a React 19 library first. Vue, Angular, Svelte, Astro and plain HTML projects get the same tokens plus a curated set of HTML components and custom elements. The support matrix, component by component.
+---
+
+Proper UI is a React 19 component library first. The React layer (`@properui/ui`, installed with the CLI) is the full
+library: 126 component groups, every page example, and React Aria behaviour underneath. Everything else on this page is
+a smaller, curated layer for projects that are not React, built on the same design tokens so both look the same.
+
+## Support matrix
+
+| Framework                                  | Layer to use                                                                 | What you get                                                                                                                      |
+| ------------------------------------------ | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| React 19, Next.js (App/Pages), Vite, Remix | `@properui/ui` via `properui add` (TSX source)                               | Everything: all component groups, page examples, marketing sections, React Aria keyboard and screen-reader behaviour              |
+| Vue 3, Nuxt                                | `@properui/elements` + `@properui/tokens` (or the html snippets)             | The curated component set below as `<pui-*>` custom elements, same tokens and themes                                              |
+| Angular                                    | `@properui/elements` with `CUSTOM_ELEMENTS_SCHEMA` + `@properui/tokens`      | Same as Vue                                                                                                                       |
+| Svelte, SvelteKit                          | `@properui/elements` + `@properui/tokens`                                    | Same as Vue                                                                                                                       |
+| Astro                                      | html snippets in `.astro` files, `@properui/elements` for interactive pieces | Same curated set. An Astro site with the React integration can also use `@properui/ui` in React islands (`init --platform react`) |
+| Plain HTML, vanilla JS                     | The prebuilt stylesheet and script from a CDN, plus the html snippets        | The curated set as plain markup on `pui-` classes, with small dependency-free behaviours                                          |
+
+The four packages:
+
+| Package              | What it is                                                                                                                                                                                                                                         |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@properui/ui`       | The React components. Copied into a project as source by `properui add`; React-only.                                                                                                                                                               |
+| `@properui/tokens`   | The token layer as plain CSS: `theme.css` for Tailwind v4 in any framework, `tokens.css` as bare CSS variables, the theme presets, and `properui.css`/`properui.min.css` (tokens plus component classes, prebuilt, for a page with no build step). |
+| `@properui/html`     | Component classes (`.pui-btn`, `.pui-modal`, ...) written against the semantic tokens, small vanilla-JS behaviours (dropdowns, tabs, modals, tooltips, toasts, theme switching), and copy-paste `.html` snippets.                                  |
+| `@properui/elements` | Light-DOM custom elements (`<pui-button>`, `<pui-modal>`, ...) that render the `@properui/html` markup and call its behaviours. No framework runtime, no shadow root, so forms and global styles work.                                             |
+
+## Install
+
+The CLI detects the framework and picks the layer. On Vue, Nuxt, Angular, Svelte, SvelteKit, Astro, or a folder with no
+`package.json`, it puts the project on the **html platform**:
+
+```bash
+npx @properui/cli@latest init          # writes components.json with "platform": "html"
+npx @properui/cli@latest add buttons   # installs the -html snippet entry: .html files, not TSX
+npx @properui/cli@latest list --platform html
+```
+
+With a global stylesheet and Tailwind v4, `init` adds the token and component CSS to it:
+
+```css
+@import "tailwindcss";
+@import "@properui/tokens/theme.css";
+@import "@properui/html/css";
+@source "./components/**/*.html";
+```
+
+Without a build step, link the prebuilt files instead:
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@properui/tokens/dist/properui.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/@properui/html/dist/properui-html.iife.js" data-auto-init defer></script>
+<!-- optional: the custom elements -->
+<script src="https://cdn.jsdelivr.net/npm/@properui/elements/dist/properui-elements.global.js" defer></script>
+```
+
+With a bundler: `npm i @properui/tokens @properui/html @properui/elements`, then register the elements once with
+`import "@properui/elements/register";`. `add` of a React-only entry on an html project fails with one line naming the
+HTML alternative when there is one; `--platform react|html` on `init` overrides detection.
+
+Dark mode works the same way everywhere: a `.dark-mode` class on `<html>` repoints every token. In the html layer,
+`setTheme("light" | "dark" | "system")` from `@properui/html` toggles it and remembers the choice.
+
+## Components outside React
+
+These exist in the html layer. `add` name is what to pass to `properui add` on an html project (it resolves to the
+`-html` entry); the custom element column is the `@properui/elements` tag where one exists (the package README is the
+authoritative list).
+
+| Component       | `add` name            | HTML classes                                          | React counterpart         | Custom element             |
+| --------------- | --------------------- | ----------------------------------------------------- | ------------------------- | -------------------------- |
+| Button          | `buttons`             | `.pui-btn`                                            | `buttons`                 | `<pui-button>`             |
+| Badge           | `badges`              | `.pui-badge`                                          | `badges`                  | `<pui-badge>`              |
+| Input           | `input`               | `.pui-field`, `.pui-label`, `.pui-input`, `.pui-hint` | `input`                   | `<pui-input>`              |
+| Textarea        | `textarea`            | `.pui-textarea`                                       | `textarea`                | `<pui-textarea>`           |
+| Checkbox        | `checkbox`            | `.pui-checkbox`                                       | `checkbox`                | `<pui-checkbox>`           |
+| Radio           | `radio-buttons`       | `.pui-radio`                                          | `radio-buttons`           | markup only                |
+| Toggle          | `toggle`              | `.pui-toggle`                                         | `toggle`                  | `<pui-toggle>`             |
+| Select (native) | `select`              | `.pui-select`                                         | `select` (`NativeSelect`) | `<pui-select>`             |
+| Avatar          | `avatar`              | `.pui-avatar`                                         | `avatar`                  | `<pui-avatar>`             |
+| Card            | `card`                | `.pui-card`                                           | none (layout pattern)     | markup only                |
+| Alert / callout | `alerts`              | `.pui-alert`                                          | `alerts`, `callout`       | `<pui-alert>`              |
+| Tabs            | `tabs`                | `.pui-tabs`, `.pui-tab`                               | `tabs`                    | `<pui-tabs>`               |
+| Tooltip         | `tooltip`             | `.pui-tooltip`, `[data-pui-tooltip]`                  | `tooltip`                 | `<pui-tooltip>`            |
+| Dropdown menu   | `dropdown`            | `.pui-dropdown`, `.pui-menu`                          | `dropdown`                | `<pui-dropdown>`           |
+| Modal           | `modals`              | `.pui-modal` on `<dialog>`                            | `modals`                  | `<pui-modal>`              |
+| Accordion       | `accordion`           | `.pui-accordion` on `<details>`                       | none                      | markup + `initAccordions`  |
+| Breadcrumbs     | `breadcrumbs`         | `.pui-breadcrumbs`                                    | `breadcrumbs`             | `<pui-breadcrumbs>`        |
+| Pagination      | `pagination`          | `.pui-pagination`                                     | `pagination`              | `<pui-pagination>`         |
+| Table           | `table`               | `.pui-table`                                          | `table`                   | markup only                |
+| Progress bar    | `progress-indicators` | `.pui-progress`                                       | `progress-indicators`     | `<pui-progress>`           |
+| Skeleton        | `skeleton`            | `.pui-skeleton`                                       | `skeleton`                | `<pui-skeleton>`           |
+| Toast           | `notifications`       | `.pui-toast`, `.pui-toaster`                          | `notifications`           | `toast({ title })` from JS |
+| Empty state     | `empty-state`         | `.pui-empty`                                          | `empty-state`             | markup only                |
+
+Accessibility in this layer comes from native HTML (`<dialog>`, `<details>`, real form controls) plus the `role` and
+`aria-*` attributes the behaviours set, not from React Aria. It covers the common keyboard paths (Escape, arrow keys in
+menus and tabs, focus return from dialogs), but it is not a line-for-line port of the React components' behaviour.
+
+## React-only
+
+Everything not in the table above has no non-React equivalent today, and `add` refuses it on an html project. That
+includes:
+
+- **Base:** `button-group`, `file-upload-trigger`, `form`, `hover-card`, `menubar`, `number-input`, `popover`,
+  `slider`, `tag-input`, `tags`, `text-editor`, `toggle-chip`, `video-player`.
+- **Application:** `activity-feed`, `ai-elements`, `app-navigation`, `card-headers`, `carousel`, `charts`,
+  `code-editor`, `code-snippet`, `color-picker`, `command-menu`, `confirm-dialog`, `content-divider`, `data-table`,
+  `date-picker`, `description-list`, `file-upload`, `filter-bar`, `gantt`, `gradient-picker`, `image-picker`,
+  `inline-cta`, `kanban`, `loading-indicator`, `messaging`, `metrics`, `page-headers`, `progress-steps`, `resizable`,
+  `scroll-area`, `section-footers`, `section-headers`, `slideout-menus`, `sortable-list`, `stepper`, `timeline`,
+  `tree-view`.
+- **Every marketing section and every page example** (`marketing`, `marketing-examples`, `app-examples`), plus the
+  `foundations` and `shared-assets` groups.
+
+Where a close html component exists (`data-table` → `table`, `confirm-dialog` → `modal`, `button-group` → `button`),
+the CLI names it in its error message. There are no Vue, Angular or Svelte ports of the React components: the custom elements and the html snippets are the
+cross-framework surface.
+
+## Per-framework guides
+
+Install, stylesheet, theme toggle, and a button and a modal in each framework's own syntax:
+[Vue](/integrations/vue), [Angular](/integrations/angular),
+[Svelte](/integrations/svelte), [Astro](/integrations/astro),
+[plain HTML](/integrations/plain-html) and [vanilla JS](/integrations/vanilla-js).
+For React: [Next.js](/integrations/nextjs) and [Vite](/integrations/vite).
+
+The CLI side of this (detection, `components.json` `platform`, how `add` resolves names) is in the [CLI guide](/docs/cli#non-react-projects).

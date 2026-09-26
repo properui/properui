@@ -1,0 +1,201 @@
+<!-- description: A data table on a real <table> inside a card: header with title and badge, a selectable checkbox column, row headers, status badges, row actions and a pagination footer. -->
+<div class="pui-table__card">
+    <div class="pui-table__header">
+        <div class="pui-table__heading">
+            <h2 class="pui-table__title" id="table-team-title">Team members <span class="pui-badge pui-badge--modern pui-badge--sm">48 users</span></h2>
+            <p class="pui-table__description">Manage your team members and their account permissions.</p>
+        </div>
+        <button class="pui-btn pui-btn--primary" type="button">
+            <svg
+                class="pui-btn__icon"
+                data-icon="leading"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+            >
+                <path d="M12 5v14m-7-7h14" />
+            </svg>
+            Add member
+        </button>
+    </div>
+    <table class="pui-table" aria-labelledby="table-team-title">
+        <thead>
+            <tr>
+                <th class="pui-table__select" scope="col"><span class="pui-sr-only">Selection</span></th>
+                <th scope="col">Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Role</th>
+                <th scope="col">Status</th>
+                <th scope="col"><span class="pui-sr-only">Actions</span></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="pui-table__select">
+                    <label class="pui-checkbox pui-checkbox--md">
+                        <input type="checkbox" name="member" value="or" />
+                        <span class="pui-checkbox__box" aria-hidden="true"></span>
+                        <span class="pui-sr-only">Select Olivia Rhye</span>
+                    </label>
+                </td>
+                <th scope="row">
+                    <span class="pui-avatar pui-avatar--sm"><span class="pui-avatar__initials" aria-hidden="true">OR</span></span>
+                    Olivia Rhye
+                </th>
+                <td>olivia@untitled.test</td>
+                <td>Admin</td>
+                <td><span class="pui-badge pui-badge--success pui-badge--sm pui-badge--dot">Active</span></td>
+                <td>
+                    <button class="pui-btn pui-btn--tertiary pui-btn--icon-only" type="button" aria-label="Edit Olivia Rhye">
+                        <svg
+                            class="pui-btn__icon"
+                            data-icon="leading"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M2.876 18.116c.046-.414.069-.62.131-.814a2 2 0 0 1 .234-.485c.111-.17.259-.317.553-.61L17 3a2.828 2.828 0 1 1 4 4L7.794 20.206c-.294.294-.442.442-.611.553a2 2 0 0 1-.485.233c-.193.063-.4.086-.814.132L2.5 21.5l.376-3.384Z"
+                            />
+                        </svg>
+                    </button>
+                </td>
+            </tr>
+            <tr class="pui-table__row--selected">
+                <td class="pui-table__select">
+                    <label class="pui-checkbox pui-checkbox--md">
+                        <input type="checkbox" name="member" value="pb" checked />
+                        <span class="pui-checkbox__box" aria-hidden="true"></span>
+                        <span class="pui-sr-only">Select Phoenix Baker</span>
+                    </label>
+                </td>
+                <th scope="row">
+                    <span class="pui-avatar pui-avatar--sm"><span class="pui-avatar__initials" aria-hidden="true">PB</span></span>
+                    Phoenix Baker
+                </th>
+                <td>phoenix@untitled.test</td>
+                <td>Editor</td>
+                <td><span class="pui-badge pui-badge--success pui-badge--sm pui-badge--dot">Active</span></td>
+                <td>
+                    <button class="pui-btn pui-btn--tertiary pui-btn--icon-only" type="button" aria-label="Edit Phoenix Baker">
+                        <svg
+                            class="pui-btn__icon"
+                            data-icon="leading"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M2.876 18.116c.046-.414.069-.62.131-.814a2 2 0 0 1 .234-.485c.111-.17.259-.317.553-.61L17 3a2.828 2.828 0 1 1 4 4L7.794 20.206c-.294.294-.442.442-.611.553a2 2 0 0 1-.485.233c-.193.063-.4.086-.814.132L2.5 21.5l.376-3.384Z"
+                            />
+                        </svg>
+                    </button>
+                </td>
+            </tr>
+            <tr>
+                <td class="pui-table__select">
+                    <label class="pui-checkbox pui-checkbox--md">
+                        <input type="checkbox" name="member" value="ls" />
+                        <span class="pui-checkbox__box" aria-hidden="true"></span>
+                        <span class="pui-sr-only">Select Lana Steiner</span>
+                    </label>
+                </td>
+                <th scope="row">
+                    <span class="pui-avatar pui-avatar--sm"><span class="pui-avatar__initials" aria-hidden="true">LS</span></span>
+                    Lana Steiner
+                </th>
+                <td>lana@untitled.test</td>
+                <td>Viewer</td>
+                <td><span class="pui-badge pui-badge--gray pui-badge--sm pui-badge--dot">Invited</span></td>
+                <td>
+                    <button class="pui-btn pui-btn--tertiary pui-btn--icon-only" type="button" aria-label="Edit Lana Steiner">
+                        <svg
+                            class="pui-btn__icon"
+                            data-icon="leading"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M2.876 18.116c.046-.414.069-.62.131-.814a2 2 0 0 1 .234-.485c.111-.17.259-.317.553-.61L17 3a2.828 2.828 0 1 1 4 4L7.794 20.206c-.294.294-.442.442-.611.553a2 2 0 0 1-.485.233c-.193.063-.4.086-.814.132L2.5 21.5l.376-3.384Z"
+                            />
+                        </svg>
+                    </button>
+                </td>
+            </tr>
+            <tr>
+                <td class="pui-table__select">
+                    <label class="pui-checkbox pui-checkbox--md">
+                        <input type="checkbox" name="member" value="dw" />
+                        <span class="pui-checkbox__box" aria-hidden="true"></span>
+                        <span class="pui-sr-only">Select Demi Wilkinson</span>
+                    </label>
+                </td>
+                <th scope="row">
+                    <span class="pui-avatar pui-avatar--sm"><span class="pui-avatar__initials" aria-hidden="true">DW</span></span>
+                    Demi Wilkinson
+                </th>
+                <td>demi@untitled.test</td>
+                <td>Editor</td>
+                <td><span class="pui-badge pui-badge--error pui-badge--sm pui-badge--dot">Suspended</span></td>
+                <td>
+                    <button class="pui-btn pui-btn--tertiary pui-btn--icon-only" type="button" aria-label="Edit Demi Wilkinson">
+                        <svg
+                            class="pui-btn__icon"
+                            data-icon="leading"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M2.876 18.116c.046-.414.069-.62.131-.814a2 2 0 0 1 .234-.485c.111-.17.259-.317.553-.61L17 3a2.828 2.828 0 1 1 4 4L7.794 20.206c-.294.294-.442.442-.611.553a2 2 0 0 1-.485.233c-.193.063-.4.086-.814.132L2.5 21.5l.376-3.384Z"
+                            />
+                        </svg>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="pui-table__footer">
+        <nav class="pui-pagination" aria-label="Team members pagination">
+            <a class="pui-btn pui-btn--secondary pui-pagination__prev" aria-disabled="true">Previous</a>
+            <p class="pui-pagination__summary">Page 1 of 12</p>
+            <ol class="pui-pagination__pages">
+                <li><a class="pui-pagination__item" href="?page=1" aria-current="page" aria-label="Page 1">1</a></li>
+                <li><a class="pui-pagination__item" href="?page=2" aria-label="Page 2">2</a></li>
+                <li><a class="pui-pagination__item" href="?page=3" aria-label="Page 3">3</a></li>
+            </ol>
+            <a class="pui-btn pui-btn--secondary pui-pagination__next" href="?page=2">Next</a>
+        </nav>
+    </div>
+</div>

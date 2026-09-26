@@ -56,7 +56,7 @@ program
 
 program
     .command("init")
-    .description("Configure this project: components.json, theme tokens, cx util and the ThemeProvider")
+    .description("Configure this project: components.json, theme tokens, cx util and the ThemeProvider (or, on the html platform, the tokens + html CSS)")
     .option("--nextjs", "treat this project as Next.js instead of auto-detecting")
     .option("--vite", "treat this project as Vite instead of auto-detecting")
     .option("--manual", "write the files but do not edit the app entry point")
@@ -65,6 +65,7 @@ program
     .option("--install", "run the install command instead of only printing it")
     .option("--no-tooling-ignores", "skip appending ESLint/Prettier ignore entries for vendored directories")
     .option("--preset <name|code>", "apply a theme preset or preset code to the global stylesheet (see `properui theme list`)")
+    .option("--platform <platform>", "react or html; overrides detection (html for Vue, Angular, Svelte, Astro and plain HTML)")
     .option("--registry <source>", REGISTRY_HELP)
     .option("-y, --yes", "accept every default; never prompt")
     .action(guard(async (options) => runInit({ ...options, cwd: program.opts().cwd })));
@@ -134,7 +135,8 @@ program
     .command("list")
     .description("List available components with layer and description")
     .option("--layer <layer>", "filter by layer, e.g. base, application, marketing")
-    .option("--type <type>", "filter by type: component, example, util, hook, style")
+    .option("--type <type>", "filter by type: component, example, util, hook, style, html")
+    .option("--platform <platform>", "filter by platform: react, next, html, vue, angular, svelte, astro, vanilla")
     .option("--json", "print the raw index rows")
     .option("--registry <source>", REGISTRY_HELP)
     .option("-y, --yes", "accept every default; never prompt")
@@ -146,6 +148,7 @@ program
     .argument("<query>")
     .option("--limit <n>", "maximum results", "20")
     .option("--icons", "search the icon export index instead (same as `properui icons <query>`)")
+    .option("--platform <platform>", "only entries for this platform: react, next, html, vue, angular, svelte, astro, vanilla")
     .option("--registry <source>", REGISTRY_HELP)
     .option("-y, --yes", "accept every default; never prompt")
     .action(guard(async (query: string, options) => runSearch(query, { ...options, cwd: program.opts().cwd })));

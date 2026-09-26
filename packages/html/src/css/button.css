@@ -1,0 +1,249 @@
+/*
+ * Button. Mirrors `styles` in packages/ui/src/components/base/buttons/button.tsx.
+ *
+ * <button class="pui-btn pui-btn--secondary pui-btn--md">
+ *     <svg class="pui-btn__icon" data-icon="leading">...</svg>
+ *     Label
+ * </button>
+ *
+ * React wraps the label in `<span data-text class="px-0.5">`; plain HTML has a bare text node, so the
+ * same geometry is produced by 2px more inline padding and gap, and a -2px margin on a
+ * `data-icon="leading"`/`data-icon="trailing"` icon at either edge.
+ */
+@layer components {
+    .pui-btn {
+        @apply outline-brand relative inline-flex h-max cursor-pointer items-center justify-center whitespace-nowrap no-underline transition duration-100 ease-linear select-none focus-visible:outline-2 focus-visible:outline-offset-2;
+        /* Size sm (the React default). */
+        @apply gap-1.5 rounded-lg px-3.5 py-2 text-sm font-semibold;
+        -webkit-tap-highlight-color: transparent;
+
+        &:disabled,
+        &[aria-disabled="true"] {
+            @apply cursor-not-allowed opacity-50;
+        }
+
+        &[aria-disabled="true"],
+        &[data-loading] {
+            @apply pointer-events-none;
+        }
+    }
+
+    .pui-btn__icon,
+    .pui-btn > svg {
+        @apply pointer-events-none size-5 shrink-0;
+        transition-property: inherit;
+        transition-duration: inherit;
+        transition-timing-function: inherit;
+    }
+
+    /* An optional wrapper for the label (the React `<span data-text>`); the padding is already on the button. */
+    .pui-btn__text {
+        transition-property: inherit;
+        transition-duration: inherit;
+        transition-timing-function: inherit;
+    }
+
+    .pui-btn > [data-icon="leading"] {
+        @apply -ms-0.5;
+    }
+
+    .pui-btn > [data-icon="trailing"] {
+        @apply -me-0.5;
+    }
+
+    /* Sizes */
+    .pui-btn--sm {
+        @apply gap-1.5 px-3.5 py-2 text-sm;
+    }
+
+    .pui-btn--md {
+        @apply gap-1.5 px-4 py-2.5 text-sm;
+    }
+
+    .pui-btn--lg {
+        @apply text-md gap-2 px-4.5 py-2.5;
+    }
+
+    .pui-btn--xl {
+        @apply text-md gap-2 px-5 py-3;
+    }
+
+    .pui-btn--icon-only {
+        @apply p-2;
+
+        &.pui-btn--md {
+            @apply p-2.5;
+        }
+
+        &.pui-btn--lg {
+            @apply p-3;
+        }
+
+        &.pui-btn--xl {
+            @apply p-3.5;
+        }
+
+        & > [data-icon] {
+            @apply m-0;
+        }
+    }
+
+    /* Loading: `data-loading` swaps the icons for a spinner and keeps the label visible. */
+    .pui-btn[data-loading] {
+        & .pui-btn__icon,
+        & > svg {
+            @apply hidden;
+        }
+
+        &::after {
+            @apply order-first size-5 shrink-0 animate-spin rounded-full border-2 border-current border-t-transparent opacity-80 motion-reduce:animate-none;
+            content: "";
+        }
+    }
+
+    /* Colours. Primary is the default, so it applies to any `.pui-btn` without another colour modifier. */
+    .pui-btn--primary,
+    .pui-btn:where(
+        :not(
+            .pui-btn--secondary,
+            .pui-btn--tertiary,
+            .pui-btn--link,
+            .pui-btn--link-gray,
+            .pui-btn--primary-destructive,
+            .pui-btn--secondary-destructive,
+            .pui-btn--tertiary-destructive
+        )
+    ) {
+        @apply bg-brand-solid shadow-xs-skeuomorphic hover:bg-brand-solid_hover text-white ring-1 ring-transparent ring-inset;
+        /* Inner border gradient */
+        @apply before:pointer-events-none before:absolute before:inset-px before:border before:border-white/12 before:mask-b-from-0%;
+
+        &::before {
+            border-radius: calc(var(--radius-lg) - 1px);
+        }
+
+        &[data-loading] {
+            @apply bg-brand-solid_hover;
+        }
+
+        & .pui-btn__icon,
+        & > svg {
+            @apply text-white/60;
+        }
+
+        &:hover .pui-btn__icon,
+        &:hover > svg {
+            @apply text-white/70;
+        }
+    }
+
+    .pui-btn--secondary {
+        @apply bg-primary text-secondary shadow-xs-skeuomorphic ring-primary hover:bg-primary_hover hover:text-secondary_hover ring-1 ring-inset;
+
+        &[data-loading] {
+            @apply bg-primary_hover;
+        }
+    }
+
+    .pui-btn--tertiary {
+        @apply text-tertiary hover:bg-primary_hover hover:text-tertiary_hover;
+
+        &[data-loading] {
+            @apply bg-primary_hover;
+        }
+    }
+
+    .pui-btn--secondary,
+    .pui-btn--tertiary,
+    .pui-btn--link-gray {
+        & .pui-btn__icon,
+        & > svg {
+            @apply text-fg-quaternary;
+        }
+
+        &:hover .pui-btn__icon,
+        &:hover > svg {
+            @apply text-fg-quaternary_hover;
+        }
+    }
+
+    .pui-btn--link,
+    .pui-btn--link-gray {
+        @apply justify-normal gap-1 rounded p-0 underline decoration-transparent underline-offset-4;
+    }
+
+    .pui-btn--link {
+        @apply text-brand-secondary hover:text-brand-secondary_hover hover:decoration-fg-brand-secondary_alt;
+
+        & .pui-btn__icon,
+        & > svg {
+            @apply text-fg-brand-secondary_alt;
+        }
+
+        &:hover .pui-btn__icon,
+        &:hover > svg {
+            @apply text-fg-brand-secondary_hover;
+        }
+    }
+
+    .pui-btn--link-gray {
+        @apply text-tertiary hover:text-tertiary_hover hover:decoration-fg-quaternary;
+    }
+
+    .pui-btn--link > [data-icon],
+    .pui-btn--link-gray > [data-icon] {
+        @apply m-0;
+    }
+
+    .pui-btn--primary-destructive {
+        @apply bg-error-solid shadow-xs-skeuomorphic outline-error hover:bg-error-solid_hover text-white ring-1 ring-transparent ring-inset;
+        @apply before:pointer-events-none before:absolute before:inset-px before:border before:border-white/12 before:mask-b-from-0%;
+
+        &::before {
+            border-radius: calc(var(--radius-lg) - 1px);
+        }
+
+        &[data-loading] {
+            @apply bg-error-solid_hover;
+        }
+
+        & .pui-btn__icon,
+        & > svg {
+            @apply text-white/60;
+        }
+
+        &:hover .pui-btn__icon,
+        &:hover > svg {
+            @apply text-white/70;
+        }
+    }
+
+    .pui-btn--secondary-destructive {
+        @apply bg-primary text-error-primary shadow-xs-skeuomorphic ring-error_subtle outline-error hover:bg-error-primary hover:text-error-primary_hover ring-1 ring-inset;
+
+        &[data-loading] {
+            @apply bg-error-primary;
+        }
+    }
+
+    .pui-btn--tertiary-destructive {
+        @apply text-error-primary outline-error hover:bg-error-primary hover:text-error-primary_hover;
+
+        &[data-loading] {
+            @apply bg-error-primary;
+        }
+    }
+
+    .pui-btn--secondary-destructive,
+    .pui-btn--tertiary-destructive {
+        & .pui-btn__icon,
+        & > svg {
+            @apply text-fg-error-secondary;
+        }
+
+        &:hover .pui-btn__icon,
+        &:hover > svg {
+            @apply text-fg-error-primary;
+        }
+    }
+}

@@ -7,6 +7,10 @@
  * was installed in components.json's `installed` manifest (2.10), installs missing npm
  * dependencies and prints what changed. A second run without `--overwrite` reports no changes.
  *
+ * Platform-aware: on a project whose components.json says `"platform": "html"`, `add <name>`
+ * installs the `<name>-html` snippet entry instead and refuses a React-only entry with a
+ * one-line message naming the html alternative (see `resolveForPlatform` in ../platform.ts).
+ *
  * Output order matters (2.6): files, then the dependency/install block, always last. When
  * dependencies are unsatisfied and neither `--yes` nor a TTY is available, the command exits
  * non-zero with `Install to finish: <cmd>` as its final line instead of silently skipping.
@@ -14,11 +18,12 @@
  * Spec: docs/cli.md
  */
 import path from "node:path";
-import { type ComponentsConfig, aliasBaseDir, aliasPrefixOf, configPath, readConfig, writeConfig } from "../config.js";
+import { type ComponentsConfig, aliasBaseDir, aliasPrefixOf, configPath, configPlatform, readConfig, writeConfig } from "../config.js";
 import { installCommand, installDependencies, missingDependencies } from "../deps.js";
 import { detectPackageManager } from "../detect.js";
 import { type WriteResult, prepareFile, writeSourceFile } from "../files.js";
 import { nearestNames } from "../fuzzy.js";
+import { isHtmlEntry, resolveForPlatform } from "../platform.js";
 import { canPrompt, confirm } from "../prompt.js";
 import { Registry, type RegistryEntry, RegistryError, type RegistryFile, entryVersion, resolveRegistrySource } from "../registry.js";
 import { kleur, log, spinner } from "../ui.js";
@@ -73,19 +78,34 @@ export async function runAdd(names: string[], options: AddOptions): Promise<void
         return;
     }
 
+    const platform = configPlatform(config);
+
     let targets: string[];
     try {
         const index = await registry.index();
         if (options.all) {
-            targets = index.filter((entry) => entry.type === "component").map((entry) => entry.name);
+            targets = index
+                .filter((entry) => (platform === "html" ? isHtmlEntry(entry) && entry.fileCount > 0 : entry.type === "component"))
+                .map((entry) => entry.name);
         } else {
             const known = new Set(index.map((entry) => entry.name));
-            const unknown = requested.filter((name) => !known.has(name));
-            if (unknown.length > 0) {
+            const unknown: string[] = [];
+            const refused: string[] = [];
+            targets = [];
+            for (const name of requested) {
+                const resolution = resolveForPlatform(name, index, platform);
+                if (resolution.ok) {
+                    targets.push(resolution.name);
+                    if (resolution.resolvedFrom) log.info(`${resolution.resolvedFrom} -> ${resolution.name} (components.json platform is "html")`);
+                } else if (resolution.reason === "unknown") unknown.push(name);
+                else refused.push(resolution.message);
+            }
+            if (unknown.length > 0 || refused.length > 0) {
                 for (const name of unknown) {
                     const hints = nearestNames([...known], name);
                     log.error(`Unknown component "${name}".${hints.length > 0 ? ` Did you mean: ${hints.join(", ")}?` : ""}`);
                 }
+                for (const message of refused) log.error(message);
                 process.exitCode = 1;
                 return;
             }
@@ -93,7 +113,6 @@ export async function runAdd(names: string[], options: AddOptions): Promise<void
                 const notExamples = requested.filter((name) => index.find((entry) => entry.name === name)?.type !== "example");
                 for (const name of notExamples) log.warn(`"${name}" is not a page example. Adding it as a component.`);
             }
-            targets = requested;
         }
     } catch (error) {
         log.error(error instanceof RegistryError ? error.message : (error as Error).message);
@@ -236,8 +255,11 @@ function reportWrites(results: { entry: RegistryEntry; writes: WriteResult[] }[]
 
     const aliasPrefix = aliasPrefixOf(config.aliases.components);
     log.plain();
-    if (aliasPrefix !== "@/") log.info(`Rewrote \`@/\` imports to \`${aliasPrefix}\`.`);
+    if (aliasPrefix !== "@/" && results.some(({ entry }) => !isHtmlEntry(entry))) log.info(`Rewrote \`@/\` imports to \`${aliasPrefix}\`.`);
     if (options.path) log.info(`Component files were placed under \`${options.path}\`. Check the imports if that folder is outside your alias.`);
+    if (results.some(({ entry }) => isHtmlEntry(entry))) {
+        log.info("HTML snippets are copy-paste markup: move them into your templates. Their classes come from @properui/html (see `properui init`).");
+    }
 
     if (counts.created + counts.updated === 0) {
         log.success(

@@ -1,0 +1,31 @@
+---
+import "@properui/tokens/properui.css";
+import "../style.css";
+
+interface Props {
+    title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>{title}</title>
+        <!-- Apply a saved dark theme before first paint, so a reload does not flash the light one. -->
+        <script is:inline>
+            try {
+                if (localStorage.getItem("theme") === "dark") document.documentElement.classList.add("dark-mode");
+            } catch {}
+        </script>
+    </head>
+    <body>
+        <slot />
+        <script>
+            import "@properui/elements/register";
+        </script>
+    </body>
+</html>

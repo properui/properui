@@ -15,6 +15,7 @@ served by the Worker). Nothing is Pages, and nothing uses `next-on-pages`.
 | ------------------------------------------ | ------------------------------------------------------- |
 | `/`, `/docs/*`, `/components/*`, …         | Prerendered at build time (919 pages)                   |
 | `/r/index.json`, `/r/<name>.json`          | Prerendered from `packages/registry/dist` (798 entries) |
+| `/css/<file>.css`                          | Prerendered from `packages/tokens/dist`                 |
 | `/llms.txt`, `/robots.txt`, `/sitemap.xml` | Prerendered                                             |
 | `/api/markdown/*`, `/preview/*`            | Rendered on demand in the Worker                        |
 
@@ -88,7 +89,7 @@ the Worker come up before wiring the domain.
 pnpm install
 
 # Workspace inputs the docs build reads from disk.
-pnpm build:packages      # @properui/ui + properui (CLI)
+pnpm build:packages      # @properui/ui + properui (CLI) + @properui/tokens (packages/tokens/dist, the source of /css/*.css)
 pnpm registry:build      # packages/registry/dist/*.json, the source of /r/*.json
 
 # Authenticate this machine once (opens a browser).

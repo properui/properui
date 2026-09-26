@@ -7,6 +7,10 @@
  *   packages/registry/dist/index.json
  *   packages/registry/dist/<name>.json
  * Fails if a component imports a package not in the allow-list.
+ *
+ * Also emits one `type: "html"` entry per `packages/html/src/components/<component>/` folder
+ * (named `<component>-html`, one file per `*.html` snippet) when that package exists, and tags
+ * every entry with the `platforms` it runs on.
  */
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
@@ -23,6 +27,12 @@ const SCHEMA_FILE = path.join(REPO, "packages", "registry", "schema.json");
 const MANIFEST_DIR = path.join(REPO, "packages", "registry", "manifest");
 const THEME_FILE = path.join(UI_SRC, "styles", "theme.css");
 const CHANGELOG_FILE = path.join(REPO, "packages", "ui", "CHANGELOG.md");
+/** `@properui/html` snippets: `<component>/<variant>.html`, one registry entry per folder. */
+const HTML_COMPONENTS = path.join(REPO, "packages", "html", "src", "components");
+
+/** Where each kind of entry runs. Mirrors REACT_PLATFORMS / HTML_PLATFORMS in packages/cli/src/platform.ts. */
+const REACT_PLATFORMS = ["react", "next"];
+const HTML_PLATFORMS = ["html", "vue", "angular", "svelte", "astro", "vanilla"];
 
 /** Layers walked by the build, in the order they appear in the index. */
 const LAYERS = ["base", "application", "marketing", "app-examples", "marketing-examples", "foundations", "shared-assets"] as const;
@@ -40,8 +50,8 @@ const uiPackageJson = JSON.parse(readFileSync(path.join(REPO, "packages", "ui", 
 };
 const ALLOWED = new Set<string>([...Object.keys(uiPackageJson.dependencies ?? {}), "react", "react-dom", "next"]);
 
-type FileType = "component" | "util" | "hook" | "style";
-type EntryType = "component" | "example" | "util" | "hook" | "style";
+type FileType = "component" | "util" | "hook" | "style" | "html";
+type EntryType = "component" | "example" | "util" | "hook" | "style" | "html";
 
 type RegistryFile = {
     path: string;
@@ -90,6 +100,8 @@ type RegistryEntry = SemanticManifest & {
     dependencies: string[];
     cssVars: string[];
     examples: string[];
+    /** Where the entry runs: REACT_PLATFORMS for TSX entries, HTML_PLATFORMS for html entries. Set on every entry before validation. */
+    platforms?: string[];
     docs?: string;
     token_contract?: string[];
     /**
@@ -892,13 +904,14 @@ const SCHEMA: Schema & { $schema: string; $id: string; title: string; descriptio
         "dependencies",
         "cssVars",
         "examples",
+        "platforms",
         "changelog",
     ],
     additionalProperties: false,
     properties: {
         name: { type: "string", pattern: "^[a-z0-9][a-z0-9-]*$" },
-        layer: { type: "string", enum: [...LAYERS, "utils", "hooks", "styles"] },
-        type: { type: "string", enum: ["component", "example", "util", "hook", "style"] },
+        layer: { type: "string", enum: [...LAYERS, "utils", "hooks", "styles", "html"] },
+        type: { type: "string", enum: ["component", "example", "util", "hook", "style", "html"] },
         title: { type: "string" },
         description: { type: "string" },
         docs: { type: "string" },
@@ -911,7 +924,7 @@ const SCHEMA: Schema & { $schema: string; $id: string; title: string; descriptio
                 properties: {
                     path: { type: "string" },
                     target: { type: "string" },
-                    type: { type: "string", enum: ["component", "util", "hook", "style"] },
+                    type: { type: "string", enum: ["component", "util", "hook", "style", "html"] },
                     content: { type: "string" },
                     dependencies: { type: "array", items: { type: "string" } },
                     kind: { type: "string", enum: ["demo"] },
@@ -923,6 +936,9 @@ const SCHEMA: Schema & { $schema: string; $id: string; title: string; descriptio
         dependencies: { type: "array", items: { type: "string" } },
         cssVars: { type: "array", items: { type: "string" } },
         examples: { type: "array", items: { type: "string" } },
+        // Where the entry runs: ["react","next"] for TSX entries, ["html","vue","angular","svelte",
+        // "astro","vanilla"] for `type: "html"` snippet entries (see packages/cli/src/platform.ts).
+        platforms: { type: "array", items: { type: "string", enum: [...REACT_PLATFORMS, ...HTML_PLATFORMS] } },
         // Semantic manifest (AGENT-BRIEF: registry metadata) — all optional, so existing entries
         // stay valid. `intent`/`avoid_when`/`a11y_contract`/`responsive_contract`/`requires_data`
         // are hand-authored (base + application layers only); `composes_with` is hand-authored
@@ -951,6 +967,76 @@ const SCHEMA: Schema & { $schema: string; $id: string; title: string; descriptio
         },
     },
 };
+
+/**
+ * `components.json`, the file `properui init` writes. Its `$schema` is https://properui.dev/schema.json,
+ * which serves this package's schema.json, so that file carries both shapes (see `SCHEMA_DOCUMENT`).
+ * Not used by the validator below; it only documents the file for editors.
+ */
+const COMPONENTS_JSON_SCHEMA = {
+    type: "object",
+    required: ["tailwind", "aliases"],
+    properties: {
+        $schema: { type: "string" },
+        style: { type: "string" },
+        platform: {
+            type: "string",
+            enum: ["react", "html"],
+            default: "react",
+            description:
+                "Which registry layer `properui add` installs from: react (TSX components) or html (@properui/html snippets, for Vue, Angular, Svelte, Astro and plain HTML). Absent means react.",
+        },
+        tsx: { type: "boolean" },
+        tailwind: {
+            type: "object",
+            properties: {
+                css: { type: "string", description: "Global stylesheet, relative to the project root." },
+                theme: { type: "string", description: "Theme token file (react) or the @properui/tokens import (html)." },
+                prefix: { type: "string" },
+            },
+        },
+        aliases: {
+            type: "object",
+            required: ["components"],
+            properties: {
+                components: { type: "string" },
+                utils: { type: "string" },
+                ui: { type: "string" },
+                hooks: { type: "string" },
+            },
+        },
+        registry: { type: "string", description: "Registry base URL or local directory." },
+        installed: {
+            type: "object",
+            description: "Entries `properui add` has written, keyed by registry name.",
+            additionalProperties: {
+                type: "object",
+                properties: {
+                    version: { type: "string" },
+                    files: { type: "array", items: { type: "string" } },
+                    installedAt: { type: "string" },
+                },
+            },
+        },
+    },
+};
+
+/**
+ * What is written to packages/registry/schema.json (served at /schema.json): a registry entry
+ * *or* a components.json, each under `definitions`, so the one URL validates both the
+ * `/r/<name>.json` payloads and the `$schema` that `init` writes into components.json.
+ */
+const SCHEMA_DOCUMENT = (() => {
+    const { $schema, $id, ...entrySchema } = SCHEMA;
+    return {
+        $schema,
+        $id,
+        title: "Proper UI schema",
+        description: "A Proper UI registry entry (/r/<name>.json) or a project's components.json.",
+        anyOf: [{ $ref: "#/definitions/registryEntry" }, { $ref: "#/definitions/componentsJson" }],
+        definitions: { registryEntry: entrySchema, componentsJson: COMPONENTS_JSON_SCHEMA },
+    };
+})();
 
 /** Tiny draft-07 subset validator: type / required / properties / additionalProperties / items / enum / pattern. */
 const validate = (value: unknown, schema: Schema, at = "$"): string[] => {
@@ -986,6 +1072,55 @@ const validate = (value: unknown, schema: Schema, at = "$"): string[] => {
 
     return errors;
 };
+
+// ---------------------------------------------------------------------------
+// HTML snippet entries (@properui/html)
+// ---------------------------------------------------------------------------
+
+/** `<!-- description: Buttons for actions. -->` at the very top of a snippet. */
+const HTML_DESCRIPTION = /^\s*<!--\s*description:\s*([\s\S]*?)\s*-->/i;
+
+/**
+ * One entry per `packages/html/src/components/<component>/` folder that holds at least one
+ * `*.html` snippet: `name: "<component>-html"`, title from the folder name, description from an
+ * optional leading `<!-- description: ... -->` comment in the first snippet (alphabetical).
+ * Returns `[]` when the html package is not there, so the build works with or without it.
+ */
+const buildHtmlEntries = (): RegistryEntry[] =>
+    listDir(HTML_COMPONENTS)
+        .filter((folder) => isDir(path.join(HTML_COMPONENTS, folder)))
+        .map((folder) => {
+            const snippets = listDir(path.join(HTML_COMPONENTS, folder)).filter((file) => file.endsWith(".html"));
+            const files: RegistryFile[] = snippets.map((file) => {
+                const relative = `components/${folder}/${file}`;
+                return {
+                    path: relative,
+                    target: relative,
+                    type: "html",
+                    content: readFileSync(path.join(HTML_COMPONENTS, folder, file), "utf8"),
+                    dependencies: [],
+                };
+            });
+            const description = HTML_DESCRIPTION.exec(files[0]?.content ?? "")?.[1]
+                ?.replace(/\s+/g, " ")
+                .trim();
+            return {
+                name: `${folder}-html`,
+                layer: "html",
+                type: "html" as const,
+                title: titleize(folder),
+                description: description ?? `${titleize(folder)} markup for @properui/html: copy-paste snippets styled by the pui- classes.`,
+                files,
+                registryDependencies: [],
+                optionalRegistryDependencies: [],
+                dependencies: [],
+                cssVars: [],
+                examples: [],
+                platforms: HTML_PLATFORMS,
+                changelog: [],
+            };
+        })
+        .filter((entry) => entry.files.length > 0);
 
 // ---------------------------------------------------------------------------
 // Build
@@ -1250,9 +1385,16 @@ const build = () => {
     // Derived from packages/ui/CHANGELOG.md, never hand-authored — see `changelogFor` above.
 
     const changelogReleases = parseChangelogReleases();
-    const withChangelog = entries.map((entry) => ({ ...entry, changelog: changelogFor(entry, changelogReleases) }));
+    const withChangelog = entries.map((entry) => ({ ...entry, changelog: changelogFor(entry, changelogReleases), platforms: REACT_PLATFORMS }));
     entries.length = 0;
     entries.push(...withChangelog);
+
+    // ---- HTML snippet entries ----------------------------------------------
+    // Appended after every React-only pass above (dependency derivation, semantics, optional
+    // deps, demo veto, changelog): snippets have no imports and no TSX to analyse.
+
+    const htmlEntries = buildHtmlEntries();
+    entries.push(...htmlEntries);
 
     // ---- Validation -------------------------------------------------------
 
@@ -1280,7 +1422,7 @@ const build = () => {
 
     rmSync(OUT, { recursive: true, force: true });
     mkdirSync(OUT, { recursive: true });
-    writeFileSync(SCHEMA_FILE, `${JSON.stringify(SCHEMA, null, 4)}\n`);
+    writeFileSync(SCHEMA_FILE, `${JSON.stringify(SCHEMA_DOCUMENT, null, 4)}\n`);
 
     for (const entry of entries) writeFileSync(path.join(OUT, `${entry.name}.json`), `${JSON.stringify(entry, null, 2)}\n`);
 
@@ -1295,7 +1437,10 @@ const build = () => {
 
     // ---- dist/exports.json — named exports per entry, so `search` can index export names too.
     const exportsByEntry = Object.fromEntries(
-        entries.map((entry): [string, string[]] => [entry.name, namedExportsForEntry(entry)]).filter(([, names]) => names.length > 0),
+        entries
+            .filter((entry) => entry.type !== "html")
+            .map((entry): [string, string[]] => [entry.name, namedExportsForEntry(entry)])
+            .filter(([, names]) => names.length > 0),
     );
     writeFileSync(path.join(OUT, "exports.json"), `${JSON.stringify(exportsByEntry, null, 2)}\n`);
 
@@ -1320,12 +1465,13 @@ const build = () => {
 
     const stats = {
         definitions: {
-            entry: "One registry item of any type — component, example, hook, util or style. Every file written to packages/registry/dist/*.json.",
+            entry: "One registry item of type component, example, hook, util or style: every packages/registry/dist/*.json file except the html snippet entries, which `htmlEntries` counts separately.",
             group: 'One registry item of type "component": one folder under packages/ui/src/components/<layer>. `groups.published` counts the base, application and marketing layers only; `groups.all` counts every layer, including foundations, shared-assets, app-examples and marketing-examples.',
             variant: 'An "example" entry in the "marketing" layer — a single section variant.',
             example: 'An "example" entry in the "marketing-examples" or "app-examples" layer — a complete page.',
         },
-        entries: entries.length,
+        entries: entries.length - htmlEntries.length,
+        htmlEntries: htmlEntries.length,
         groups: {
             published: publishedGroups,
             all: allGroups,
@@ -1351,7 +1497,7 @@ const build = () => {
         // installable (see `emptyGroups` below) — which is now skipped entirely, so today this
         // equals `entries`. Kept as its own field so a future empty group shows up as a gap here
         // instead of silently changing what `entries` means.
-        entriesWithFiles: entries.filter((entry) => entry.files.length > 0).length,
+        entriesWithFiles: entries.filter((entry) => entry.type !== "html" && entry.files.length > 0).length,
     };
     writeFileSync(path.join(OUT, "stats.json"), `${JSON.stringify(stats, null, 4)}\n`);
 
@@ -1359,7 +1505,7 @@ const build = () => {
 
     const components = entries.filter((entry) => entry.type === "component").length;
     const examples = entries.filter((entry) => entry.type === "example").length;
-    const support = entries.length - components - examples;
+    const support = entries.length - components - examples - htmlEntries.length;
     const fileCount = entries.reduce((total, entry) => total + entry.files.length, 0);
 
     if (unresolved.length > 0) {
@@ -1377,9 +1523,14 @@ const build = () => {
         for (const item of unique(emptyGroups)) console.warn(`  ${item}`);
     }
 
+    const htmlDir = path.relative(REPO, HTML_COMPONENTS).split(path.sep).join("/");
+    if (htmlEntries.length > 0) console.log(`registry:build — ${htmlEntries.length} html entries from ${htmlDir}`);
+    else if (isDir(HTML_COMPONENTS)) console.log(`registry:build — 0 html entries: no *.html snippets under ${htmlDir}`);
+    else console.log(`registry:build — 0 html entries: ${htmlDir} does not exist yet`);
+
     const out = path.relative(REPO, OUT).split(path.sep).join("/");
     console.log(
-        `registry:build — ${entries.length} entries (${components} components, ${examples} examples, ${support} utils/hooks/styles), ${fileCount} files → ${out}`,
+        `registry:build — ${entries.length} entries (${components} components, ${examples} examples, ${support} utils/hooks/styles, ${htmlEntries.length} html), ${fileCount} files → ${out}`,
     );
 };
 

@@ -47,15 +47,15 @@ Requires Node 20+.
 
 ## Tools
 
-| Tool                 | What it does                                                                                            |
-| -------------------- | ------------------------------------------------------------------------------------------------------- |
-| `list_components`    | Registry entries (name, layer, type, title, description), filtered by `layer` / `type`, paginated       |
-| `search_components`  | Fuzzy search over names, titles, descriptions, example names and exported symbols (`properui search`)   |
-| `get_component`      | The full entry: every file with its source, dependencies, `registryDependencies`, usage notes, docs URL |
-| `get_component_docs` | The entry's docs page as markdown                                                                       |
-| `add_component`      | `properui add`: writes the files, resolves dependencies, rewrites `@/` imports, returns the install cmd |
-| `get_project_info`   | `properui info --json`                                                                                  |
-| `check_tokens`       | `properui check` on a file or directory: raw palette classes, `dark:` variants, arbitrary colours       |
+| Tool                 | What it does                                                                                                                                                |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `list_components`    | Registry entries (name, layer, type, title, description, platforms), filtered by `layer` / `type` / `platform`, paginated                                   |
+| `search_components`  | Fuzzy search over names, titles, descriptions, example names and exported symbols (`properui search`)                                                       |
+| `get_component`      | The full entry: every file with its source, dependencies, `registryDependencies`, usage notes, docs URL                                                     |
+| `get_component_docs` | The entry's docs page as markdown                                                                                                                           |
+| `add_component`      | `properui add`: writes the files, resolves dependencies, rewrites `@/` imports, returns the install cmd; on an html-platform project installs `<name>-html` |
+| `get_project_info`   | `properui info --json`, including `platform` (`react` or `html`)                                                                                            |
+| `check_tokens`       | `properui check` on a file or directory: raw palette classes, `dark:` variants, arbitrary colours                                                           |
 
 Resources: `properui://registry/index` (the index) and `properui://registry/<name>` (one entry with its source).
 

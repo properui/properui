@@ -10,7 +10,7 @@ import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mc
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import { createRequire } from "node:module";
 import { z } from "zod";
-import { RegistryError } from "./cli.js";
+import { PLATFORM_FILTERS, RegistryError } from "./cli.js";
 import { ServerContext, type ServerOptions } from "./context.js";
 import { ToolError, addComponents, checkTokens, getComponent, getComponentDocs, listComponents, projectInfo, searchComponents } from "./operations.js";
 
@@ -28,7 +28,18 @@ Before writing UI markup by hand:
 4. add_component: copy it into the project (resolves registry dependencies, rewrites @/ imports, reports the npm install command).
 5. check_tokens: after editing, flag raw palette classes, dark: variants and arbitrary colour values.
 
-Code rules for anything written by hand: React Aria props (onPress, isDisabled, isSelected), semantic tokens only (bg-primary, text-tertiary, never bg-purple-600 or bg-[#7f56d9]), no dark: utilities, logical properties (ms-/me-/ps-/pe-/start-/end-), icons passed as component references (iconLeading={ArrowRight}), subpath imports.`;
+Non-React projects (Vue, Nuxt, Angular, Svelte, SvelteKit, Astro, plain HTML): get_project_info reports platform "html". There, add_component installs the <name>-html snippet entry (plain HTML using the @properui/html pui- classes) and refuses React-only entries; use @properui/elements custom elements (<pui-button>, <pui-modal>) in framework templates, and never write TSX into those projects. Filter list_components/search_components with platform: "html" to see what exists.
+
+Code rules for React code written by hand: React Aria props (onPress, isDisabled, isSelected), semantic tokens only (bg-primary, text-tertiary, never bg-purple-600 or bg-[#7f56d9]), no dark: utilities, logical properties (ms-/me-/ps-/pe-/start-/end-), icons passed as component references (iconLeading={ArrowRight}), subpath imports.`;
+
+const TYPES = ["component", "example", "util", "hook", "style", "html"] as const;
+
+const platformSchema = z
+    .enum(PLATFORM_FILTERS)
+    .optional()
+    .describe(
+        'Only entries that run on this platform. "react"/"next" for the TSX components; "html" (or vue, angular, svelte, astro, vanilla) for the @properui/html snippet entries.',
+    );
 
 const cwdSchema = z
     .string()
@@ -57,10 +68,11 @@ export function createServer(options: ServerOptions = {}): McpServer {
         {
             title: "List Proper UI components",
             description:
-                "List registry entries (name, layer, type, title, description). Filter by layer (base, application, marketing, app-examples, marketing-examples, foundations, shared-assets, utils, hooks, styles) or type (component, example, util, hook, style). Paginated: pass offset=nextOffset for more.",
+                "List registry entries (name, layer, type, title, description, platforms). Filter by layer (base, application, marketing, app-examples, marketing-examples, foundations, shared-assets, utils, hooks, styles, html), type (component, example, util, hook, style, html) or platform (react, next, html, vue, angular, svelte, astro, vanilla). Paginated: pass offset=nextOffset for more.",
             inputSchema: {
                 layer: z.string().optional().describe("Only entries in this layer, e.g. base, application, marketing."),
-                type: z.enum(["component", "example", "util", "hook", "style"]).optional().describe("Only entries of this type."),
+                type: z.enum(TYPES).optional().describe("Only entries of this type."),
+                platform: platformSchema,
                 limit: z.number().int().min(1).max(1000).optional().describe("Maximum rows to return (default 100)."),
                 offset: z.number().int().min(0).optional().describe("Rows to skip, for paging (default 0)."),
                 cwd: cwdSchema,
@@ -79,7 +91,8 @@ export function createServer(options: ServerOptions = {}): McpServer {
             inputSchema: {
                 query: z.string().min(1).describe('What you need, e.g. "date picker", "pricing table", "Button".'),
                 limit: z.number().int().min(1).max(100).optional().describe("Maximum matches (default 10)."),
-                type: z.enum(["component", "example", "util", "hook", "style"]).optional().describe("Only entries of this type, e.g. example for full pages."),
+                type: z.enum(TYPES).optional().describe("Only entries of this type, e.g. example for full pages, html for HTML snippets."),
+                platform: platformSchema,
                 cwd: cwdSchema,
             },
             annotations: { readOnlyHint: true, openWorldHint: true },
@@ -123,7 +136,7 @@ export function createServer(options: ServerOptions = {}): McpServer {
         {
             title: "Add Proper UI components",
             description:
-                'Copy registry entries into the project exactly like `properui add`: resolves registryDependencies, rewrites @/ imports to the components.json alias, records the install in components.json and reports the missing npm packages with the command to install them. Existing files are skipped unless overwrite is true. Pass ["example", "<name>"] or just the example name for a full page. Requires components.json (run `npx @properui/cli@latest init -y` first).',
+                'Copy registry entries into the project exactly like `properui add`: resolves registryDependencies, rewrites @/ imports to the components.json alias, records the install in components.json and reports the missing npm packages with the command to install them. Existing files are skipped unless overwrite is true. Pass ["example", "<name>"] or just the example name for a full page. On a project whose components.json platform is "html", "<name>" resolves to the "<name>-html" snippet entry and React-only entries are refused with the HTML alternative named. Requires components.json (run `npx @properui/cli@latest init -y` first).',
             inputSchema: {
                 names: z.array(z.string().min(1)).min(1).describe('Registry names, e.g. ["buttons", "date-picker"].'),
                 cwd: cwdSchema,
@@ -147,7 +160,7 @@ export function createServer(options: ServerOptions = {}): McpServer {
         {
             title: "Inspect the project's Proper UI setup",
             description:
-                "Same report as `properui info --json`: framework, TypeScript, Tailwind version, package manager, components.json aliases and theme path, installed @properui packages, the registry source and whether it is reachable, and which entries are already installed.",
+                "Same report as `properui info --json`: framework, platform (react or html: which registry layer add_component installs from), TypeScript, Tailwind version, package manager, components.json aliases and theme path, installed @properui packages, the registry source and whether it is reachable, and which entries are already installed.",
             inputSchema: { cwd: cwdSchema },
             annotations: { readOnlyHint: true, openWorldHint: true },
         },

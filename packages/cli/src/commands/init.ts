@@ -8,6 +8,9 @@
  * root, creates utils/cx.ts, adds consumer lint/format ignore entries for the vendored
  * directories, and reports (or runs) the npm install the written files need.
  *
+ * On an html-platform project (Vue, Angular, Svelte, Astro, plain HTML, or `--platform html`)
+ * none of that runs: `runInitHtml` in ./init-html.ts takes over.
+ *
  * Spec: docs/cli.md
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -15,7 +18,7 @@ import path from "node:path";
 import { resolvePreset } from "../../../ui/src/styles/presets.js";
 import { CONFIG_SCHEMA_URL, type ComponentsConfig, configPath, readConfig, writeConfig } from "../config.js";
 import { installCommand, installDependencies, missingDependencies } from "../deps.js";
-import { FRAMEWORK_LABEL, type Framework, type ProjectInfo, defaultCssFile, detectProject } from "../detect.js";
+import { FRAMEWORK_LABEL, type Framework, type Platform, type ProjectInfo, defaultCssFile, detectProject } from "../detect.js";
 import { type WriteResult, writeSourceFile } from "../files.js";
 import { ask, confirm } from "../prompt.js";
 import { DEFAULT_REGISTRY_URL, Registry, resolveRegistrySource } from "../registry.js";
@@ -33,6 +36,7 @@ import {
     TYPOGRAPHY_CSS_PLACEHOLDER,
 } from "../templates.js";
 import { kleur, log, spinner } from "../ui.js";
+import { runInitHtml } from "./init-html.js";
 import { applyPresetToFile } from "./theme.js";
 
 export interface InitOptions {
@@ -51,6 +55,8 @@ export interface InitOptions {
     toolingIgnores?: boolean;
     /** `--preset <name|code>`: apply a theme preset block to the global stylesheet (see `properui theme`). */
     preset?: string;
+    /** `--platform react|html`: override the detected platform (react for React frameworks, html for the rest). */
+    platform?: string;
 }
 
 /** Tailwind v3 is not supported — the token layer is written entirely in v4 `@theme` syntax. */
@@ -508,14 +514,27 @@ function wirePrettierIgnore(cwd: string, dirs: string[], dryRun: boolean): Tooli
 
 export async function runInit(options: InitOptions): Promise<void> {
     const cwd = path.resolve(options.cwd ?? process.cwd());
-    const project = detectProject(cwd, frameworkOverride(options));
+    if (options.platform && options.platform !== "react" && options.platform !== "html") {
+        log.error(`Unknown --platform "${options.platform}". Use "react" or "html".`);
+        process.exitCode = 1;
+        return;
+    }
+    // `--nextjs` / `--vite` name a React framework, so they imply the react platform.
+    const platformOverride = (options.platform as Platform | undefined) ?? (options.nextjs || options.vite ? "react" : undefined);
+    const project = detectProject(cwd, frameworkOverride(options), platformOverride);
     const filesTouched: string[] = [];
     const relTo = (file: string) => path.relative(cwd, file) || path.basename(file);
     // Resolve before writing anything, so a mistyped preset fails fast instead of half-initialising.
     const preset = options.preset ? resolvePreset(options.preset) : null;
 
+    if (project.platform === "html") {
+        await runInitHtml(project, options, preset);
+        return;
+    }
+
     log.title("Configuring this project for Proper UI");
     log.step(`Framework       ${FRAMEWORK_LABEL[project.framework]}`);
+    log.step(`Platform        react`);
     log.step(`Language        ${project.typescript ? "TypeScript" : "JavaScript"}`);
     log.step(`Source folder   ${project.srcDir ? "src/" : "project root"}`);
     log.step(`Import alias    ${project.aliasPrefix}${project.aliasDeclared ? "" : kleur.yellow(" (not declared in tsconfig paths)")}`);
@@ -557,6 +576,7 @@ export async function runInit(options: InitOptions): Promise<void> {
     const config: ComponentsConfig = {
         $schema: CONFIG_SCHEMA_URL,
         style: "default",
+        platform: "react",
         tsx: project.typescript,
         tailwind: {
             css: cssFile,

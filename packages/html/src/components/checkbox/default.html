@@ -1,0 +1,19 @@
+<!-- description: Checkboxes on a real <input type="checkbox"> inside a label: sm and md, with hint text, checked and disabled. -->
+<label class="pui-checkbox">
+    <input type="checkbox" name="remember" />
+    <span class="pui-checkbox__box" aria-hidden="true"></span>
+    <span class="pui-checkbox__text"><span class="pui-checkbox__label">Remember me</span></span>
+</label>
+<label class="pui-checkbox pui-checkbox--md">
+    <input type="checkbox" name="newsletter" checked aria-describedby="checkbox-newsletter-hint" />
+    <span class="pui-checkbox__box" aria-hidden="true"></span>
+    <span class="pui-checkbox__text">
+        <span class="pui-checkbox__label">Product updates</span>
+        <span class="pui-checkbox__hint" id="checkbox-newsletter-hint">One email a month, no spam.</span>
+    </span>
+</label>
+<label class="pui-checkbox">
+    <input type="checkbox" name="locked" disabled />
+    <span class="pui-checkbox__box" aria-hidden="true"></span>
+    <span class="pui-checkbox__text"><span class="pui-checkbox__label">Unavailable option</span></span>
+</label>

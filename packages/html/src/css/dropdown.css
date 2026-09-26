@@ -1,0 +1,89 @@
+/*
+ * Dropdown menu. Mirrors `Dropdown.Popover`, `Dropdown.Menu`, `Dropdown.Item` and
+ * `Dropdown.Separator` in packages/ui/src/components/base/dropdown/dropdown.tsx. The JS
+ * (`data-pui="dropdown"`) sets `role="menu"`/`menuitem`, `aria-expanded`, toggles `hidden`,
+ * moves focus with the arrow keys, and sets `data-placement="top"` when there is no room below.
+ *
+ * <div class="pui-dropdown" data-pui="dropdown">
+ *     <button class="pui-btn pui-btn--secondary pui-dropdown__trigger" type="button">Options</button>
+ *     <div class="pui-menu" hidden>
+ *         <button class="pui-menu__item" type="button">Edit</button>
+ *         <div class="pui-menu__separator"></div>
+ *         <a class="pui-menu__item" href="/logout">Log out</a>
+ *     </div>
+ * </div>
+ */
+@layer components {
+    .pui-dropdown {
+        @apply relative inline-flex;
+    }
+
+    .pui-dropdown__chevron {
+        @apply transition-transform duration-150 ease-linear;
+    }
+
+    .pui-dropdown__trigger[aria-expanded="true"] .pui-dropdown__chevron {
+        @apply rotate-180;
+    }
+
+    .pui-menu {
+        @apply bg-primary ring-secondary_alt absolute end-0 top-full z-50 mt-1 flex max-h-80 w-62 origin-top flex-col overflow-y-auto rounded-lg px-1.5 py-1 shadow-lg ring-1 outline-hidden select-none;
+        animation: pui-menu-in 150ms ease-out;
+
+        &[data-placement="top"] {
+            @apply top-auto bottom-full mt-0 mb-1 origin-bottom;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            animation: none;
+        }
+    }
+
+    .pui-menu--start {
+        @apply start-0 end-auto;
+    }
+
+    .pui-menu__item {
+        @apply text-secondary outline-focus-ring relative my-px flex w-full cursor-pointer items-center gap-2 rounded-md border-0 bg-transparent px-2.5 py-2 text-start text-sm font-semibold no-underline transition duration-100 ease-linear;
+        @apply hover:bg-primary_hover hover:text-secondary_hover focus:bg-primary_hover focus:text-secondary_hover focus:outline-hidden focus-visible:outline-2 focus-visible:-outline-offset-2;
+
+        & > svg {
+            @apply text-fg-quaternary size-4 shrink-0;
+            stroke-width: 2.25;
+        }
+
+        &:disabled,
+        &[aria-disabled="true"] {
+            @apply cursor-not-allowed opacity-50 hover:bg-transparent;
+        }
+    }
+
+    /* An optional wrapper for the item's text, truncated when the menu is narrow. */
+    .pui-menu__label {
+        @apply min-w-0 grow truncate;
+    }
+
+    /* A trailing shortcut or count: `<span class="pui-menu__shortcut">⌘K</span>`. */
+    .pui-menu__shortcut {
+        @apply text-quaternary ms-auto shrink-0 ps-1 text-xs font-medium;
+    }
+
+    .pui-menu__separator {
+        @apply bg-border-secondary -mx-1.5 my-1 h-px shrink-0;
+    }
+
+    .pui-menu__section {
+        @apply flex flex-col;
+    }
+
+    .pui-menu__heading {
+        @apply text-tertiary m-0 px-2.5 pt-2 pb-1 text-xs font-semibold;
+    }
+
+    @keyframes pui-menu-in {
+        from {
+            opacity: 0;
+            translate: 0 calc(var(--spacing) * -0.5);
+        }
+    }
+}

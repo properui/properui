@@ -1,0 +1,37 @@
+/*
+ * Empty state. Mirrors `EmptyState` (size md) and its modern featured icon in
+ * packages/ui/src/components/application/empty-state/empty-state.tsx.
+ *
+ * <div class="pui-empty">
+ *     <div class="pui-empty__icon"><svg aria-hidden="true">...</svg></div>
+ *     <h3 class="pui-empty__title">No projects found</h3>
+ *     <p class="pui-empty__description">...</p>
+ *     <div class="pui-empty__actions">...</div>
+ * </div>
+ */
+@layer components {
+    .pui-empty {
+        @apply mx-auto flex w-full max-w-lg flex-col items-center justify-center py-12 text-center;
+    }
+
+    .pui-empty__icon {
+        @apply bg-primary text-fg-secondary shadow-xs-skeuomorphic ring-primary mb-5 flex size-12 shrink-0 items-center justify-center ring-1 ring-inset;
+        border-radius: calc(var(--radius-lg) + 2px);
+
+        & > svg {
+            @apply size-6;
+        }
+    }
+
+    .pui-empty__title {
+        @apply text-primary m-0 text-lg font-semibold;
+    }
+
+    .pui-empty__description {
+        @apply text-tertiary m-0 mt-2 max-w-88 text-sm;
+    }
+
+    .pui-empty__actions {
+        @apply mt-8 flex flex-wrap justify-center gap-3;
+    }
+}

@@ -1,0 +1,46 @@
+/*
+ * Pagination. Mirrors the page-number pagination in
+ * packages/ui/src/components/application/pagination/pagination.tsx: previous/next as secondary
+ * buttons, numbered pages in between (hidden below `md`, where a "Page 1 of 10" summary shows).
+ *
+ * <nav class="pui-pagination" aria-label="Pagination">
+ *     <a class="pui-btn pui-btn--secondary pui-pagination__prev" href="?page=1">Previous</a>
+ *     <ol class="pui-pagination__pages">
+ *         <li><a class="pui-pagination__item" href="?page=1" aria-current="page">1</a></li>
+ *         <li><a class="pui-pagination__item" href="?page=2">2</a></li>
+ *     </ol>
+ *     <p class="pui-pagination__summary">Page 1 of 10</p>
+ *     <a class="pui-btn pui-btn--secondary pui-pagination__next" href="?page=2">Next</a>
+ * </nav>
+ */
+@layer components {
+    .pui-pagination {
+        @apply border-secondary flex w-full items-center justify-between gap-3 border-t pt-4 md:pt-5;
+    }
+
+    .pui-pagination__prev,
+    .pui-pagination__next {
+        @apply shrink-0;
+    }
+
+    .pui-pagination__pages {
+        @apply m-0 hidden list-none items-center justify-center gap-0.5 p-0 md:flex;
+    }
+
+    .pui-pagination__item {
+        @apply text-quaternary outline-focus-ring flex size-10 cursor-pointer items-center justify-center rounded-lg border-0 bg-transparent p-3 text-sm font-medium no-underline transition duration-100 ease-linear;
+        @apply hover:bg-primary_hover hover:text-secondary focus-visible:bg-primary_hover focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2;
+
+        &[aria-current="page"] {
+            @apply bg-primary_hover text-secondary;
+        }
+    }
+
+    .pui-pagination__ellipsis {
+        @apply text-tertiary flex size-10 shrink-0 items-center justify-center text-sm;
+    }
+
+    .pui-pagination__summary {
+        @apply text-fg-secondary m-0 text-sm whitespace-nowrap md:hidden;
+    }
+}

@@ -22,7 +22,8 @@ Components ship as readable TypeScript source rather than a compiled bundle, so 
 normal dependency _or_ copy the files in with `npx @properui/cli@latest add` and own them outright. Behaviour, keyboard
 handling and ARIA come from [React Aria Components](https://react-spectrum.adobe.com/react-aria/); styling is Tailwind
 CSS v4 utilities resolved through a semantic token layer, so re-branding the whole system means editing one file, and a
-generated screen lands on the system rather than near it.
+generated screen lands on the system rather than near it. Vue, Angular, Svelte, Astro and plain-HTML projects get the
+same tokens plus a smaller, curated set of HTML components and custom elements: see [Beyond React](#beyond-react).
 
 <!-- stats:start -->
 
@@ -45,6 +46,8 @@ so Claude Code, Codex, Cursor, v0, Bolt and Lovable can all drive them.
 | CLI: `why`                 | `npx @properui/cli@latest why <component>`                                                        | Prints what pulled a given entry in, for auditing an install you didn't expect.                                                                                                                                          |
 | CLI: `check`               | `npx @properui/cli@latest check`                                                                  | The token guard: flags raw palette classes and arbitrary values in place of semantic tokens.                                                                                                                             |
 | CLI: `icons`               | `npx @properui/cli@latest icons`                                                                  | Lists and installs icon components the same way `add` handles the rest of the registry.                                                                                                                                  |
+| HTML registry entries      | `/r/<component>-html.json`                                                                        | Fetches `@properui/html` snippets (`type: "html"`) for Vue, Angular, Svelte, Astro and plain HTML; `add` picks them on an html-platform project.                                                                         |
+| Prebuilt stylesheet        | [`/css/properui.min.css`](https://properui.dev/css/properui.min.css)                              | Tokens plus the html component classes in one file, for a `<link>` on a page with no build step (also `@properui/tokens/dist/properui.min.css` on jsDelivr).                                                             |
 | MCP server                 | `npx -y @properui/mcp`                                                                            | The same registry and `add` as MCP tools (`search_components`, `get_component`, `add_component`, ...), for assistants that speak MCP.                                                                                    |
 
 Why generated code comes out better against this library specifically:
@@ -271,6 +274,50 @@ npx @properui/cli@latest add button
 `init` writes `components.json`, your theme file, the `cx` utility and the Tailwind `@source` line, and wires up
 `ThemeProvider`. `add` copies a component's files (plus everything it depends on) into your project. See
 [docs/cli.md](./docs/cli.md).
+
+## Beyond React
+
+The React layer above is the full library. For projects that are not React there are three smaller packages on the same
+tokens, so a Vue or plain-HTML page looks the same as a React one:
+
+- **`@properui/tokens`**: the token layer as plain CSS (`theme.css` for Tailwind v4 in any framework, `tokens.css` as
+  bare CSS variables, the theme presets, and a prebuilt `properui.min.css`).
+- **`@properui/html`**: `pui-` component classes, small dependency-free behaviours (dropdowns, tabs, modals, tooltips,
+  toasts) and copy-paste `.html` snippets.
+- **`@properui/elements`**: light-DOM custom elements (`<pui-button>`, `<pui-modal>`, ...) for Vue, Angular, Svelte and
+  Astro templates.
+
+They cover a curated set of about twenty components (buttons, form fields, badges, alerts, tabs, dropdowns, modals,
+tables, pagination and similar), with accessibility from native HTML (`<dialog>`, `<details>`, real form controls) plus
+ARIA set by the scripts, not React Aria. Data tables, date pickers, charts, the marketing sections and the page examples
+are React-only. [docs/frameworks.md](./docs/frameworks.md) has the component-by-component matrix.
+
+No build step:
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@properui/tokens/dist/properui.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/@properui/html/dist/properui-html.iife.js" data-auto-init defer></script>
+
+<button type="button" class="pui-btn pui-btn--primary pui-btn--md">Save</button>
+```
+
+With a bundler (Vue shown; Angular needs `CUSTOM_ELEMENTS_SCHEMA`):
+
+```bash
+npm i @properui/tokens @properui/html @properui/elements
+```
+
+```ts
+// main.ts
+import "@properui/elements/register";
+```
+
+```vue
+<pui-button color="primary">Save</pui-button>
+```
+
+The CLI detects the framework: `npx @properui/cli@latest init` on a Vue, Angular, Svelte, Astro or plain-HTML project
+writes `"platform": "html"` to `components.json`, and `add buttons` then installs the HTML snippets instead of TSX.
 
 ## Theming
 

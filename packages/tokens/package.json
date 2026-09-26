@@ -1,0 +1,62 @@
+{
+    "name": "@properui/tokens",
+    "version": "0.1.0",
+    "description": "Proper UI design tokens as plain CSS: the Tailwind v4 theme, a framework-free CSS-variables file, the theme presets, and a prebuilt properui.css for pages with no build step.",
+    "keywords": [
+        "design-tokens",
+        "css-variables",
+        "tailwindcss",
+        "design-system",
+        "theme",
+        "dark-mode",
+        "css"
+    ],
+    "license": "MIT",
+    "author": "Ayman Shabaro (https://github.com/aymanshabaro)",
+    "homepage": "https://github.com/properui/properui#readme",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/properui/properui.git",
+        "directory": "packages/tokens"
+    },
+    "bugs": {
+        "url": "https://github.com/properui/properui/issues"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "type": "module",
+    "sideEffects": true,
+    "style": "./dist/properui.css",
+    "unpkg": "./dist/properui.min.css",
+    "jsdelivr": "./dist/properui.min.css",
+    "exports": {
+        "./theme.css": "./dist/theme.css",
+        "./tokens.css": "./dist/tokens.css",
+        "./properui.css": "./dist/properui.css",
+        "./properui.min.css": "./dist/properui.min.css",
+        "./presets/*": "./dist/presets/*",
+        "./package.json": "./package.json"
+    },
+    "files": [
+        "dist",
+        "README.md",
+        "LICENSE"
+    ],
+    "scripts": {
+        "build": "tsx scripts/build.ts",
+        "lint": "eslint scripts test",
+        "type-check": "tsc --noEmit",
+        "test": "vitest run"
+    },
+    "devDependencies": {
+        "@tailwindcss/postcss": "^4.3.3",
+        "@types/node": "^22.9.0",
+        "lightningcss": "^1.32.0",
+        "postcss": "^8.5.28",
+        "tailwindcss": "^4.3.3",
+        "tsx": "^4.19.2",
+        "typescript": "^5.9.3",
+        "vitest": "^2.1.8"
+    }
+}

@@ -21,13 +21,14 @@ Global flags: `--cwd <dir>` runs against another directory; every command accept
 
 ## `init`
 
-Configures the current project: detects the framework, TypeScript vs JavaScript, a `src/` folder, the import alias from `tsconfig.json` paths, the Tailwind version and the package manager, then writes `components.json`, `styles/theme.css`, the `cx` utility, the Tailwind `@source` scan line and a `ThemeProvider` in the app entry point.
+Configures the current project: detects the framework (React ones, or Vue, Nuxt, Angular, Svelte, SvelteKit, Astro and plain HTML, which put the project on the html platform: see "Platforms" in [docs/cli.md](https://github.com/properui/properui/blob/main/docs/cli.md#platforms)), TypeScript vs JavaScript, a `src/` folder, the import alias from `tsconfig.json` paths, the Tailwind version and the package manager, then writes `components.json`, `styles/theme.css`, the `cx` utility, the Tailwind `@source` scan line and a `ThemeProvider` in the app entry point.
 
 ```bash
 npx @properui/cli@latest init              # auto-detect everything
 npx @properui/cli@latest init --nextjs     # force the Next.js layout
 npx @properui/cli@latest init --vite       # force the Vite layout
 npx @properui/cli@latest init --manual     # write the files, leave the entry point alone
+npx @properui/cli@latest init --platform html  # Vue/Angular/Svelte/Astro/plain HTML: tokens + html CSS, no TSX
 npx @properui/cli@latest init --overwrite  # replace components.json and existing files
 npx @properui/cli@latest init --yes        # non-interactive (CI)
 ```

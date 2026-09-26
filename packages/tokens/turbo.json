@@ -1,0 +1,13 @@
+{
+    "$schema": "https://turbo.build/schema.json",
+    "extends": ["//"],
+    "tasks": {
+        "build": {
+            "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/packages/ui/src/styles/**", "$TURBO_ROOT$/packages/html/src/**"],
+            "outputs": ["dist/**"]
+        },
+        "test": {
+            "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/packages/ui/src/styles/**", "$TURBO_ROOT$/packages/html/src/**"]
+        }
+    }
+}

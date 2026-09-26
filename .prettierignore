@@ -14,3 +14,7 @@ cloudflare-env.d.ts
 
 # Emitted by `pnpm registry:build` with its own formatting.
 packages/registry/schema.json
+
+# Example apps' framework files: the repo's Prettier plugins cannot parse Vue SFCs or Angular decorators.
+examples/**/*.vue
+examples/angular/src/**/*.ts

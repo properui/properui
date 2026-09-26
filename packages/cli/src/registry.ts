@@ -15,8 +15,9 @@ import { readAuthToken } from "./auth.js";
 /** Fallback used when neither `--registry` nor `REGISTRY_URL` nor components.json says otherwise. */
 export const DEFAULT_REGISTRY_URL = "https://properui.dev/r";
 
-export type RegistryFileType = "component" | "util" | "hook" | "style";
-export type RegistryEntryType = "component" | "example" | "util" | "hook" | "style";
+export type RegistryFileType = "component" | "util" | "hook" | "style" | "html";
+/** `html` entries are `@properui/html` snippets (`layer: "html"`, named `<component>-html`). */
+export type RegistryEntryType = "component" | "example" | "util" | "hook" | "style" | "html";
 
 export interface RegistryFile {
     /** Path inside `packages/ui/src`, e.g. `components/base/badges/badges.tsx`. */
@@ -44,6 +45,12 @@ export interface RegistryMeta {
     dependencies: string[];
     cssVars: string[];
     examples: string[];
+    /**
+     * Where the entry runs: `["react","next"]` for TSX entries,
+     * `["html","vue","angular","svelte","astro","vanilla"]` for html entries. Absent on registries
+     * built before the field existed; read it through `entryPlatforms`.
+     */
+    platforms?: string[];
     docs?: string;
     /** Present once the registry publishes a stable version/hash for the entry; see `entryVersion`. */
     version?: string;

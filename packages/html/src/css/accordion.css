@@ -1,0 +1,56 @@
+/*
+ * Accordion on native `<details>`/`<summary>`: keyboard, `aria-expanded` and find-in-page come from
+ * the platform. `data-pui="accordion"` plus `data-pui-exclusive` keeps one item open at a time (the
+ * same as giving every `<details>` one `name`, which the JS also sets).
+ *
+ * <div class="pui-accordion" data-pui="accordion" data-pui-exclusive>
+ *     <details class="pui-accordion__item" open>
+ *         <summary class="pui-accordion__trigger">Is there a free trial?</summary>
+ *         <div class="pui-accordion__panel">Yes, 30 days.</div>
+ *     </details>
+ * </div>
+ */
+@layer components {
+    .pui-accordion {
+        @apply flex w-full flex-col;
+    }
+
+    .pui-accordion__item {
+        @apply border-secondary border-b;
+
+        &:first-child {
+            @apply border-t;
+        }
+    }
+
+    .pui-accordion__trigger {
+        @apply text-md text-primary outline-focus-ring flex w-full cursor-pointer list-none items-center justify-between gap-4 rounded-md py-4 text-start font-semibold focus-visible:outline-2 focus-visible:outline-offset-2;
+
+        &::-webkit-details-marker {
+            display: none;
+        }
+
+        &::after {
+            @apply bg-fg-quaternary size-5 shrink-0 transition-transform duration-150 ease-linear;
+            content: "";
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")
+                center / contain no-repeat;
+        }
+
+        &:hover::after {
+            @apply bg-fg-quaternary_hover;
+        }
+    }
+
+    .pui-accordion__item[open] > .pui-accordion__trigger::after {
+        @apply rotate-180;
+    }
+
+    .pui-accordion__panel {
+        @apply text-md text-tertiary pe-9 pb-4;
+
+        & > p {
+            @apply m-0;
+        }
+    }
+}

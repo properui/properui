@@ -1,0 +1,163 @@
+---
+title: Angular integration
+section: integrations
+description: "Use Proper UI in Angular with the <pui-*> custom elements and CUSTOM_ELEMENTS_SCHEMA: install, stylesheet, theme toggle and a modal driven by a signal."
+metaTitle: Angular integration | Proper UI
+metaDescription: "Proper UI in Angular: install @properui/elements and @properui/tokens, add CUSTOM_ELEMENTS_SCHEMA to a standalone component, and build a button and a modal."
+---
+
+Angular projects use the same design tokens as the React library, through `@properui/elements`: light-DOM custom
+elements (`<pui-button>`, `<pui-modal>`, ...) that Angular renders like native tags. Attribute bindings, `(event)`
+bindings and forms work on them. This is a curated set, not the full React library; see the end of this page.
+
+## Install
+
+```bash
+npm install @properui/elements @properui/tokens
+```
+
+`@properui/elements` brings `@properui/html` (the behaviours) with it. The CLI does the same on a detected Angular project:
+`npx @properui/cli@latest init` puts it on the html platform, and `add` then writes html snippets instead of React
+source (see [Frameworks](/docs/frameworks#install)).
+
+## Stylesheet
+
+Add the prebuilt stylesheet to `angular.json` (`projects.<app>.architect.build.options.styles`). It holds the tokens
+(light and dark), Tailwind's preflight and every `pui-` component class; no Tailwind build is needed:
+
+```json
+"styles": ["node_modules/@properui/tokens/dist/properui.css", "src/styles.css"]
+```
+
+Or `@import "@properui/tokens/properui.css";` at the top of `src/styles.css`. On Tailwind v4, import
+`@properui/tokens/theme.css` and `@properui/html/css` after `@import "tailwindcss";` instead.
+
+## Register the elements
+
+Define the elements once in `main.ts`, and add `CUSTOM_ELEMENTS_SCHEMA` to every standalone component whose template
+uses a `pui-` tag, so the compiler accepts the tags and their attributes:
+
+```ts
+// src/main.ts
+import { bootstrapApplication } from "@angular/platform-browser";
+import "@properui/elements/register";
+import { AppComponent } from "./app/app.component";
+
+bootstrapApplication(AppComponent).catch(console.error);
+```
+
+```ts
+import { CUSTOM_ELEMENTS_SCHEMA, Component } from "@angular/core";
+
+@Component({
+    selector: "app-root",
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
+    template: `<pui-button color="secondary">Hello</pui-button>`,
+})
+export class AppComponent {}
+```
+
+With SSR, the register import is a no-op on the server; the tags render as plain HTML and upgrade in the browser.
+
+## Theme toggle
+
+```html
+<pui-theme-toggle></pui-theme-toggle>
+```
+
+It switches the `.dark-mode` class on `<html>`, which repoints every token, and remembers the choice in
+`localStorage` (`theme`). To drive it from your own control, call `setTheme("light" | "dark" | "system")` from
+`@properui/elements`.
+
+## A button and a modal
+
+```ts
+import { CUSTOM_ELEMENTS_SCHEMA, Component, signal } from "@angular/core";
+
+@Component({
+    selector: "app-invite",
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
+    template: `
+        <pui-button color="primary" (click)="open.set(true)">Invite teammates</pui-button>
+
+        <pui-modal
+            title="Invite teammates"
+            description="They get an email with a link to join."
+            size="sm"
+            [attr.open]="open() ? '' : null"
+            (pui-close)="open.set(false)"
+        >
+            <pui-input label="Email address" type="email" name="email" [value]="email()" (input)="email.set($any($event.target).value)"></pui-input>
+            <div slot="footer">
+                <pui-button color="secondary" (click)="open.set(false)">Cancel</pui-button>
+                <pui-button [attr.is-disabled]="email() ? null : ''" (click)="open.set(false)">Send invite</pui-button>
+            </div>
+        </pui-modal>
+    `,
+})
+export class InviteComponent {
+    readonly open = signal(false);
+    readonly email = signal("");
+}
+```
+
+Use `[attr.x]` bindings for the elements' attributes: `null` removes an attribute, `''` sets a boolean one. Custom
+events bind like DOM events, `(pui-close)`, with the data in `$event.detail`. The elements re-dispatch `input` and
+`change` from themselves, so `$event.target.value` is the element's current value.
+
+## The same markup without custom elements
+
+The elements render `@properui/html` markup. If you would rather write it yourself (or render it from a server
+template), this is the equivalent of the example above:
+
+```html
+<button class="pui-btn pui-btn--tertiary pui-btn--icon-only" type="button" data-pui="theme-toggle" aria-label="Dark theme">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M22 15.844A10.5 10.5 0 1 1 8.156 2 8 8 0 0 0 22 15.844Z" />
+    </svg>
+</button>
+
+<button class="pui-btn pui-btn--primary" type="button" data-pui-modal-open="invite">Invite teammates</button>
+
+<dialog class="pui-modal pui-modal--sm" id="invite" aria-labelledby="invite-title">
+    <div class="pui-modal__header">
+        <h2 class="pui-modal__title" id="invite-title">Invite teammates</h2>
+        <p class="pui-modal__description">They get an email with a link to join.</p>
+        <button class="pui-modal__close" type="button" aria-label="Close" data-pui-modal-close>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+    <div class="pui-modal__body">
+        <div class="pui-field">
+            <label class="pui-label" for="invite-email">Email address</label>
+            <input class="pui-input" id="invite-email" name="email" type="email" />
+        </div>
+    </div>
+    <div class="pui-modal__footer">
+        <button class="pui-btn pui-btn--secondary" type="button" data-pui-modal-close>Cancel</button>
+        <button class="pui-btn pui-btn--primary" type="button" data-pui-modal-close value="send">Send invite</button>
+    </div>
+</dialog>
+```
+
+`data-pui="theme-toggle"` and `data-pui-modal-open` are picked up by `init()` from `@properui/html` (`import { init }
+from "@properui/html"`, or the `data-auto-init` script tag). `init` is idempotent, so calling it again after new markup
+appears is safe.
+
+## What is React-only
+
+Proper UI is a React 19 library first. The React layer (`@properui/ui`) has 126 component groups on React Aria; the
+elements and the html layer cover a curated set: button, badge, avatar, input, textarea, select, checkbox, toggle,
+alert, tabs, dropdown menu, modal, tooltip, progress, skeleton, breadcrumbs, pagination, toasts and the theme toggle
+(plus radio, card, accordion, table and empty state as html markup). Date pickers, comboboxes, sliders, data tables,
+charts, the command menu, file upload, application shells, every marketing section and every page example are
+React-only today, and there is no Angular port of the React components. Keyboard and screen-reader support in this layer
+comes from native HTML and the ARIA the behaviours set, not from React Aria. The full matrix is on
+[Frameworks](/docs/frameworks); every element, attribute and event is in the [custom elements reference](/docs/elements).
+
+## Example app
+
+[`examples/angular`](https://github.com/properui/properui/tree/main/examples/angular) in the repository is a
+small, complete Angular app using the elements; its README has the one command to run it.

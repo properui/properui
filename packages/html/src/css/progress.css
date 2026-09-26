@@ -1,0 +1,44 @@
+/*
+ * Progress bar. Mirrors `ProgressBarBase` and `ProgressBar` (label on the right) in
+ * packages/ui/src/components/base/progress-indicators/progress-indicators.tsx.
+ * The value is data, so it goes in an inline `width` (or `--pui-progress`); the ARIA values say the
+ * same thing to assistive tech.
+ *
+ * <div class="pui-progress">
+ *     <div class="pui-progress__track" role="progressbar" aria-label="Upload" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100">
+ *         <div class="pui-progress__bar" style="width: 40%"></div>
+ *     </div>
+ *     <span class="pui-progress__label">40%</span>
+ * </div>
+ *
+ * The `.pui-progress` element can also be the track itself: `<div class="pui-progress" role="progressbar" ...><div class="pui-progress__bar" ...>`.
+ */
+@layer components {
+    .pui-progress {
+        @apply flex w-full items-center gap-3;
+    }
+
+    .pui-progress__track,
+    .pui-progress:has(> .pui-progress__bar) {
+        @apply bg-quaternary block h-2 w-full overflow-hidden rounded-md;
+    }
+
+    .pui-progress__bar {
+        @apply bg-fg-brand-primary h-full rounded-md transition-all duration-75 ease-linear;
+        width: var(--pui-progress, 0%);
+    }
+
+    .pui-progress__label {
+        @apply text-secondary shrink-0 text-sm font-medium tabular-nums;
+    }
+
+    .pui-progress--sm .pui-progress__track,
+    .pui-progress--sm:has(> .pui-progress__bar) {
+        @apply h-1.5;
+    }
+
+    .pui-progress--md .pui-progress__track,
+    .pui-progress--md:has(> .pui-progress__bar) {
+        @apply h-2;
+    }
+}

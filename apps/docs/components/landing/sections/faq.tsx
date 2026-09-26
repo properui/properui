@@ -58,9 +58,10 @@ const QUESTIONS: Array<{ question: string; answer: React.ReactNode }> = [
         question: "What does the agent setup command change in my repository?",
         answer: (
             <>
-                Exactly what each tool's setup card lists: a <code>SKILL.md</code> or rule file, plus a short pointer or marked block appended to{" "}
-                <code>CLAUDE.md</code> or <code>AGENTS.md</code> where applicable. Nothing else in the project is modified, and re-running the command only
-                updates that section in place.
+                Exactly what each tool's setup card lists: a <code>SKILL.md</code> or rule file, a short pointer or marked block appended to{" "}
+                <code>CLAUDE.md</code> or <code>AGENTS.md</code> where applicable, and a <code>properui</code> entry for the MCP server in{" "}
+                <code>.mcp.json</code> or <code>.cursor/mcp.json</code>, merged into any servers already there (<code>--no-mcp</code> skips it). Nothing else in
+                the project is modified, and re-running the command only updates those sections in place.
             </>
         ),
     },
@@ -78,9 +79,22 @@ const QUESTIONS: Array<{ question: string; answer: React.ReactNode }> = [
         question: "Does it work with Claude Code, Codex, Cursor and Lovable?",
         answer: (
             <>
-                Claude Code, Codex and Cursor each get a one-command setup that writes a skill or rule file directly into the project. Lovable runs in the
-                browser with no access to local files, so it uses the same instructions pasted into its Knowledge panel instead. v0 and Bolt have no{" "}
+                Claude Code, Codex and Cursor each get a one-command setup that writes a skill or rule file directly into the project, and any assistant that
+                speaks MCP can connect to <code>npx -y @properui/mcp</code> to search the registry and install components as tools. Lovable runs in the browser
+                with no access to local files, so it uses the same instructions pasted into its Knowledge panel instead. v0 and Bolt have no{" "}
                 <code>agent init</code> for them, but can read Proper UI's documentation and <code>/llms.txt</code> directly.
+            </>
+        ),
+    },
+    {
+        question: "Can I use Proper UI without React?",
+        answer: (
+            <>
+                Partly. The full library is React. Vue, Angular, Svelte, Astro and plain-HTML projects get the same tokens through <code>@properui/tokens</code>{" "}
+                (including a prebuilt stylesheet you can link from a CDN), about twenty components as HTML classes with small vanilla-JS behaviours in{" "}
+                <code>@properui/html</code>, and matching custom elements such as <code>&lt;pui-button&gt;</code> in <code>@properui/elements</code>. Data
+                tables, charts, date pickers, the marketing sections and the page examples stay React-only; the <a href="/docs/frameworks">frameworks page</a>{" "}
+                lists exactly what each platform gets.
             </>
         ),
     },

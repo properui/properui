@@ -1,0 +1,95 @@
+/*
+ * Radio. Mirrors `RadioButtonBase` and `RadioButton` in packages/ui/src/components/base/radio-buttons/radio-buttons.tsx.
+ * Group radios with a `<fieldset class="pui-radio-group">` (and a `<legend>`) or `role="radiogroup"`;
+ * arrow keys between radios of the same `name` are native.
+ *
+ * <label class="pui-radio">
+ *     <input type="radio" name="plan" value="basic" checked />
+ *     <span class="pui-radio__box" aria-hidden="true"></span>
+ *     <span class="pui-radio__text"><span class="pui-radio__label">Basic</span></span>
+ * </label>
+ */
+@layer components {
+    .pui-radio-group {
+        @apply m-0 flex min-w-0 flex-col gap-4 border-0 p-0;
+
+        & > legend {
+            @apply text-secondary mb-4 p-0 text-sm font-medium;
+        }
+    }
+
+    .pui-radio {
+        @apply relative flex w-max max-w-full cursor-pointer items-start gap-2;
+
+        /* The native input stays in the accessibility tree and the tab order, visually hidden. */
+        & > input {
+            @apply sr-only;
+        }
+
+        &:has(> input:disabled) {
+            @apply cursor-not-allowed;
+        }
+    }
+
+    .pui-radio__box {
+        @apply bg-primary ring-primary mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full ring-1 ring-inset;
+
+        &::after {
+            @apply bg-fg-white size-1.5 rounded-full opacity-0;
+            content: "";
+        }
+    }
+
+    .pui-radio > input:checked + .pui-radio__box {
+        @apply bg-brand-solid ring-brand-solid;
+
+        &::after {
+            @apply opacity-100;
+        }
+    }
+
+    .pui-radio > input:focus-visible + .pui-radio__box {
+        @apply outline-focus-ring outline-2 outline-offset-2;
+    }
+
+    .pui-radio > input:disabled + .pui-radio__box {
+        @apply cursor-not-allowed opacity-50;
+    }
+
+    .pui-radio > input:disabled:not(:checked) + .pui-radio__box {
+        @apply bg-tertiary;
+    }
+
+    .pui-radio__text {
+        @apply inline-flex flex-col;
+    }
+
+    .pui-radio__label {
+        @apply text-secondary text-sm font-medium select-none;
+    }
+
+    .pui-radio__hint {
+        @apply text-tertiary text-sm;
+    }
+
+    .pui-radio--md {
+        @apply gap-3;
+
+        & .pui-radio__text {
+            @apply gap-0.5;
+        }
+
+        & .pui-radio__label,
+        & .pui-radio__hint {
+            @apply text-md;
+        }
+    }
+
+    .pui-radio--md .pui-radio__box {
+        @apply size-5;
+
+        &::after {
+            @apply size-2;
+        }
+    }
+}

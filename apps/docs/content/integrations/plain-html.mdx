@@ -1,0 +1,134 @@
+---
+title: Plain HTML integration
+section: integrations
+description: "Use Proper UI on a plain HTML page with no build step: one stylesheet and one script from a CDN, custom elements or pui- markup, a theme toggle and a modal."
+metaTitle: Plain HTML integration | Proper UI
+metaDescription: "Proper UI with no build step: link properui.min.css and the elements script from jsDelivr, then use <pui-*> tags or pui- classes. Theme toggle and modal included."
+---
+
+A plain HTML page needs no bundler and no Node: one stylesheet and one script from a CDN. The stylesheet is
+`@properui/tokens`' prebuilt `properui.css` (the tokens for both themes, Tailwind's preflight and every `pui-`
+component class); the script is `@properui/elements`' classic build, which defines the `<pui-*>` elements and bundles
+the `@properui/html` behaviours. This is a curated set, not the full React library; see the end of this page.
+
+## Install
+
+Nothing to install. Pin versions in production (`@properui/elements@0.1.0`):
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@properui/tokens/dist/properui.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/@properui/elements/dist/properui-elements.global.js" defer></script>
+```
+
+The CLI works here too: in a folder with no `package.json`, `npx @properui/cli@latest init` sets up the html platform
+and `add buttons` writes the `.html` snippets.
+
+## Stylesheet
+
+The `<link>` above is the whole stylesheet. It sets no colours on `<body>`; give the page its surface with the tokens,
+which switch with the theme:
+
+```css
+body {
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+}
+```
+
+## Register the elements
+
+The `defer`red script defines every element when the document has been parsed. Its API is on
+`window.ProperUIElements`: `toast()`, `setTheme()`, `defineElements()` and the element classes.
+
+## Theme toggle
+
+```html
+<pui-theme-toggle></pui-theme-toggle>
+```
+
+It switches the `.dark-mode` class on `<html>` and remembers the choice in `localStorage` (`theme`). To avoid a flash
+of the light theme on reload, apply the saved choice before first paint:
+
+```html
+<script>
+    try {
+        if (localStorage.getItem("theme") === "dark") document.documentElement.classList.add("dark-mode");
+    } catch {}
+</script>
+```
+
+## A button and a modal
+
+```html
+<pui-button color="primary" data-pui-modal-open="invite">Invite teammates</pui-button>
+
+<pui-modal id="invite" title="Invite teammates" description="They get an email with a link to join." size="sm">
+    <form method="dialog" id="invite-form">
+        <pui-input label="Email address" type="email" name="email"></pui-input>
+    </form>
+    <div slot="footer">
+        <pui-button color="secondary" type="submit" form="invite-form" value="cancel">Cancel</pui-button>
+        <pui-button type="submit" form="invite-form" value="send">Send invite</pui-button>
+    </div>
+</pui-modal>
+```
+
+`data-pui-modal-open` opens the modal with no script of your own. The `<form method="dialog">` closes it on submit,
+and `pui-close` reports which button did it in `event.detail.returnValue`.
+
+## The same markup without custom elements
+
+The elements render `@properui/html` markup. If you would rather write it yourself (or render it from a server
+template), this is the equivalent of the example above:
+
+```html
+<button class="pui-btn pui-btn--tertiary pui-btn--icon-only" type="button" data-pui="theme-toggle" aria-label="Dark theme">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M22 15.844A10.5 10.5 0 1 1 8.156 2 8 8 0 0 0 22 15.844Z" />
+    </svg>
+</button>
+
+<button class="pui-btn pui-btn--primary" type="button" data-pui-modal-open="invite">Invite teammates</button>
+
+<dialog class="pui-modal pui-modal--sm" id="invite" aria-labelledby="invite-title">
+    <div class="pui-modal__header">
+        <h2 class="pui-modal__title" id="invite-title">Invite teammates</h2>
+        <p class="pui-modal__description">They get an email with a link to join.</p>
+        <button class="pui-modal__close" type="button" aria-label="Close" data-pui-modal-close>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+    <div class="pui-modal__body">
+        <div class="pui-field">
+            <label class="pui-label" for="invite-email">Email address</label>
+            <input class="pui-input" id="invite-email" name="email" type="email" />
+        </div>
+    </div>
+    <div class="pui-modal__footer">
+        <button class="pui-btn pui-btn--secondary" type="button" data-pui-modal-close>Cancel</button>
+        <button class="pui-btn pui-btn--primary" type="button" data-pui-modal-close value="send">Send invite</button>
+    </div>
+</dialog>
+```
+
+`data-pui="theme-toggle"` and `data-pui-modal-open` are picked up by `init()` from `@properui/html` (`import { init }
+from "@properui/html"`, or the `data-auto-init` script tag). `init` is idempotent, so calling it again after new markup
+appears is safe.
+
+## What is React-only
+
+Proper UI is a React 19 library first. The React layer (`@properui/ui`) has 126 component groups on React Aria; the
+elements and the html layer cover a curated set: button, badge, avatar, input, textarea, select, checkbox, toggle,
+alert, tabs, dropdown menu, modal, tooltip, progress, skeleton, breadcrumbs, pagination, toasts and the theme toggle
+(plus radio, card, accordion, table and empty state as html markup). Date pickers, comboboxes, sliders, data tables,
+charts, the command menu, file upload, application shells, every marketing section and every page example are
+React-only today, and there is no plain HTML port of the React components. Keyboard and screen-reader support in this layer
+comes from native HTML and the ARIA the behaviours set, not from React Aria. The full matrix is on
+[Frameworks](/docs/frameworks); every element, attribute and event is in the [custom elements reference](/docs/elements).
+
+## Example app
+
+[`examples/plain-html`](https://github.com/properui/properui/tree/main/examples/plain-html) in the repository is a
+small, complete plain HTML app using the elements; its README has the one command to run it.

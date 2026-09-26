@@ -1,0 +1,149 @@
+---
+title: Astro integration
+section: integrations
+description: "Use Proper UI in Astro: the <pui-*> custom elements (or plain pui- markup) in .astro files, the prebuilt stylesheet, a theme toggle and a modal."
+metaTitle: Astro integration | Proper UI
+metaDescription: "Proper UI in Astro: install @properui/elements and @properui/tokens, write pui- tags in .astro pages, and add a theme toggle, a button and a modal."
+---
+
+Astro renders HTML on the server and ships as little JavaScript as it can, which suits the two non-React Proper UI
+layers well: write `pui-` classes straight into `.astro` markup for static pieces, and `<pui-*>` custom elements
+(`@properui/elements`, about 45 KB minified with the behaviours) for the interactive ones. An Astro site with the
+React integration can also use the React components from `@properui/ui` in React islands. This page covers the
+non-React path; see the end of the page for what it does not include.
+
+## Install
+
+```bash
+npm install @properui/elements @properui/tokens
+```
+
+`@properui/elements` brings `@properui/html` (the behaviours) with it. The CLI does the same on a detected Astro project:
+`npx @properui/cli@latest init` puts it on the html platform, and `add` then writes html snippets instead of React
+source (see [Frameworks](/docs/frameworks#install)).
+
+## Stylesheet
+
+Import the prebuilt stylesheet in your layout's frontmatter. It holds the tokens (light and dark), Tailwind's preflight
+and every `pui-` component class:
+
+```astro
+---
+import "@properui/tokens/properui.css";
+---
+```
+
+On Tailwind v4 (`@tailwindcss/vite`), import `@properui/tokens/theme.css` and `@properui/html/css` from your global
+stylesheet after `@import "tailwindcss";` instead.
+
+## Register the elements
+
+Add one script to the layout. Astro bundles it and runs it in the browser; the tags are already in the server-rendered
+HTML and upgrade when it runs:
+
+```astro
+<script>
+    import "@properui/elements/register";
+</script>
+```
+
+## Theme toggle
+
+```astro
+<pui-theme-toggle></pui-theme-toggle>
+```
+
+It switches the `.dark-mode` class on `<html>` and remembers the choice in `localStorage` (`theme`). To avoid a flash
+of the light theme on reload, apply the saved choice before first paint with an inline script in `<head>`:
+
+```astro
+<script is:inline>
+    try {
+                if (localStorage.getItem("theme") === "dark") document.documentElement.classList.add("dark-mode");
+            } catch {}
+</script>
+```
+
+## A button and a modal
+
+```astro
+<pui-button color="primary" data-pui-modal-open="invite">Invite teammates</pui-button>
+
+<pui-modal id="invite" title="Invite teammates" description="They get an email with a link to join." size="sm">
+    <pui-input label="Email address" type="email" name="email"></pui-input>
+    <div slot="footer">
+        <pui-button color="secondary" data-close>Cancel</pui-button>
+        <pui-button data-close>Send invite</pui-button>
+    </div>
+</pui-modal>
+
+<script>
+    import type { PuiModal } from "@properui/elements";
+
+    const modal = document.getElementById("invite") as PuiModal;
+    modal.addEventListener("click", (event) => {
+        if ((event.target as Element).closest("[data-close]")) modal.close();
+    });
+    modal.addEventListener("pui-close", () => console.log("closed"));
+</script>
+```
+
+Any element with `data-pui-modal-open` set to a `pui-modal`'s id opens it, with no script of your own. Astro passes
+attributes through to custom elements as written.
+
+## The same markup without custom elements
+
+The elements render `@properui/html` markup. If you would rather write it yourself (or render it from a server
+template), this is the equivalent of the example above:
+
+```html
+<button class="pui-btn pui-btn--tertiary pui-btn--icon-only" type="button" data-pui="theme-toggle" aria-label="Dark theme">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M22 15.844A10.5 10.5 0 1 1 8.156 2 8 8 0 0 0 22 15.844Z" />
+    </svg>
+</button>
+
+<button class="pui-btn pui-btn--primary" type="button" data-pui-modal-open="invite">Invite teammates</button>
+
+<dialog class="pui-modal pui-modal--sm" id="invite" aria-labelledby="invite-title">
+    <div class="pui-modal__header">
+        <h2 class="pui-modal__title" id="invite-title">Invite teammates</h2>
+        <p class="pui-modal__description">They get an email with a link to join.</p>
+        <button class="pui-modal__close" type="button" aria-label="Close" data-pui-modal-close>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+    <div class="pui-modal__body">
+        <div class="pui-field">
+            <label class="pui-label" for="invite-email">Email address</label>
+            <input class="pui-input" id="invite-email" name="email" type="email" />
+        </div>
+    </div>
+    <div class="pui-modal__footer">
+        <button class="pui-btn pui-btn--secondary" type="button" data-pui-modal-close>Cancel</button>
+        <button class="pui-btn pui-btn--primary" type="button" data-pui-modal-close value="send">Send invite</button>
+    </div>
+</dialog>
+```
+
+`data-pui="theme-toggle"` and `data-pui-modal-open` are picked up by `init()` from `@properui/html` (`import { init }
+from "@properui/html"`, or the `data-auto-init` script tag). `init` is idempotent, so calling it again after new markup
+appears is safe.
+
+## What is React-only
+
+Proper UI is a React 19 library first. The React layer (`@properui/ui`) has 126 component groups on React Aria; the
+elements and the html layer cover a curated set: button, badge, avatar, input, textarea, select, checkbox, toggle,
+alert, tabs, dropdown menu, modal, tooltip, progress, skeleton, breadcrumbs, pagination, toasts and the theme toggle
+(plus radio, card, accordion, table and empty state as html markup). Date pickers, comboboxes, sliders, data tables,
+charts, the command menu, file upload, application shells, every marketing section and every page example are
+React-only today, and there is no Astro port of the React components. Keyboard and screen-reader support in this layer
+comes from native HTML and the ARIA the behaviours set, not from React Aria. The full matrix is on
+[Frameworks](/docs/frameworks); every element, attribute and event is in the [custom elements reference](/docs/elements).
+
+## Example app
+
+[`examples/astro`](https://github.com/properui/properui/tree/main/examples/astro) in the repository is a
+small, complete Astro app using the elements; its README has the one command to run it.

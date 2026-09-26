@@ -40,6 +40,19 @@ side effect of the project being unconfigured. Read the output before deciding a
 - Tailwind is not v4 → `init` will refuse and print an upgrade path. Do not attempt to work around
   this by writing v3-style config.
 
+### Non-React projects
+
+`info --json` also reports `platform`: `react` for React, Next.js, Vite React and Remix, `html` for
+Vue, Nuxt, Angular, Svelte, SvelteKit, Astro and plain HTML. On `html`, `init` writes
+`"platform": "html"` into `components.json` and wires `@properui/tokens` + `@properui/html` (or prints
+the CDN `<link>`/`<script>` lines when there is no Tailwind v4 stylesheet), and `add <name>` installs
+the `<name>-html` snippets (plain HTML on the `pui-` classes) instead of TSX; it refuses React-only
+entries and names the HTML alternative when there is one (`list --platform html` shows what exists).
+In Vue, Angular and Svelte templates, prefer the `@properui/elements` custom elements
+(`<pui-button>`, `<pui-modal>`) over pasted markup. Never write TSX or React Aria code into a Vue,
+Angular, Svelte or Astro project; the React rules in step 5 apply to React projects only, while the
+token, no-`dark:` and logical-property rules apply everywhere.
+
 ## 2. Search before creating
 
 Never write a component's markup from memory or invent your own version of something the registry

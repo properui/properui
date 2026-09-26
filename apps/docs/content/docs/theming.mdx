@@ -149,6 +149,13 @@ output in its own cascade layer when that block comes _after_ the `tailwindcss` 
 `theme.css`'s dark-mode overrides are written to win either way — see [Dark mode: import-order independence](/docs/dark-mode#import-order-independence)
 for the mechanism and a worked example.
 
+## Non-React projects
+
+The same tokens ship as plain CSS in `@properui/tokens`: `tokens.css` (CSS variables on `:root` and `.dark-mode`, no Tailwind needed) for Vue,
+Angular, Svelte or Astro apps, `theme.css` for Tailwind projects in any framework, every preset as a file, and a prebuilt `properui.min.css` a plain
+HTML page can link from a CDN. Everything on this page applies to them unchanged: re-brand by redeclaring the same variables after the file you load.
+See [Design tokens (CSS)](/docs/tokens).
+
 ## FAQs
 
 <FAQs

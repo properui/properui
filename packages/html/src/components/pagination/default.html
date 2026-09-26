@@ -1,0 +1,48 @@
+<!-- description: Page-number pagination: previous/next buttons, numbered links with aria-current, an ellipsis, and a "Page 1 of 10" summary on small screens. -->
+<nav class="pui-pagination" aria-label="Pagination">
+    <a class="pui-btn pui-btn--secondary pui-pagination__prev" aria-disabled="true">
+        <svg
+            class="pui-btn__icon"
+            data-icon="leading"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+        >
+            <path d="M19 12H5m0 0 7 7m-7-7 7-7" />
+        </svg>
+        Previous
+    </a>
+    <ol class="pui-pagination__pages">
+        <li><a class="pui-pagination__item" href="?page=1" aria-current="page" aria-label="Page 1">1</a></li>
+        <li><a class="pui-pagination__item" href="?page=2" aria-label="Page 2">2</a></li>
+        <li><a class="pui-pagination__item" href="?page=3" aria-label="Page 3">3</a></li>
+        <li><span class="pui-pagination__ellipsis" aria-hidden="true">…</span></li>
+        <li><a class="pui-pagination__item" href="?page=9" aria-label="Page 9">9</a></li>
+        <li><a class="pui-pagination__item" href="?page=10" aria-label="Page 10">10</a></li>
+    </ol>
+    <p class="pui-pagination__summary">Page 1 of 10</p>
+    <a class="pui-btn pui-btn--secondary pui-pagination__next" href="?page=2">
+        Next
+        <svg
+            class="pui-btn__icon"
+            data-icon="trailing"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+        >
+            <path d="M5 12h14m0 0-7-7m7 7-7 7" />
+        </svg>
+    </a>
+</nav>

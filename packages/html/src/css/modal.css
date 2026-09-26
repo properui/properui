@@ -1,0 +1,113 @@
+/*
+ * Modal on a native `<dialog>` (focus containment, Escape, the top layer and `inert` background come
+ * from the platform). Mirrors `ModalOverlay`, `Modal` and `ModalPanel`/`ModalHeader`/`ModalBody`/
+ * `ModalFooter` in packages/ui/src/components/application/modals/. The JS
+ * (`data-pui-modal-open="<dialog id>"`) calls `showModal()`, restores focus on close and closes on a
+ * backdrop click.
+ *
+ * <dialog class="pui-modal" id="invite" aria-labelledby="invite-title">
+ *     <div class="pui-modal__header">
+ *         <h2 class="pui-modal__title" id="invite-title">Invite</h2>
+ *         <p class="pui-modal__description">...</p>
+ *         <button class="pui-modal__close" type="button" aria-label="Close" data-pui-modal-close>...</button>
+ *     </div>
+ *     <div class="pui-modal__body">...</div>
+ *     <div class="pui-modal__footer">...</div>
+ * </dialog>
+ */
+@layer components {
+    .pui-modal {
+        @apply bg-primary text-primary m-auto w-full overflow-y-auto rounded-xl border-0 p-0 shadow-xl outline-hidden sm:rounded-2xl;
+        max-width: min(calc(var(--spacing) * 120), calc(100% - var(--spacing) * 8));
+        max-height: calc(100dvh - var(--spacing) * 16);
+
+        &[open] {
+            @apply flex flex-col;
+            animation: pui-modal-in 300ms ease-out;
+        }
+
+        &::backdrop {
+            @apply bg-overlay/70;
+            backdrop-filter: blur(6px);
+        }
+
+        &[open]::backdrop {
+            animation: pui-fade-in 300ms ease-out;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            &[open],
+            &[open]::backdrop {
+                animation: none;
+            }
+        }
+    }
+
+    .pui-modal--sm {
+        max-width: min(calc(var(--spacing) * 100), calc(100% - var(--spacing) * 8));
+    }
+
+    .pui-modal--md {
+        max-width: min(calc(var(--spacing) * 120), calc(100% - var(--spacing) * 8));
+    }
+
+    .pui-modal--lg {
+        max-width: min(calc(var(--spacing) * 160), calc(100% - var(--spacing) * 8));
+    }
+
+    .pui-modal__header {
+        @apply relative flex flex-col gap-0.5 px-4 pe-12 pt-4 sm:gap-1 sm:px-6 sm:pe-14 sm:pt-6;
+    }
+
+    /* A featured icon above the title. */
+    .pui-modal__icon {
+        @apply bg-primary text-fg-secondary shadow-xs-skeuomorphic ring-primary mb-3.5 flex size-12 shrink-0 items-center justify-center ring-1 ring-inset;
+        border-radius: calc(var(--radius-lg) + 2px);
+
+        & > svg {
+            @apply size-6;
+        }
+    }
+
+    .pui-modal__title {
+        @apply text-md text-primary m-0 font-semibold sm:text-lg;
+    }
+
+    .pui-modal__description {
+        @apply text-tertiary m-0 text-sm;
+    }
+
+    .pui-modal__close {
+        @apply absolute end-3 top-3;
+    }
+
+    .pui-modal__body {
+        @apply text-tertiary flex flex-col gap-4 px-4 py-4 text-sm sm:px-6 sm:pt-5;
+    }
+
+    .pui-modal__footer {
+        @apply flex flex-col-reverse gap-3 p-4 pt-6 sm:flex-row sm:justify-end sm:px-6 sm:pt-8 sm:pb-6;
+
+        & > * {
+            @apply w-full sm:w-auto;
+        }
+    }
+
+    /* No scrolling of the page behind an open modal. */
+    html:has(dialog.pui-modal[open]) {
+        overflow: hidden;
+    }
+
+    @keyframes pui-modal-in {
+        from {
+            opacity: 0;
+            scale: 0.95;
+        }
+    }
+
+    @keyframes pui-fade-in {
+        from {
+            opacity: 0;
+        }
+    }
+}
