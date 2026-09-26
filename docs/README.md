@@ -31,10 +31,11 @@ Component-level reference (props, examples, source links) lives on that site, un
 
 ## Tooling
 
-| Guide                                                   | What it covers                                   |
-| ------------------------------------------------------- | ------------------------------------------------ |
-| [CLI](./cli.md)                                         | `init`, `add`, `list`, `search`, `diff`, `login` |
-| [Contributing components](./contributing-components.md) | Adding a component end to end                    |
+| Guide                                                   | What it covers                                                     |
+| ------------------------------------------------------- | ------------------------------------------------------------------ |
+| [CLI](./cli.md)                                         | `init`, `add`, `list`, `search`, `diff`, `login`                   |
+| [MCP server](./mcp.md)                                  | `@properui/mcp`: the registry and `add` as tools for AI assistants |
+| [Contributing components](./contributing-components.md) | Adding a component end to end                                      |
 
 ## Elsewhere in the repo
 

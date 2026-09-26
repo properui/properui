@@ -44,7 +44,7 @@ This writes `.cursor/rules/properui.mdc` with `alwaysApply: true` frontmatter: C
     items={[
         {
             question: "Does Cursor need a Skill file or an MCP server for this?",
-            answer: "An MCP server doesn't exist for Proper UI today, but a Skill file does, in the .mdc rule format Cursor reads: run npx @properui/cli@latest agent init --client cursor to install it. Combined with Cursor's own terminal tool, that's enough; Agent mode can already run npx @properui/cli@latest search and add.",
+            answer: "Neither is required, but both exist. npx @properui/cli@latest agent init --client cursor installs the rule in the .mdc format Cursor reads and registers the @properui/mcp server in .cursor/mcp.json. Without the server, Agent mode runs npx @properui/cli@latest search and add in its terminal instead.",
         },
         {
             question: "Why .mdc and not a plain .md file?",

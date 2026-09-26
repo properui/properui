@@ -72,7 +72,8 @@ function isUtilityToken(line: string, matchIndex: number): boolean {
     return line.slice(start, end).includes("-utility-");
 }
 
-interface Finding {
+export interface Finding {
+    /** Path relative to the `cwd` the scan was run from. */
     file: string;
     line: number;
     rule: string;
@@ -112,12 +113,28 @@ function walk(dir: string, cwd: string, findings: Finding[]): void {
     }
 }
 
+/**
+ * Scans a directory (recursively) or a single file and returns every finding, without printing.
+ * `runCheck` and the MCP server's `check_tokens` tool both go through this.
+ */
+export function scanForViolations(target: string, cwd: string): Finding[] {
+    const findings: Finding[] = [];
+    let isFile = false;
+    try {
+        isFile = statSync(target).isFile();
+    } catch {
+        return findings;
+    }
+    if (isFile) scanFile(target, cwd, findings);
+    else walk(target, cwd, findings);
+    return findings;
+}
+
 export async function runCheck(dir: string | undefined, options: CheckOptions): Promise<void> {
     const cwd = path.resolve(options.cwd ?? process.cwd());
     const scanRoot = path.resolve(cwd, dir ?? ".");
 
-    const findings: Finding[] = [];
-    walk(scanRoot, cwd, findings);
+    const findings = scanForViolations(scanRoot, cwd);
 
     if (findings.length === 0) {
         log.success("No raw palette classes, dark: variants or arbitrary colour values found.");
