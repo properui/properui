@@ -16,6 +16,7 @@ Requires Node 20+.
 
 | Command               | What it does                                                             |
 | --------------------- | ------------------------------------------------------------------------ |
+| `create <dir>`        | Scaffold a new Next.js or Vite project, then `init` and `add` into it    |
 | `init`                | Configure this project: `components.json`, tokens, `cx`, `ThemeProvider` |
 | `add <components...>` | Copy components (and their dependencies) into the project                |
 | `add example <name>`  | Copy a whole page example plus everything it uses                        |
@@ -23,8 +24,33 @@ Requires Node 20+.
 | `search <query>`      | Fuzzy search names, descriptions and example names                       |
 | `diff [component]`    | Show your local modifications against the registry version               |
 | `login`               | Store a token for a private registry                                     |
+| `check [dir]`         | Scan for raw palette classes and arbitrary values that bypass tokens     |
+| `theme list`          | List the shipped theme presets and their preset codes                    |
+| `theme apply <p>`     | Write a theme preset (name or code) into the global stylesheet           |
 
 Every command accepts `--registry <source>`, `-y, --yes` and the global `--cwd <dir>`.
+
+## `create`
+
+```bash
+npx @properui/cli@latest create my-app
+npx @properui/cli@latest create my-app --template vite --pm pnpm --install
+```
+
+Scaffolds a brand-new project from an embedded template — no `create-next-app`/`create-vite` step first — then runs
+`init` and `add buttons badges` against it, so the new project is already configured and has a working `Button` and
+`Badge` on its home page.
+
+| Option              | Description                                                                                                       |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `--template <name>` | `next` (Next.js 15 App Router) or `vite` (Vite + React 19); default `next`                                        |
+| `--pm <manager>`    | `pnpm`, `npm`, `yarn` or `bun`; default `npm`                                                                     |
+| `--install`         | Also run the package manager install, both for the template's own dependencies and for anything `init`/`add` need |
+| `--overwrite`       | Scaffold into a directory that already has files in it                                                            |
+| `-y, --yes`         | Accept every default; never prompt                                                                                |
+
+`<dir>` must not already exist with files in it unless `--overwrite` is passed. Without `--install`, nothing touches
+the network: the command only writes files, and prints the install command to run afterward.
 
 ## `init`
 
@@ -51,6 +77,9 @@ v4 `@theme` syntax.
 | `--manual`    | Write the files but leave the app entry point alone        |
 | `--overwrite` | Replace `components.json` and any files that already exist |
 | `-y, --yes`   | Accept every default; never prompt                         |
+
+`--preset <name|code>` also applies a theme preset to the global stylesheet as part of `init`, exactly as
+[`theme apply`](#theme) does. An unknown name or an invalid code stops `init` before it writes anything.
 
 ### `components.json`
 
@@ -162,6 +191,11 @@ npx @properui/cli@latest diff button       # just one
 
 Requires `components.json`, so run `init` first.
 
+`diff <component>` also prints the entry's `changelog` (see [registry metadata](https://properui.dev/docs/registry-metadata)):
+the `@properui/ui` releases newer than the version recorded for it in your `components.json` `installed` manifest,
+when that record carries a real `x.y.z` to compare against — otherwise the full changelog, since there's nothing to
+compare it to yet.
+
 ## `login`
 
 Only needed for a **private** registry: the public one is anonymous, and `add` works without ever logging in.
@@ -172,6 +206,46 @@ npx @properui/cli@latest login --token <token>
 ```
 
 The token is stored at `~/.properui/auth.json` and reused by later commands on the same machine.
+
+## `check`
+
+The token guard: scans your installed component directories (or a path you give it) for raw palette classes and
+arbitrary values that should have been semantic tokens, and exits non-zero on any hit.
+
+```bash
+npx @properui/cli@latest check
+npx @properui/cli@latest check src/components/ui
+```
+
+If your project already runs ESLint, [`@properui/eslint-plugin`](https://properui.dev/docs/linting) catches the
+same things (plus `dark:` variants and physical directional properties) inline as you type, with an autofix for
+the directional-property rule.
+
+## `theme`
+
+Theme presets: a brand ramp, a base gray (`gray`, `slate`, `zinc`, `neutral` or `stone`), a radius scale (`none`, `sm`,
+`md`, `lg` or `xl`) and optional fonts. They ship inside the CLI, so both subcommands work offline.
+
+```bash
+npx @properui/cli@latest theme list
+npx @properui/cli@latest theme apply teal
+npx @properui/cli@latest theme apply AYoDBHRlYWw   # a preset code from the theme generator
+```
+
+`theme list` prints each shipped preset (`brand`, `blue`, `indigo`, `teal`, `green`, `orange`, `rose`, `slate-mono`)
+with its base gray, radius and preset code, and marks the one currently applied. `--json` prints them as JSON.
+
+`theme apply <preset>` takes a preset name or a preset code (the short url-safe string the
+[theme generator](https://properui.dev/docs/theme-generator) produces) and writes one `@theme` block that redeclares
+`--color-brand-*`, `--color-neutral-*`, `--radius-*` and, when set, `--font-body`/`--font-display`. The block sits
+between `/* properui:theme-preset */` and `/* /properui:theme-preset */` markers at the end of the stylesheet, after the
+theme import, so it wins. Re-running replaces that block in place and never touches anything outside it; applying the
+same preset twice leaves the file byte-for-byte unchanged.
+
+| Option         | Description                                                                                                 |
+| -------------- | ----------------------------------------------------------------------------------------------------------- |
+| `--css <file>` | Stylesheet to write to. Default: `tailwind.css` from `components.json`, else the detected global stylesheet |
+| `--dry-run`    | Print the block without writing anything                                                                    |
 
 ## Pointing at another registry
 

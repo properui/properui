@@ -3,7 +3,7 @@
 Conventions for an AI assistant working in this repository. Same file Codex reads; Claude Code reads it too.
 
 If you are consuming Proper UI in **another** project rather than developing the library itself, you only need the
-three surfaces under "Fetching components" below.
+four surfaces under "Fetching components" below.
 
 ## Fetching components
 
@@ -16,6 +16,7 @@ curl https://properui.dev/r/buttons.json    # one entry, including its real sour
 npx @properui/cli@latest add buttons date-picker # write the files, report what to install
 npx @properui/cli@latest info --json             # this project's setup: framework, aliases, installed entries
 npx @properui/cli@latest agent init              # install the Proper UI Skill for Claude, Codex, Cursor and Lovable
+npx -y @properui/mcp                             # MCP server over stdio: the same registry and add, as tools
 ```
 
 `add` resolves `registryDependencies`, rewrites `@/` imports to the alias in `components.json`, and reports the missing
@@ -28,7 +29,9 @@ cover the other direction: `remove <name>` deletes an installed entry (and warns
 it), `why <name>` prints what pulled it in. `check` is a token guard: it flags raw palette classes and arbitrary
 values that should have been semantic tokens. `agent init` writes the portable Skill (`skills/properui/SKILL.md`)
 into `.claude/skills/`, `.agents/skills/`, or `.cursor/rules/`, so every session after the first one gets this
-guidance automatically instead of relying on this file alone.
+guidance automatically instead of relying on this file alone. It also registers the MCP server (`@properui/mcp`) in
+`.mcp.json` and `.cursor/mcp.json`; when an assistant has those tools (`search_components`, `get_component`,
+`add_component`, ...) connected, prefer them to shelling out to the CLI.
 
 ## Writing component code
 
@@ -84,8 +87,10 @@ pnpm build
 
 Do not document or generate code against these, because they do not exist:
 
-- `properui upgrade` / `properui migrate`. The commands are `init`, `add`, `remove`, `why`, `check`, `icons`, `list`,
-  `search`, `diff`, `login`, `info` and `agent init`.
+- `properui upgrade` / `properui migrate`. The commands are `init`, `create`, `add`, `remove`, `why`, `check`, `icons`,
+  `list`, `search`, `diff`, `login`, `info`, `theme` and `agent init`.
 - A browser OAuth flow for `login`. It takes `--token`, or prompts you to paste one.
-- An MCP server. It is on the [roadmap](./ROADMAP.md); the Skill and the CLI cover the same ground today.
+- MCP tools beyond the seven `@properui/mcp` ships: `list_components`, `search_components`, `get_component`,
+  `get_component_docs`, `add_component`, `get_project_info` and `check_tokens`. There is no `init` tool: run
+  `npx @properui/cli@latest init` for that.
 - A paid or PRO tier. Everything in this repository is MIT licensed.

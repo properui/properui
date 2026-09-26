@@ -17,6 +17,7 @@ import { runList } from "./commands/list.js";
 import { runLogin } from "./commands/login.js";
 import { runRemove } from "./commands/remove.js";
 import { runSearch } from "./commands/search.js";
+import { runThemeApply, runThemeList } from "./commands/theme.js";
 import { runWhy } from "./commands/why.js";
 import { CancelledError } from "./prompt.js";
 import { DEFAULT_REGISTRY_URL, RegistryError } from "./registry.js";
@@ -63,6 +64,7 @@ program
     .option("--no-providers", "skip copying/wiring ThemeProvider and RouterProvider entirely")
     .option("--install", "run the install command instead of only printing it")
     .option("--no-tooling-ignores", "skip appending ESLint/Prettier ignore entries for vendored directories")
+    .option("--preset <name|code>", "apply a theme preset or preset code to the global stylesheet (see `properui theme list`)")
     .option("--registry <source>", REGISTRY_HELP)
     .option("-y, --yes", "accept every default; never prompt")
     .action(guard(async (options) => runInit({ ...options, cwd: program.opts().cwd })));
@@ -167,6 +169,24 @@ program
             .option("--no-mcp", "skip registering the Proper UI MCP server (.mcp.json, .cursor/mcp.json, the Codex TOML block)")
             .option("-y, --yes", "accept every default; never prompt")
             .action(guard(async (options) => runAgentInit({ ...options, cwd: program.opts().cwd }))),
+    );
+
+program
+    .command("theme")
+    .description("List theme presets, or apply one (brand ramp, base gray, radius, fonts) to the global stylesheet")
+    .addCommand(
+        new Command("list")
+            .description("List the shipped theme presets with their preset codes")
+            .option("--json", "print the presets as JSON")
+            .action(guard(async (options) => runThemeList({ ...options, cwd: program.opts().cwd }))),
+    )
+    .addCommand(
+        new Command("apply")
+            .description("Write (or replace) the marked theme-preset block in the global stylesheet")
+            .argument("<preset>", "a preset name from `properui theme list`, or a preset code from the docs theme generator")
+            .option("--css <file>", "stylesheet to write to (default: components.json tailwind.css, else the detected global stylesheet)")
+            .option("--dry-run", "print the block without writing anything")
+            .action(guard(async (preset: string, options) => runThemeApply(preset, { ...options, cwd: program.opts().cwd }))),
     );
 
 program

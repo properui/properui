@@ -7,24 +7,47 @@ the code does not do.
 Each item links to where it would live. Issues and pull requests are welcome. See
 [CONTRIBUTING.md](./CONTRIBUTING.md).
 
-## Not built yet
+## Shipped since this page was written
 
 ### MCP server
 
-An MCP server would let an AI coding assistant query the registry directly instead of shelling out
-to `npx @properui/cli` for every lookup: `search_components`, `get_component`, `list_components`,
-`add_component`.
+[`packages/mcp`](./packages/mcp) (`@properui/mcp`) lets an AI coding assistant query the registry
+directly instead of shelling out to `npx @properui/cli` for every lookup: `list_components`,
+`search_components`, `get_component`, `get_component_docs`, `add_component`, `get_project_info` and
+`check_tokens`, plus the registry index and every entry as MCP resources. It does not reimplement
+anything: registry access, fuzzy search, `add`, `info` and `check` are the CLI's own modules, bundled
+in. `properui agent init` registers it for Claude Code and Cursor. Setup for each client is in
+[docs/mcp.md](./docs/mcp.md).
 
-Today the CLI is the supported path and covers the same ground: any assistant that can run shell
-commands can drive it. The pieces an MCP server would build on already exist in
-[`packages/registry`](./packages/registry) and
-[`packages/cli/src/commands`](./packages/cli/src/commands). It would live at `packages/mcp`.
+The CLI is still the path for anything the server does not cover (`init`, `diff`, `remove`, `why`,
+`login`), and for assistants that do not speak MCP.
 
 ### `init` scaffolding a new project
 
-`properui init` configures an **existing** project: it detects the framework, writes
-`components.json`, installs the token stylesheet and wires the theme provider. It does not scaffold
-a new project from a template. Use `create-next-app` or `create-vite` first, then run `init`.
+`properui create <dir>` scaffolds a brand-new Next.js (App Router) or Vite project from an embedded
+template — `package.json`, `tsconfig.json`, the Tailwind v4 stylesheet, the framework config, a home
+page rendering a `Button` and a `Badge` — then runs the same `init`/`add` logic `properui` uses
+against an existing project. `create-next-app`/`create-vite` first, then `init`, is no longer a
+required two-step: `create` does both. `properui init` itself is unchanged and still only configures
+an **existing** project. See [docs/cli.md](./docs/cli.md#create).
+
+### A lint rule for raw palette colours
+
+[`packages/eslint-plugin`](./packages/eslint-plugin) (`@properui/eslint-plugin`) is a flat-config
+ESLint 9 plugin with four rules: `no-raw-palette` (`bg-red-500`, `from-blue-50`, ... in JSX
+`className`, template literals and `cx()`/`cn()`/`clsx()`/`sortCx()` arguments and object values, with
+an `allow` option), `no-arbitrary-values` (`bg-[#7f56d9]`, `p-[13px]`, ...; a bare arbitrary property
+like `[mask-image:...]` is allowed by default, also with an `allow` option), `no-dark-variant` (any
+`dark:` utility) and `no-physical-properties` (`ml-`, `pr-`, `left-`, `text-left`, `rounded-l-`,
+`border-r-`, ... with an autofix to the logical equivalent, e.g. `ml-4` → `ms-4`). `configs.recommended`
+turns all four on (`no-arbitrary-values` at `warn`, the rest at `error`), and the root
+[`eslint.config.mjs`](./eslint.config.mjs) applies them to `packages/ui/src/components/**`. The
+palette/dark-variant/arbitrary-value detection is copied from `properui check`
+(`packages/cli/src/commands/check.ts`), extended with the gradient-stop prefixes (`from-`, `via-`,
+`to-`) `check.ts` doesn't scan for; `check` itself is unchanged and still the guard for a project that
+only has the CLI installed, not ESLint. See [Linting](./apps/docs/content/docs/linting.mdx).
+
+## Not built yet
 
 ### A bundled build for non-bundling consumers: attempted, not shipped
 
@@ -71,6 +94,11 @@ Two real defects surfaced while measuring, both are now fixed, independently of 
     `ES2020`+ (already common) clears it. This is a pre-existing source-compatibility gap, not an
     alias issue.
 
+`transpilePackages` itself is now a one-liner instead of an array literal to remember: `withProperUI`
+(`import { withProperUI } from "@properui/ui/next"`, wrapping your `next.config.ts` export) appends
+`@properui/ui` to whatever `transpilePackages` your config already sets, deduplicated. It does not
+change any of the above — Next.js still needs `transpilePackages`, this just writes it for you.
+
 ### Registry entries that over-fetch
 
 `properui add input` still copies `payment-icons` (60 files) because `input-payment.tsx` imports
@@ -80,12 +108,6 @@ header, so every hero pulls all header-navigation variants; a header slot on tho
 end that. The registry build already refuses to mark a dependency optional or a file demo-only while
 a required file imports it, so neither can be fixed by a flag alone. It would live in
 [`packages/registry/src/build.ts`](./packages/registry/src/build.ts) and the affected components.
-
-### A lint rule for raw palette colours
-
-`bg-purple-600 dark:bg-black` lints clean today. A small ESLint rule (or a vitest guard consumers
-can copy in) that flags Tailwind palette classes outside `theme.css` would keep AI-written code on
-tokens. It would live at `packages/eslint-plugin`.
 
 ### Full RTL coverage
 

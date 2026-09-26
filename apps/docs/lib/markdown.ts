@@ -23,6 +23,8 @@ export const mdxToMarkdown = (body: string): string =>
         })
         .replace(/<Install\b[^>]*\/>/g, (tag) => `\`\`\`bash\nnpx ${CLI_PACKAGE}@latest add ${attribute(tag, "slug") ?? ""}\n\`\`\``)
         .replace(/<VariantGrid\b[^>]*\/>/g, "")
+        .replace(/<ThemeGenerator\b[^>]*\/>/g, "")
+        .replace(/<Playground\b[\s\S]*?\/>/g, "")
         .replace(/<FAQs\b[\s\S]*?\/>/g, renderFaqs)
         .replace(/\n{3,}/g, "\n\n")
         .trim();

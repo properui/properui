@@ -98,11 +98,11 @@ values (rare — the two vocabularies were kept close on purpose), the row says 
 | `Charts/Line`, `Bar`, `Pie`, `Radar`, `Area`, `Gauges`                | `line-bar-charts`, `pie-charts`, `radar-charts`, `area-charts`, `activity-gauges` | One registry slug per chart family, each its own component (not one `Chart` with a `type` prop) — match by shape, not by name.                                                                                                                                                   |
 | `Navigation/Header`, `Navigation/Sidebar`                             | `header-navigations`, `sidebar-navigations`                                       | Full nav shells assembled from `Button`, `Avatar`, `Dropdown`, `Badge`, etc. — see the docs page for the slot layout, since these are page-level, not single-prop, components.                                                                                                   |
 
-Not every Figma layer under `application/` has a shipped equivalent yet — `menubar`, `number-input`,
-`code-editor`, `data-table`, `gantt`, `resizable`, `scroll-area`, `sortable-list`, `stepper` and
-`timeline` exist as component folders in `packages/ui/src/components` but have no published docs
-page or registry entry as of this page; treat a Figma layer that seems to point at one of those as
-not yet mapped rather than assuming the name lines up.
+The newer application-layer groups map one to one by name and have no Untitled UI Figma
+counterpart yet: `menubar`, `number-input`, `tag-input`, `hover-card`, `code-editor`, `data-table`,
+`gantt`, `kanban`, `resizable`, `scroll-area`, `sortable-list`, `stepper`, `timeline` and
+`ai-elements`. Each is its own registry entry and docs page; a Figma layer that seems to point at one
+of them should be treated as unmapped until the kit gains a matching component.
 
 ## Marketing sections
 

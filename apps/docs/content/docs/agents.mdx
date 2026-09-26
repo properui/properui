@@ -34,6 +34,8 @@ npx @properui/cli@latest agent init --client all
 | **Cursor**      | `.cursor/rules/properui.mdc` (`alwaysApply: true`)                                                | Cursor's rules system only reads `.mdc` files with frontmatter from `.cursor/rules` (it does not read `SKILL.md`), so the same guidance is written as a Cursor rule instead.                            |
 | **Lovable**     | Nothing written locally                                                                           | Lovable runs in the browser with no access to this checkout. `agent init --client lovable` prints the Skill's public GitHub URL and what to paste into Lovable's knowledge / custom instructions panel. |
 
+`agent init` also registers the [MCP server](#mcp-server) where the client reads a project-level MCP config: `.mcp.json` for Claude Code and `.cursor/mcp.json` for Cursor. An existing file is merged (other servers are kept, and an existing `properui` entry is left alone unless you pass `--overwrite`). Codex keeps MCP servers in `~/.codex/config.toml`, outside the project, so for Codex the TOML block is printed instead. Pass `--no-mcp` to skip all of this.
+
 `CLAUDE.md` and `AGENTS.md` are never overwritten wholesale: the block `agent init` adds lives between a pair of HTML comment markers, so re-running the command updates that section in place and leaves the rest of the file untouched. Running `agent init` again after an update to the Skill is always safe.
 
 ### Command options
@@ -42,6 +44,7 @@ npx @properui/cli@latest agent init --client all
 | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `--client <name>` | `claude`, `codex`, `cursor`, `lovable`, or `all` (default).                                                                                                                                                          |
 | `--overwrite`     | Replace the installed `SKILL.md` / rule file even if it already exists and differs: useful after editing the Skill upstream. Does not affect the `CLAUDE.md`/`AGENTS.md` marker block, which is always kept in sync. |
+| `--no-mcp`        | Skip registering the MCP server (`.mcp.json`, `.cursor/mcp.json`, the printed Codex block).                                                                                                                          |
 | `-y, --yes`       | Accept every default; never prompt.                                                                                                                                                                                  |
 | `--cwd <path>`    | Run against a directory other than the current one.                                                                                                                                                                  |
 
@@ -86,6 +89,88 @@ npx @properui/cli@latest info --json
 
 The Skill itself tells an agent to run this before deciding anything: whether to run `init` first, which alias to use in hand-written imports, and which components are already installed and shouldn't be re-added.
 
+## MCP server
+
+`@properui/mcp` is a [Model Context Protocol](https://modelcontextprotocol.io) server that gives an assistant the registry and the CLI's `add` as tools, so it can search, read and install components without shelling out for every lookup. It is the CLI's own code (registry client, fuzzy search, `add`, `info`, `check`) bundled behind MCP, so a file it writes is exactly what `properui add` would have written. The Skill tells an agent to prefer these tools when they are connected, and to fall back to the CLI when they are not.
+
+| Tool                 | Same as          | What it returns                                                                                  |
+| -------------------- | ---------------- | ------------------------------------------------------------------------------------------------ |
+| `list_components`    | `list --json`    | Registry entries (name, layer, type, title, description), filtered by layer and type             |
+| `search_components`  | `search <query>` | Fuzzy matches over names, titles, descriptions, example names and exported symbols               |
+| `get_component`      | `/r/<name>.json` | Every file with its source, npm and registry dependencies, usage guidance and the docs URL       |
+| `get_component_docs` | `/<route>.md`    | The entry's docs page as markdown                                                                |
+| `add_component`      | `add <names...>` | Files written, the `installed` record in `components.json`, and the install command for npm deps |
+| `get_project_info`   | `info --json`    | The same report as above                                                                         |
+| `check_tokens`       | `check [dir]`    | Raw palette classes, `dark:` variants and arbitrary colour values                                |
+
+The registry index is also a resource (`properui://registry/index`), and so is every entry (`properui://registry/<name>`).
+
+### Claude Code
+
+```bash
+claude mcp add properui -- npx -y @properui/mcp
+```
+
+Add `--scope project` to write it to the project's `.mcp.json` (which is what `agent init --client claude` does).
+
+### Cursor
+
+`.cursor/mcp.json` in the project, or `~/.cursor/mcp.json` for every project:
+
+```json
+{
+    "mcpServers": {
+        "properui": {
+            "command": "npx",
+            "args": ["-y", "@properui/mcp"]
+        }
+    }
+}
+```
+
+### Codex
+
+`~/.codex/config.toml`:
+
+```toml
+[mcp_servers.properui]
+command = "npx"
+args = ["-y", "@properui/mcp"]
+```
+
+### Windsurf
+
+`~/.codeium/windsurf/mcp_config.json`:
+
+```json
+{
+    "mcpServers": {
+        "properui": {
+            "command": "npx",
+            "args": ["-y", "@properui/mcp"]
+        }
+    }
+}
+```
+
+### VS Code
+
+`.vscode/mcp.json` in the project (VS Code uses `servers`, not `mcpServers`):
+
+```json
+{
+    "servers": {
+        "properui": {
+            "type": "stdio",
+            "command": "npx",
+            "args": ["-y", "@properui/mcp"]
+        }
+    }
+}
+```
+
+The server reads the same registry the CLI does: `--registry <source>` after the package name, then `PROPERUI_REGISTRY`, `REGISTRY_URL`, the `registry` field of the project's `components.json`, and finally `https://properui.dev/r`. A local directory works too, e.g. `"args": ["-y", "@properui/mcp", "--registry", "./packages/registry/dist"]`. Tools act on the directory the client starts the server in (the project root, for every client above); each project tool also takes an explicit `cwd`.
+
 ## FAQs
 
 <FAQs
@@ -99,8 +184,36 @@ The Skill itself tells an agent to run this before deciding anything: whether to
             answer: "Today both read the same SKILL.md shape (YAML frontmatter with name and description, then Markdown instructions), so agent init writes the identical file to both locations. If that changes, agent init is the seam where a client-specific wrapper would be generated from the same canonical source in skills/properui/SKILL.md.",
         },
         {
+            question: "Do I need the MCP server, or is the CLI enough?",
+            answer: "The CLI is enough: any assistant that can run shell commands can drive it, and the Skill is written around it. The MCP server exposes the same registry and the same add as tools, which saves an agent a shell round-trip per lookup and works in clients that restrict shell access. There is no init tool, so run properui init from the CLI either way.",
+        },
+        {
             question: "Does agent init install @properui/ui or run properui init?",
             answer: "No, it only installs the Skill/rule files that tell an agent how to use the CLI. Run properui init separately to configure the project itself.",
         },
     ]}
 />
+
+## Using Proper UI through the shadcn CLI and MCP
+
+Proper UI also mirrors its registry in [shadcn](https://ui.shadcn.com/docs/registry)'s own format, under the namespace **`@properui`**: `https://properui.dev/r/shadcn/registry.json` is the index, `https://properui.dev/r/shadcn/<name>.json` is one entry (`packages/registry/src/shadcn.ts` generates both from the native registry every `pnpm registry:build`). This is a second path to the same components, alongside the `properui` CLI and the Skill above — pick whichever your tool already speaks.
+
+Point a project's own `components.json` at the namespace:
+
+```json
+{
+    "registries": {
+        "@properui": "https://properui.dev/r/shadcn/{name}.json"
+    }
+}
+```
+
+and then install with shadcn's own CLI instead of ours:
+
+```bash
+npx shadcn@latest add @properui/buttons
+```
+
+This resolves `registryDependencies` and rewrites imports the same way `properui add` does, because both read the same underlying files — the shadcn build only changes the JSON shape, never the component source. Without a `components.json` yet, the same file installs standalone from its full URL: `npx shadcn@latest add https://properui.dev/r/shadcn/buttons.json`.
+
+An agent connected to shadcn's own MCP server gets this for free, too: that server discovers items through whichever registries are listed in the project's `components.json`, so once `@properui` is added there, the same MCP tools that search and install any other shadcn registry also search and install Proper UI — no separate Proper UI MCP configuration needed for this path. See [`docs/ecosystem.md`](https://github.com/properui/properui/blob/main/docs/ecosystem.md) for how `@properui` gets (or already is) listed in shadcn's official registry directory, and for the equivalent submission steps for `registry.directory`, `21st.dev` and the skills marketplaces.

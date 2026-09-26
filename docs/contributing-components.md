@@ -194,8 +194,22 @@ demoFile: switches
 <Preview id="sizes" title="Sizes" demo="switches:Sizes" />
 ```
 
-Four MDX blocks are available and nothing else: `<Preview>`, `<Install>`, `<FAQs>` and `<VariantGrid>`. `demo` is
-`"<demoFile>:<ExportName>"`.
+These MDX blocks are available and nothing else:
+
+- `<Preview id title height demo />` — one live example. `demo` is `"<demoFile>:<ExportName>"`.
+- `<Install slug />` — the CLI / manual installation tabs.
+- `<FAQs items={[{ question, answer }]} />` — the FAQ accordion.
+- `<VariantGrid slug showViewToggle />` — the masonry gallery of a page's variants.
+- `<Playground component props />` — a live prop editor for one component from
+  `apps/docs/lib/playground-registry.ts`, e.g.
+  `<Playground component="buttons:Button" props={{ size: ["sm","md","lg","xl"], isDisabled: "boolean", children: "text" }} />`.
+  `component` is `"<registry slug>:<ExportName>"` and must already be curated in
+  `playground-registry.ts` (see that file for the current set — Button, Badge, Input, Select,
+  Checkbox, Toggle, Avatar, Tooltip, Slider, Textarea today); `props` maps each controllable
+  prop name to an array of option strings (enum → select), `"boolean"` (→ switch), or `"text"`
+  (→ text input).
+- `<ThemeGenerator />` — the interactive theme-preset generator (no props). It is used once, on
+  `apps/docs/content/docs/theme-generator.mdx`; component pages have no reason to use it.
 
 Check it renders:
 
