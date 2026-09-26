@@ -22,6 +22,7 @@ const OUT = path.join(REPO, "packages", "registry", "dist");
 const SCHEMA_FILE = path.join(REPO, "packages", "registry", "schema.json");
 const MANIFEST_DIR = path.join(REPO, "packages", "registry", "manifest");
 const THEME_FILE = path.join(UI_SRC, "styles", "theme.css");
+const CHANGELOG_FILE = path.join(REPO, "packages", "ui", "CHANGELOG.md");
 
 /** Layers walked by the build, in the order they appear in the index. */
 const LAYERS = ["base", "application", "marketing", "app-examples", "marketing-examples", "foundations", "shared-assets"] as const;
@@ -73,6 +74,9 @@ type SemanticManifest = {
     requires_data?: string[];
 };
 
+/** One `packages/ui/CHANGELOG.md` release, filtered to the bullets that mention this entry. */
+type ChangelogEntry = { version: string; changes: string[] };
+
 type RegistryEntry = SemanticManifest & {
     name: string;
     layer: string;
@@ -88,6 +92,14 @@ type RegistryEntry = SemanticManifest & {
     examples: string[];
     docs?: string;
     token_contract?: string[];
+    /**
+     * `packages/ui/CHANGELOG.md` releases that mention this entry (by name or by its folder),
+     * newest-topmost order preserved from the file. Always present — `[]` when nothing in the
+     * changelog mentions it. Populated by `withChangelog` after every entry exists, same as
+     * `token_contract`/`composes_with` above, so it is optional here and guaranteed non-optional
+     * by the time entries are validated and written.
+     */
+    changelog?: ChangelogEntry[];
 };
 
 // ---------------------------------------------------------------------------
@@ -344,6 +356,99 @@ const withSemantics = (entry: RegistryEntry, manifests: Map<string, SemanticMani
         ...(manifest?.requires_data?.length ? { requires_data: manifest.requires_data } : {}),
         ...(tokenContract.length > 0 ? { token_contract: tokenContract } : {}),
     };
+};
+
+// ---------------------------------------------------------------------------
+// Per-entry changelog, derived from packages/ui/CHANGELOG.md — never hand-authored.
+// ---------------------------------------------------------------------------
+
+type ChangelogRelease = { version: string; bullets: string[] };
+
+/**
+ * Parses `## x.y.z` release headings and their top-level bullets (changesets always emits one
+ * `- <hash>: <summary>` bullet per changeset, at column 0) out of `packages/ui/CHANGELOG.md`.
+ * A bullet's own continuation lines (wrapped prose, up to the first blank line) are folded into
+ * its text; further-indented sub-bullets are that changeset's own elaboration, not a new entry,
+ * and are intentionally left out of the derived `changes` text. Returns `[]` when the file is
+ * missing (a fresh checkout that hasn't cut a release yet).
+ */
+const parseChangelogReleases = (): ChangelogRelease[] => {
+    if (!existsSync(CHANGELOG_FILE)) return [];
+
+    const releases: ChangelogRelease[] = [];
+    let current: ChangelogRelease | null = null;
+    let bullet: string[] | null = null;
+    let bulletOpen = false;
+
+    const flush = () => {
+        if (current && bullet) {
+            const text = bullet
+                .join(" ")
+                .replace(/\s+/g, " ")
+                .replace(/^[0-9a-f]{7,40}:\s*/, "") // the changeset commit hash changesets prefixes each bullet with
+                .trim();
+            if (text) current.bullets.push(text);
+        }
+        bullet = null;
+        bulletOpen = false;
+    };
+
+    for (const line of readFileSync(CHANGELOG_FILE, "utf8").split(/\r?\n/)) {
+        const heading = /^##\s+(\d+\.\d+\.\d+(?:-[0-9A-Za-z.]+)?)\s*$/.exec(line);
+        if (heading?.[1]) {
+            flush();
+            current = { version: heading[1], bullets: [] };
+            releases.push(current);
+            continue;
+        }
+        const topLevelBullet = /^-\s+(.*)$/.exec(line);
+        if (topLevelBullet) {
+            flush();
+            bullet = [topLevelBullet[1] ?? ""];
+            bulletOpen = true;
+            continue;
+        }
+        if (!bullet || !bulletOpen) continue;
+        if (!line.trim()) {
+            bulletOpen = false; // blank line ends this bullet's summary; further lines are elaboration
+            continue;
+        }
+        bullet.push(line.trim());
+    }
+    flush();
+
+    return releases;
+};
+
+/** `close-button` → `CloseButton` — how a changelog bullet names a component in prose, not by its folder. */
+const pascalOf = (kebabName: string): string =>
+    kebabName
+        .split("-")
+        .map((part) => (part ? part[0]!.toUpperCase() + part.slice(1) : ""))
+        .join("");
+
+const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/** The group folder an entry's first file lives in, when it differs from the entry's own name (an `example` entry's slug). */
+const folderOfEntry = (entry: Pick<RegistryEntry, "name" | "files">): string | undefined => {
+    const segments = entry.files[0]?.path.split("/");
+    const folder =
+        segments?.[0] === "components" ? segments[2] : segments?.[0] === "utils" || segments?.[0] === "hooks" ? stripExtension(segments[1] ?? "") : undefined;
+    return folder && folder !== entry.name ? folder : undefined;
+};
+
+/** Whether a changelog bullet's text names this entry — by its own kebab name, its folder, or either's PascalCase component-name form. */
+const bulletMentionsEntry = (text: string, name: string, folder: string | undefined): boolean => {
+    const candidates = unique([name, pascalOf(name), ...(folder ? [folder, pascalOf(folder)] : [])]);
+    return candidates.some((candidate) => candidate.length > 1 && new RegExp(`\\b${escapeRegExp(candidate)}\\b`, "i").test(text));
+};
+
+/** This entry's changelog: every release with at least one bullet that mentions it, `[]` otherwise. */
+const changelogFor = (entry: Pick<RegistryEntry, "name" | "files">, releases: ChangelogRelease[]): ChangelogEntry[] => {
+    const folder = folderOfEntry(entry);
+    return releases
+        .map((release) => ({ version: release.version, changes: release.bullets.filter((bullet) => bulletMentionsEntry(bullet, entry.name, folder)) }))
+        .filter((release) => release.changes.length > 0);
 };
 
 // ---------------------------------------------------------------------------
@@ -776,7 +881,19 @@ const SCHEMA: Schema & { $schema: string; $id: string; title: string; descriptio
     title: "Proper UI registry entry",
     description: "One component, example, util, hook or stylesheet as served from /r/<name>.json.",
     type: "object",
-    required: ["name", "layer", "type", "title", "files", "registryDependencies", "optionalRegistryDependencies", "dependencies", "cssVars", "examples"],
+    required: [
+        "name",
+        "layer",
+        "type",
+        "title",
+        "files",
+        "registryDependencies",
+        "optionalRegistryDependencies",
+        "dependencies",
+        "cssVars",
+        "examples",
+        "changelog",
+    ],
     additionalProperties: false,
     properties: {
         name: { type: "string", pattern: "^[a-z0-9][a-z0-9-]*$" },
@@ -818,6 +935,20 @@ const SCHEMA: Schema & { $schema: string; $id: string; title: string; descriptio
         responsive_contract: { type: "array", items: { type: "string" } },
         token_contract: { type: "array", items: { type: "string" } },
         requires_data: { type: "array", items: { type: "string" } },
+        // Derived from packages/ui/CHANGELOG.md (never hand-authored) — see `changelogFor` above.
+        // Always present, `[]` when no release's bullets mention this entry.
+        changelog: {
+            type: "array",
+            items: {
+                type: "object",
+                required: ["version", "changes"],
+                additionalProperties: false,
+                properties: {
+                    version: { type: "string" },
+                    changes: { type: "array", items: { type: "string" } },
+                },
+            },
+        },
     },
 };
 
@@ -1114,6 +1245,14 @@ const build = () => {
         }
     }
     if (untagged > 0) console.log(`registry:build — ${untagged} fixture file(s) kept required because a component imports them`);
+
+    // ---- Per-entry changelog ------------------------------------------------
+    // Derived from packages/ui/CHANGELOG.md, never hand-authored — see `changelogFor` above.
+
+    const changelogReleases = parseChangelogReleases();
+    const withChangelog = entries.map((entry) => ({ ...entry, changelog: changelogFor(entry, changelogReleases) }));
+    entries.length = 0;
+    entries.push(...withChangelog);
 
     // ---- Validation -------------------------------------------------------
 

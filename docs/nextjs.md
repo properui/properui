@@ -34,7 +34,20 @@ project that is `../node_modules`; from `src/app/globals.css` it is `../../node_
 ## 2. `transpilePackages`
 
 `@properui/ui` publishes TypeScript source. Next.js only compiles your own code by default, so tell it to compile the
-package too:
+package too. `withProperUI` is the one-liner: it appends `@properui/ui` to `transpilePackages`, deduplicated, and
+otherwise leaves your config untouched:
+
+```ts
+// next.config.ts
+import type { NextConfig } from "next";
+import { withProperUI } from "@properui/ui/next";
+
+const nextConfig: NextConfig = {};
+
+export default withProperUI(nextConfig);
+```
+
+Equivalent by hand, if you'd rather not import the helper:
 
 ```ts
 // next.config.ts

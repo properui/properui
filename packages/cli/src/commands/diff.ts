@@ -17,6 +17,41 @@ export interface DiffOptions {
     cwd?: string;
 }
 
+const SEMVER = /^\d+\.\d+\.\d+$/;
+
+/** `1` when `a` is a newer release than `b`, `0` equal, `-1` older. Only meaningful for `x.y.z` strings. */
+function compareSemver(a: string, b: string): number {
+    const partsA = a.split(".").map(Number);
+    const partsB = b.split(".").map(Number);
+    for (let index = 0; index < 3; index++) {
+        const delta = (partsA[index] ?? 0) - (partsB[index] ?? 0);
+        if (delta !== 0) return delta > 0 ? 1 : -1;
+    }
+    return 0;
+}
+
+/**
+ * Prints the entry's changelog (2.14 registry metadata), filtered to releases newer than the
+ * version recorded in the installed manifest when that record is a real `x.y.z` — the manifest
+ * mostly carries a content hash today (see `entryVersion`), which isn't comparable, so the full
+ * changelog is printed instead whenever it isn't.
+ */
+function printChangelog(entry: RegistryEntry, installedVersion: string | undefined): void {
+    const changelog = entry.changelog ?? [];
+    if (changelog.length === 0) return;
+
+    const installed = installedVersion && SEMVER.test(installedVersion) ? installedVersion : undefined;
+    const releases = installed ? changelog.filter((release) => SEMVER.test(release.version) && compareSemver(release.version, installed) > 0) : changelog;
+    if (releases.length === 0) return;
+
+    log.title(installed ? `Changelog since ${installed}` : "Changelog");
+    for (const release of releases) {
+        log.plain(`  ${kleur.bold(release.version)}`);
+        for (const change of release.changes) log.plain(`    - ${change}`);
+    }
+    log.plain();
+}
+
 export async function runDiff(component: string | undefined, options: DiffOptions): Promise<void> {
     const cwd = path.resolve(options.cwd ?? process.cwd());
     const config = readConfig(cwd);
@@ -61,6 +96,11 @@ export async function runDiff(component: string | undefined, options: DiffOption
         load.fail(error instanceof RegistryError ? error.message : (error as Error).message);
         process.exitCode = 1;
         return;
+    }
+
+    if (component && entries[0]) {
+        log.plain();
+        printChangelog(entries[0], config.installed?.[component]?.version);
     }
 
     let modified = 0;

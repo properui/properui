@@ -41,7 +41,19 @@ npm install @properui/ui react-aria-components next-themes
 
 **3. Transpile the package**
 
-Next.js only compiles your own source by default. Add the package to `transpilePackages` so its TSX is processed the same way your app code is:
+Next.js only compiles your own source by default. `withProperUI` is the one-liner: it appends `@properui/ui` to `transpilePackages`, deduplicated, and leaves the rest of your config untouched.
+
+```ts
+// next.config.ts
+import type { NextConfig } from "next";
+import { withProperUI } from "@properui/ui/next";
+
+const nextConfig: NextConfig = {};
+
+export default withProperUI(nextConfig);
+```
+
+Equivalent by hand, so its TSX is processed the same way your app code is:
 
 ```ts
 // next.config.ts
