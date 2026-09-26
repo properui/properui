@@ -1,6 +1,6 @@
 {
     "name": "@properui/mcp",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "Model Context Protocol server for Proper UI: lets an AI coding assistant search, read and install registry components directly.",
     "keywords": [
         "mcp",
