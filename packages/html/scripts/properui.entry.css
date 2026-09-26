@@ -1,0 +1,9 @@
+/*
+ * Build entry for `dist/properui.css`: a self-contained stylesheet (Tailwind preflight, the token
+ * layer, and every `pui-*` component class) for pages with no build step, such as the page examples
+ * in src/components/page-example. `source(none)`: the component layer is all `@apply`, so no
+ * utility classes need scanning. The CDN build of the same thing ships from `@properui/tokens`.
+ */
+@import "tailwindcss" source(none);
+@import "../../ui/src/styles/theme.css" theme(static);
+@import "../src/index.css";

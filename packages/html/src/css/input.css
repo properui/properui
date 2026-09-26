@@ -1,0 +1,122 @@
+/*
+ * Field, label, hint, error, input. Mirrors packages/ui/src/components/base/input/{input,label,hint-text,input-group}.tsx.
+ * React draws the ring on a wrapper `Group`; here it sits on the `<input>` itself, so a bare
+ * `<input class="pui-input">` is already complete.
+ *
+ * <div class="pui-field">
+ *     <label class="pui-label" for="email">Email</label>
+ *     <input class="pui-input" id="email" type="email" aria-describedby="email-hint" />
+ *     <p class="pui-hint" id="email-hint">We never share it.</p>
+ * </div>
+ */
+@layer components {
+    .pui-field {
+        @apply flex w-full flex-col gap-1.5;
+    }
+
+    .pui-label {
+        @apply text-secondary flex cursor-default items-center gap-0.5 text-sm font-medium;
+    }
+
+    /* The required asterisk: `<span class="pui-label__required" aria-hidden="true">*</span>`. */
+    .pui-label__required {
+        @apply text-brand-tertiary;
+    }
+
+    .pui-hint {
+        @apply text-tertiary text-sm;
+    }
+
+    .pui-error {
+        @apply text-error-primary text-sm;
+    }
+
+    .pui-input,
+    .pui-textarea {
+        @apply bg-primary text-md text-primary ring-primary placeholder:text-placeholder m-0 w-full min-w-0 appearance-none rounded-lg shadow-xs ring-1 outline-hidden transition-shadow duration-100 ease-linear ring-inset;
+        @apply focus:ring-brand focus:ring-2;
+        @apply disabled:cursor-not-allowed disabled:opacity-50;
+        @apply aria-invalid:ring-error_subtle aria-invalid:focus:ring-error aria-invalid:focus:ring-2;
+    }
+
+    .pui-input {
+        @apply px-3 py-2;
+    }
+
+    .pui-input--sm {
+        @apply px-3 py-2 text-sm;
+    }
+
+    .pui-input--md {
+        @apply text-md px-3 py-2;
+    }
+
+    .pui-input--lg {
+        @apply text-md px-3.5 py-2.5;
+    }
+
+    /* An invalid field turns its hint into error text, as `HintText` does inside an invalid `TextField`. */
+    .pui-field:has([aria-invalid="true"]) .pui-hint {
+        @apply text-error-primary;
+    }
+
+    /* A field whose control is disabled: the control dims itself; the field only changes the cursor. */
+    .pui-field--disabled {
+        @apply cursor-not-allowed;
+    }
+
+    /* A row that positions a leading icon or joins an addon to the input. */
+    .pui-field__control {
+        @apply relative flex w-full items-stretch;
+    }
+
+    .pui-field__icon-leading {
+        @apply text-fg-quaternary pointer-events-none absolute start-3 top-1/2 size-5 -translate-y-1/2;
+    }
+
+    .pui-field__icon-leading ~ .pui-input {
+        @apply ps-10;
+    }
+
+    .pui-field__icon-leading ~ .pui-input--sm {
+        @apply ps-9;
+    }
+
+    .pui-field__icon-leading:has(~ .pui-input--sm) {
+        @apply size-4;
+    }
+
+    /* Leading or trailing text addon (`https://`, `.com`), as `InputPrefix` inside an `InputGroup`. */
+    .pui-field__addon {
+        @apply text-md text-tertiary ring-primary flex shrink-0 items-center px-3 py-2 whitespace-nowrap shadow-xs ring-1 ring-inset;
+
+        &:first-child {
+            @apply -me-px rounded-s-lg;
+        }
+
+        &:last-child {
+            @apply -ms-px rounded-e-lg;
+        }
+    }
+
+    .pui-field__addon + .pui-input {
+        @apply rounded-s-none;
+    }
+
+    .pui-input:has(+ .pui-field__addon) {
+        @apply rounded-e-none;
+    }
+
+    .pui-field__control .pui-input:focus {
+        @apply z-10;
+    }
+
+    /* Textarea: same ring and states, the React `TextArea` padding. */
+    .pui-textarea {
+        @apply block scroll-py-3 px-3.5 py-3;
+    }
+
+    .pui-textarea--sm {
+        @apply p-3 text-sm;
+    }
+}

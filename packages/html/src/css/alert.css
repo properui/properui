@@ -1,0 +1,77 @@
+/*
+ * Alert / callout. Tones mirror `Callout` in packages/ui/src/components/application/callout/callout.tsx
+ * (`--info` is the brand tone); the close button mirrors `CloseButton`.
+ * Use `role="alert"` for something that just happened and must be announced, `role="status"` for a
+ * polite update, and `role="note"` (or none) for static guidance. `data-pui-dismiss` on the close
+ * button removes the alert (see the JS).
+ *
+ * <div class="pui-alert pui-alert--success" role="status">
+ *     <svg class="pui-alert__icon" aria-hidden="true">...</svg>
+ *     <div class="pui-alert__body">
+ *         <p class="pui-alert__title">Saved</p>
+ *         <p>Your changes are live.</p>
+ *     </div>
+ *     <button class="pui-alert__close" type="button" aria-label="Dismiss" data-pui-dismiss>...</button>
+ * </div>
+ */
+@layer components {
+    .pui-alert {
+        @apply border-secondary bg-secondary relative flex w-full gap-3 rounded-xl border p-4;
+        --pui-alert-icon: var(--color-fg-secondary);
+        --pui-alert-title: var(--color-text-primary);
+    }
+
+    .pui-alert--info {
+        @apply border-brand bg-brand-primary;
+        --pui-alert-icon: var(--color-fg-brand-primary);
+        --pui-alert-title: var(--color-text-brand-primary);
+    }
+
+    .pui-alert--success {
+        @apply border-secondary bg-success-primary;
+        --pui-alert-icon: var(--color-fg-success-primary);
+        --pui-alert-title: var(--color-text-success-primary);
+    }
+
+    .pui-alert--warning {
+        @apply border-secondary bg-warning-primary;
+        --pui-alert-icon: var(--color-fg-warning-primary);
+        --pui-alert-title: var(--color-text-warning-primary);
+    }
+
+    .pui-alert--error {
+        @apply border-error bg-error-primary;
+        --pui-alert-icon: var(--color-fg-error-primary);
+        --pui-alert-title: var(--color-text-error-primary);
+    }
+
+    .pui-alert__icon {
+        @apply size-5 shrink-0;
+        color: var(--pui-alert-icon);
+    }
+
+    .pui-alert__body {
+        @apply text-secondary flex min-w-0 flex-1 flex-col gap-1 text-sm;
+
+        & > p {
+            @apply m-0;
+        }
+    }
+
+    .pui-alert__title {
+        @apply m-0 text-sm font-semibold;
+        color: var(--pui-alert-title);
+    }
+
+    .pui-alert__description {
+        @apply m-0;
+    }
+
+    .pui-alert__actions {
+        @apply mt-2 flex flex-wrap items-center gap-3;
+    }
+
+    .pui-alert__close {
+        @apply -m-1.5 ms-auto;
+    }
+}

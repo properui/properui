@@ -1,0 +1,46 @@
+/*
+ * Tooltip. Mirrors packages/ui/src/components/base/tooltip/tooltip.tsx. The element is created and
+ * positioned by the JS (`data-pui-tooltip="text"` on the trigger); these classes style it, and
+ * `data-placement="top|bottom"` (set by the JS) points the arrow.
+ */
+@layer components {
+    .pui-tooltip {
+        @apply bg-primary-solid pointer-events-none fixed z-50 flex max-w-xs flex-col items-start gap-1 rounded-lg px-3 py-2 text-start text-xs font-semibold text-white shadow-lg;
+        top: 0;
+        left: 0;
+        animation: pui-tooltip-in 150ms ease-out;
+
+        &::after {
+            @apply bg-primary-solid absolute size-2.5;
+            content: "";
+            left: var(--pui-tooltip-arrow-x, 50%);
+            translate: -50% 0;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M0,0 L35.858,35.858 Q50,50 64.142,35.858 L100,0 Z'/%3E%3C/svg%3E")
+                center / contain no-repeat;
+        }
+
+        &[data-placement="top"]::after {
+            top: 100%;
+        }
+
+        &[data-placement="bottom"]::after {
+            bottom: 100%;
+            rotate: 180deg;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            animation: none;
+        }
+    }
+
+    .pui-tooltip__description {
+        @apply text-tooltip-supporting-text font-medium;
+    }
+
+    @keyframes pui-tooltip-in {
+        from {
+            opacity: 0;
+            scale: 0.95;
+        }
+    }
+}

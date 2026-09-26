@@ -1,0 +1,39 @@
+/*
+ * Card. The surface the React table card, metrics cards and settings panels share
+ * (`bg-primary ring-secondary rounded-xl shadow-xs ring-1`, see TableCardRoot in
+ * packages/ui/src/components/application/table/table.tsx), with a header, body and footer.
+ *
+ * <article class="pui-card">
+ *     <header class="pui-card__header">
+ *         <h3 class="pui-card__title">Team members</h3>
+ *         <p class="pui-card__description">Manage who has access.</p>
+ *     </header>
+ *     <div class="pui-card__body">...</div>
+ *     <footer class="pui-card__footer">...</footer>
+ * </article>
+ */
+@layer components {
+    .pui-card {
+        @apply bg-primary ring-secondary flex flex-col overflow-hidden rounded-xl shadow-xs ring-1;
+    }
+
+    .pui-card__header {
+        @apply border-secondary relative flex flex-col gap-0.5 border-b px-4 py-5 md:px-6;
+    }
+
+    .pui-card__title {
+        @apply text-md text-primary m-0 font-semibold;
+    }
+
+    .pui-card__description {
+        @apply text-tertiary m-0 text-sm;
+    }
+
+    .pui-card__body {
+        @apply text-tertiary flex flex-1 flex-col gap-4 px-4 py-5 text-sm md:px-6;
+    }
+
+    .pui-card__footer {
+        @apply border-secondary flex flex-wrap items-center justify-end gap-3 border-t px-4 py-4 md:px-6;
+    }
+}

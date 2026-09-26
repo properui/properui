@@ -1,0 +1,97 @@
+/*
+ * Toggle (switch). Mirrors `ToggleBase` and `Toggle` in packages/ui/src/components/base/toggle/toggle.tsx.
+ * A real `<input type="checkbox" role="switch">` inside the label, so it submits with a form and
+ * Space toggles it natively.
+ *
+ * <label class="pui-toggle">
+ *     <input type="checkbox" role="switch" />
+ *     <span class="pui-toggle__track" aria-hidden="true"><span class="pui-toggle__thumb"></span></span>
+ *     <span class="pui-toggle__text"><span class="pui-toggle__label">Email alerts</span></span>
+ * </label>
+ */
+@layer components {
+    .pui-toggle {
+        @apply relative flex w-max max-w-full cursor-pointer items-start gap-2;
+
+        /* The native input stays in the accessibility tree and the tab order, visually hidden. */
+        & > input {
+            @apply sr-only;
+        }
+
+        &:has(> input:disabled) {
+            @apply cursor-not-allowed;
+        }
+    }
+
+    .pui-toggle__track {
+        @apply bg-tertiary outline-focus-ring flex h-5 w-9 shrink-0 cursor-pointer rounded-full p-0.5 transition duration-150 ease-linear;
+        box-shadow: inset 0 0 0 0.5px var(--color-border-secondary);
+    }
+
+    .pui-toggle__thumb {
+        @apply bg-fg-white size-4 rounded-full shadow-sm;
+        transition:
+            transform 0.15s ease-in-out,
+            translate 0.15s ease-in-out,
+            background-color 0.1s linear;
+    }
+
+    .pui-toggle > input:checked + .pui-toggle__track {
+        @apply bg-brand-solid;
+
+        & .pui-toggle__thumb {
+            @apply translate-x-4 rtl:-translate-x-4;
+        }
+    }
+
+    .pui-toggle:hover > input:checked:not(:disabled) + .pui-toggle__track {
+        @apply bg-brand-solid_hover;
+    }
+
+    .pui-toggle > input:focus-visible + .pui-toggle__track {
+        @apply outline-2 outline-offset-2;
+    }
+
+    .pui-toggle > input:disabled + .pui-toggle__track {
+        @apply cursor-not-allowed opacity-50;
+    }
+
+    .pui-toggle__text {
+        @apply inline-flex flex-col;
+    }
+
+    .pui-toggle__label {
+        @apply text-secondary text-sm font-medium select-none;
+    }
+
+    .pui-toggle__hint {
+        @apply text-tertiary text-sm;
+    }
+
+    .pui-toggle--md {
+        @apply gap-3;
+
+        & .pui-toggle__text {
+            @apply gap-0.5;
+        }
+
+        & .pui-toggle__label,
+        & .pui-toggle__hint {
+            @apply text-md;
+        }
+    }
+
+    .pui-toggle--md {
+        & .pui-toggle__track {
+            @apply h-6 w-11;
+        }
+
+        & .pui-toggle__thumb {
+            @apply size-5;
+        }
+
+        & > input:checked + .pui-toggle__track .pui-toggle__thumb {
+            @apply translate-x-5 rtl:-translate-x-5;
+        }
+    }
+}

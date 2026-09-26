@@ -1,0 +1,39 @@
+/*
+ * @properui/html: the component layer as Tailwind v4 source.
+ *
+ * This file does not import Tailwind or the tokens; the consumer's entry does, then this:
+ *
+ *     @import "tailwindcss";
+ *     @import "@properui/tokens/theme.css";
+ *     @import "@properui/html/css";
+ *
+ * Every class below is `@layer components`, built with `@apply` of the same semantic-token utilities
+ * the React components use, so Tailwind utilities on the same element still win. For a page with no
+ * build step, link the prebuilt stylesheet instead (`@properui/tokens/properui.css` on a CDN, or this
+ * package's `dist/properui.css`).
+ */
+@import "./css/base.css";
+@import "./css/button.css";
+@import "./css/close-button.css";
+@import "./css/badge.css";
+@import "./css/input.css";
+@import "./css/textarea.css";
+@import "./css/checkbox.css";
+@import "./css/radio.css";
+@import "./css/toggle.css";
+@import "./css/select.css";
+@import "./css/avatar.css";
+@import "./css/card.css";
+@import "./css/alert.css";
+@import "./css/tabs.css";
+@import "./css/tooltip.css";
+@import "./css/dropdown.css";
+@import "./css/modal.css";
+@import "./css/accordion.css";
+@import "./css/breadcrumbs.css";
+@import "./css/pagination.css";
+@import "./css/table.css";
+@import "./css/progress.css";
+@import "./css/skeleton.css";
+@import "./css/toast.css";
+@import "./css/empty-state.css";

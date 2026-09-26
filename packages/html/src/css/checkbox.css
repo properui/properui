@@ -1,0 +1,103 @@
+/*
+ * Checkbox. Mirrors `CheckboxBase` and `Checkbox` in packages/ui/src/components/base/checkbox/checkbox.tsx.
+ * A `<label>` wraps a real `<input type="checkbox">` (so forms, `required`, `indeterminate` and
+ * keyboard all work natively); `.pui-checkbox__box` is the drawn box, the tick is a mask filled with
+ * a token colour.
+ *
+ * <label class="pui-checkbox">
+ *     <input type="checkbox" name="terms" />
+ *     <span class="pui-checkbox__box" aria-hidden="true"></span>
+ *     <span class="pui-checkbox__text">
+ *         <span class="pui-checkbox__label">Accept terms</span>
+ *         <span class="pui-checkbox__hint">You can change this later.</span>
+ *     </span>
+ * </label>
+ */
+@layer components {
+    .pui-checkbox {
+        @apply relative flex w-max max-w-full cursor-pointer items-start gap-2;
+
+        /* The native input stays in the accessibility tree and the tab order, visually hidden. */
+        & > input {
+            @apply sr-only;
+        }
+
+        &:has(> input:disabled) {
+            @apply cursor-not-allowed;
+        }
+    }
+
+    .pui-checkbox__box {
+        @apply bg-primary ring-primary relative mt-0.5 flex size-4 shrink-0 items-center justify-center rounded ring-1 ring-inset;
+
+        &::after {
+            @apply bg-fg-white size-3 opacity-0;
+            content: "";
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11.667 3.5 5.25 9.917 2.333 7'/%3E%3C/svg%3E")
+                center / contain no-repeat;
+        }
+    }
+
+    .pui-checkbox__box:only-child,
+    .pui-checkbox > input + .pui-checkbox__box:last-child {
+        @apply mt-0;
+    }
+
+    .pui-checkbox > input:checked + .pui-checkbox__box,
+    .pui-checkbox > input:indeterminate + .pui-checkbox__box {
+        @apply bg-brand-solid ring-brand-solid;
+
+        &::after {
+            @apply opacity-100;
+        }
+    }
+
+    .pui-checkbox > input:indeterminate + .pui-checkbox__box::after {
+        mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.917 7h8.166'/%3E%3C/svg%3E");
+    }
+
+    .pui-checkbox > input:focus-visible + .pui-checkbox__box {
+        @apply outline-focus-ring outline-2 outline-offset-2;
+    }
+
+    .pui-checkbox > input:disabled + .pui-checkbox__box {
+        @apply cursor-not-allowed opacity-50;
+    }
+
+    .pui-checkbox > input:disabled:not(:checked, :indeterminate) + .pui-checkbox__box {
+        @apply bg-tertiary;
+    }
+
+    .pui-checkbox__text {
+        @apply inline-flex flex-col;
+    }
+
+    .pui-checkbox__label {
+        @apply text-secondary text-sm font-medium select-none;
+    }
+
+    .pui-checkbox__hint {
+        @apply text-tertiary text-sm;
+    }
+
+    .pui-checkbox--md {
+        @apply gap-3;
+
+        & .pui-checkbox__text {
+            @apply gap-0.5;
+        }
+
+        & .pui-checkbox__label,
+        & .pui-checkbox__hint {
+            @apply text-md;
+        }
+    }
+
+    .pui-checkbox--md .pui-checkbox__box {
+        @apply size-5 rounded-md;
+
+        &::after {
+            @apply size-3.5;
+        }
+    }
+}

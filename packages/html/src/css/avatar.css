@@ -1,0 +1,154 @@
+/*
+ * Avatar. Mirrors packages/ui/src/components/base/avatar/avatar.tsx and
+ * base-components/avatar-online-indicator.tsx (md and rounded are the React defaults).
+ *
+ * <span class="pui-avatar pui-avatar--md">
+ *     <img src="..." alt="Olivia Rhye" />
+ *     <span class="pui-avatar__status" role="img" aria-label="Online"></span>
+ * </span>
+ * <span class="pui-avatar" role="img" aria-label="Olivia Rhye"><span class="pui-avatar__initials" aria-hidden="true">OR</span></span>
+ */
+@layer components {
+    .pui-avatar {
+        @apply bg-tertiary relative inline-flex size-10 shrink-0 items-center justify-center rounded-full align-middle;
+
+        & > img {
+            @apply size-full object-cover outline-black/16;
+            border-radius: inherit;
+            outline-style: solid;
+            outline-width: 0.5px;
+            outline-offset: -0.5px;
+        }
+
+        & > svg {
+            @apply text-fg-quaternary size-6;
+        }
+    }
+
+    .pui-avatar__initials {
+        @apply text-md text-quaternary font-semibold select-none;
+    }
+
+    .pui-avatar__status {
+        @apply bg-fg-success-secondary absolute end-0 bottom-0 size-2.5 rounded-full;
+        box-shadow: 0 0 0 1.5px var(--color-bg-primary);
+    }
+
+    .pui-avatar__status--online {
+        @apply bg-fg-success-secondary;
+    }
+
+    .pui-avatar__status--offline {
+        @apply bg-utility-neutral-300;
+    }
+
+    .pui-avatar--xs {
+        @apply size-6;
+
+        & .pui-avatar__initials {
+            @apply text-xs;
+        }
+
+        & .pui-avatar__status {
+            @apply size-1.5;
+        }
+
+        & > svg {
+            @apply size-4;
+        }
+    }
+
+    .pui-avatar--sm {
+        @apply size-8;
+
+        & .pui-avatar__initials {
+            @apply text-sm;
+        }
+
+        & .pui-avatar__status {
+            @apply size-2;
+        }
+
+        & > svg {
+            @apply size-5;
+        }
+    }
+
+    .pui-avatar--md {
+        @apply size-10;
+
+        & .pui-avatar__initials {
+            @apply text-md;
+        }
+
+        & .pui-avatar__status {
+            @apply size-2.5;
+        }
+
+        & > svg {
+            @apply size-6;
+        }
+    }
+
+    .pui-avatar--lg {
+        @apply size-12;
+
+        & .pui-avatar__initials {
+            @apply text-lg;
+        }
+
+        & .pui-avatar__status {
+            @apply size-3;
+        }
+
+        & > svg {
+            @apply size-7;
+        }
+    }
+
+    .pui-avatar--xl {
+        @apply size-14;
+
+        & .pui-avatar__initials {
+            @apply text-xl;
+        }
+
+        & .pui-avatar__status {
+            @apply size-3.5;
+        }
+
+        & > svg {
+            @apply size-8;
+        }
+    }
+
+    .pui-avatar--2xl {
+        @apply size-16;
+
+        & .pui-avatar__initials {
+            @apply text-display-xs;
+        }
+
+        & .pui-avatar__status {
+            @apply size-4;
+        }
+
+        & > svg {
+            @apply size-8;
+        }
+    }
+
+    /* Square avatar (`rounded={false}` in React). */
+    .pui-avatar--square {
+        @apply rounded-lg;
+    }
+
+    /* Overlapping avatars. */
+    .pui-avatar-group {
+        @apply flex items-center -space-x-1;
+
+        & > .pui-avatar {
+            box-shadow: 0 0 0 1.5px var(--color-bg-primary);
+        }
+    }
+}

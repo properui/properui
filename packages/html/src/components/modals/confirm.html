@@ -1,0 +1,14 @@
+<!-- description: A modal on a native <dialog>: data-pui-modal-open opens it with showModal(), focus returns to the opener, Escape and a backdrop click close it. -->
+<!-- A destructive confirmation. data-pui-static keeps a backdrop click from dismissing it; the close button's value becomes dialog.returnValue. -->
+<button class="pui-btn pui-btn--secondary-destructive" type="button" data-pui-modal-open="modal-delete">Delete project</button>
+
+<dialog class="pui-modal pui-modal--sm" id="modal-delete" data-pui-static>
+    <div class="pui-modal__header">
+        <h2 class="pui-modal__title">Delete this project?</h2>
+        <p class="pui-modal__description">This removes all of its files for everyone. It cannot be undone.</p>
+    </div>
+    <div class="pui-modal__footer">
+        <button class="pui-btn pui-btn--secondary pui-btn--lg" type="button" data-pui-modal-close value="cancel">Cancel</button>
+        <button class="pui-btn pui-btn--primary-destructive pui-btn--lg" type="button" data-pui-modal-close value="delete">Delete</button>
+    </div>
+</dialog>

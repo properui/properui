@@ -1,0 +1,33 @@
+/*
+ * Skeleton placeholder. Mirrors `Skeleton` and `SkeletonText` in
+ * packages/ui/src/components/base/skeleton/skeleton.tsx. Always `aria-hidden="true"`; mark the
+ * loading region itself with `aria-busy="true"`.
+ *
+ * <div class="pui-skeleton pui-skeleton--circle" aria-hidden="true"></div>
+ * <div class="pui-skeleton pui-skeleton--text" aria-hidden="true"></div>
+ */
+@layer components {
+    .pui-skeleton {
+        @apply bg-tertiary block animate-pulse rounded-md motion-reduce:animate-none;
+    }
+
+    .pui-skeleton--text {
+        @apply h-3 w-full rounded-full;
+
+        & + .pui-skeleton--text {
+            @apply mt-2;
+        }
+
+        &:last-child:not(:first-child) {
+            @apply w-2/3;
+        }
+    }
+
+    .pui-skeleton--circle {
+        @apply size-10 rounded-full;
+    }
+
+    .pui-skeleton--rect {
+        @apply h-32 w-full rounded-lg;
+    }
+}

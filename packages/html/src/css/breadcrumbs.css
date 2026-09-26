@@ -1,0 +1,54 @@
+/*
+ * Breadcrumbs. Mirrors the `text` type with the chevron divider in
+ * packages/ui/src/components/application/breadcrumbs/breadcrumbs.tsx.
+ *
+ * <nav class="pui-breadcrumbs" aria-label="Breadcrumb">
+ *     <ol>
+ *         <li class="pui-breadcrumbs__item"><a href="/">Home</a></li>
+ *         <li class="pui-breadcrumbs__item">
+ *             <svg class="pui-breadcrumbs__separator" aria-hidden="true">...</svg>
+ *             <a href="/settings" aria-current="page">Settings</a>
+ *         </li>
+ *     </ol>
+ * </nav>
+ */
+@layer components {
+    .pui-breadcrumbs > ol,
+    .pui-breadcrumbs__list {
+        @apply m-0 flex list-none flex-wrap items-center gap-1.5 p-0 md:gap-2;
+    }
+
+    .pui-breadcrumbs__item {
+        @apply flex min-w-0 items-center gap-1.5 md:gap-2;
+
+        & > a,
+        & > span {
+            @apply text-quaternary outline-focus-ring inline-flex items-center justify-center gap-1 rounded-md text-sm font-semibold whitespace-nowrap no-underline transition duration-100 ease-linear focus-visible:outline-2 focus-visible:outline-offset-2;
+        }
+
+        & > a:hover {
+            @apply text-tertiary_hover;
+        }
+
+        & > [aria-current="page"] {
+            @apply text-brand-secondary truncate;
+
+            &:hover {
+                @apply text-brand-secondary;
+            }
+        }
+
+        & svg:not(.pui-breadcrumbs__separator) {
+            @apply text-fg-quaternary size-5 shrink-0;
+        }
+
+        & > a:hover svg {
+            @apply text-fg-quaternary_hover;
+        }
+    }
+
+    .pui-breadcrumbs__separator {
+        @apply text-utility-neutral-300 size-4 shrink-0 rtl:-scale-x-100;
+        stroke-width: 2.25;
+    }
+}

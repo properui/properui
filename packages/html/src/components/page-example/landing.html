@@ -1,0 +1,872 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Acme Analytics: product analytics without the setup</title>
+        <!--
+            This page links the prebuilt stylesheet and script from this package's dist/ folder.
+            Outside the repository, use the CDN builds instead:
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@properui/tokens/dist/properui.min.css" />
+            <script src="https://cdn.jsdelivr.net/npm/@properui/html/dist/properui-html.iife.js" data-auto-init defer></script>
+        -->
+        <link rel="stylesheet" href="../../../dist/properui.css" />
+        <script src="../../../dist/properui-html.iife.js" data-auto-init defer></script>
+        <style>
+            /*
+             * Page layout only. Every colour, size and radius is a Proper UI token variable (the
+             * fallbacks are the token defaults, for a stylesheet built without that token in use);
+             * directions are logical, so dir="rtl" on <html> mirrors the page.
+             */
+            body {
+                margin: 0;
+                background: var(--color-bg-primary);
+                color: var(--color-text-primary);
+            }
+            .container {
+                max-width: 80rem;
+                margin-inline: auto;
+                padding-inline: calc(var(--spacing) * 4);
+            }
+            @media (min-width: 48rem) {
+                .container {
+                    padding-inline: calc(var(--spacing) * 8);
+                }
+            }
+            .site-header {
+                border-block-end: 1px solid var(--color-border-secondary);
+            }
+            .site-header .container {
+                display: flex;
+                align-items: center;
+                gap: calc(var(--spacing) * 6);
+                min-block-size: calc(var(--spacing) * 18);
+            }
+            .brand {
+                display: inline-flex;
+                align-items: center;
+                gap: calc(var(--spacing) * 2);
+                font-weight: 600;
+                font-size: var(--text-lg);
+                color: var(--color-text-primary);
+                text-decoration: none;
+            }
+            .brand svg {
+                inline-size: calc(var(--spacing) * 8);
+                block-size: calc(var(--spacing) * 8);
+                color: var(--color-fg-brand-primary);
+            }
+            .site-nav {
+                display: none;
+                gap: calc(var(--spacing) * 1);
+            }
+            @media (min-width: 64rem) {
+                .site-nav {
+                    display: flex;
+                }
+            }
+            .header-actions {
+                display: flex;
+                align-items: center;
+                gap: calc(var(--spacing) * 3);
+                margin-inline-start: auto;
+            }
+            .section {
+                padding-block: calc(var(--spacing) * 16);
+            }
+            @media (min-width: 64rem) {
+                .section {
+                    padding-block: calc(var(--spacing) * 24);
+                }
+            }
+            .section--muted {
+                background: var(--color-bg-secondary);
+            }
+            .hero {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: calc(var(--spacing) * 6);
+            }
+            .display {
+                margin: 0;
+                font-family: var(--font-display, inherit);
+                font-weight: 600;
+                font-size: var(--text-display-md, 2.25rem);
+                line-height: var(--text-display-md--line-height, 2.75rem);
+                letter-spacing: -0.02em;
+                max-inline-size: 48rem;
+            }
+            @media (min-width: 64rem) {
+                .display {
+                    font-size: var(--text-display-xl, 3.75rem);
+                    line-height: var(--text-display-xl--line-height, 4.5rem);
+                }
+            }
+            .lead {
+                margin: 0;
+                max-inline-size: 40rem;
+                font-size: var(--text-lg);
+                line-height: var(--text-lg--line-height);
+                color: var(--color-text-tertiary);
+            }
+            .actions {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: calc(var(--spacing) * 3);
+            }
+            .section-heading {
+                display: flex;
+                flex-direction: column;
+                gap: calc(var(--spacing) * 3);
+                max-inline-size: 48rem;
+                margin-block-end: calc(var(--spacing) * 12);
+            }
+            .section-heading h2 {
+                margin: 0;
+                font-weight: 600;
+                font-size: var(--text-display-sm, 1.875rem);
+                line-height: var(--text-display-sm--line-height, 2.375rem);
+            }
+            .section-heading p {
+                margin: 0;
+                color: var(--color-text-tertiary);
+                font-size: var(--text-lg);
+                line-height: var(--text-lg--line-height);
+            }
+            .eyebrow {
+                font-size: var(--text-md);
+                font-weight: 600;
+                color: var(--color-text-brand-secondary);
+            }
+            .grid {
+                display: grid;
+                gap: calc(var(--spacing) * 8);
+            }
+            @media (min-width: 48rem) {
+                .grid--3 {
+                    grid-template-columns: repeat(3, minmax(0, 1fr));
+                }
+            }
+            .feature {
+                display: flex;
+                flex-direction: column;
+                gap: calc(var(--spacing) * 2);
+            }
+            .feature h3 {
+                margin: calc(var(--spacing) * 3) 0 0;
+                font-size: var(--text-xl);
+                line-height: var(--text-xl--line-height);
+                font-weight: 600;
+            }
+            .feature p {
+                margin: 0;
+                color: var(--color-text-tertiary);
+            }
+            .price {
+                margin: 0;
+                font-weight: 600;
+                font-size: var(--text-display-md, 2.25rem);
+                line-height: var(--text-display-md--line-height, 2.75rem);
+                color: var(--color-text-primary);
+            }
+            .price small {
+                font-size: var(--text-md);
+                font-weight: 500;
+                color: var(--color-text-tertiary);
+            }
+            .checklist {
+                list-style: none;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                flex-direction: column;
+                gap: calc(var(--spacing) * 3);
+                color: var(--color-text-tertiary);
+            }
+            .checklist li {
+                display: flex;
+                gap: calc(var(--spacing) * 3);
+            }
+            .checklist svg {
+                flex-shrink: 0;
+                inline-size: calc(var(--spacing) * 6);
+                block-size: calc(var(--spacing) * 6);
+                padding: calc(var(--spacing) * 1);
+                border-radius: 9999px;
+                color: var(--color-fg-success-primary);
+                background: var(--color-bg-success-secondary, var(--color-bg-success-primary));
+            }
+            .faq {
+                max-inline-size: 48rem;
+                margin-inline: auto;
+            }
+            .newsletter {
+                display: flex;
+                flex-direction: column;
+                gap: calc(var(--spacing) * 4);
+                max-inline-size: 30rem;
+            }
+            .newsletter form {
+                display: flex;
+                flex-wrap: wrap;
+                gap: calc(var(--spacing) * 4);
+                align-items: flex-start;
+            }
+            .newsletter .pui-field {
+                flex: 1 1 16rem;
+            }
+            .site-footer {
+                border-block-start: 1px solid var(--color-border-secondary);
+                padding-block: calc(var(--spacing) * 12);
+                color: var(--color-text-quaternary, var(--color-text-tertiary));
+            }
+            .site-footer .container {
+                display: flex;
+                flex-wrap: wrap;
+                gap: calc(var(--spacing) * 4);
+                justify-content: space-between;
+                align-items: center;
+            }
+            .site-footer p {
+                margin: 0;
+                font-size: var(--text-md);
+            }
+        </style>
+    </head>
+    <body>
+        <a class="pui-btn pui-btn--secondary pui-skip-link" href="#main">Skip to content</a>
+        <header class="site-header">
+            <div class="container">
+                <a class="brand" href="#top">
+                    <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                    >
+                        <path
+                            d="m2 12 9.642 4.821c.131.066.197.099.266.111.06.012.123.012.184 0 .069-.012.135-.045.266-.11L22 12M2 17l9.642 4.821c.131.066.197.099.266.111.06.012.123.012.184 0 .069-.012.135-.045.266-.11L22 17M2 7l9.642-4.821c.131-.066.197-.098.266-.111a.5.5 0 0 1 .184 0c.069.013.135.045.266.11L22 7l-9.642 4.821a1.028 1.028 0 0 1-.266.111.501.501 0 0 1-.184 0c-.069-.012-.135-.045-.266-.11L2 7Z"
+                        />
+                    </svg>
+                    Acme
+                </a>
+                <nav class="site-nav" aria-label="Main">
+                    <a class="pui-btn pui-btn--tertiary" href="#features">Features</a>
+                    <a class="pui-btn pui-btn--tertiary" href="#pricing">Pricing</a>
+                    <a class="pui-btn pui-btn--tertiary" href="#faq">FAQ</a>
+                    <div class="pui-dropdown" data-pui="dropdown">
+                        <button class="pui-btn pui-btn--tertiary pui-dropdown__trigger" type="button">
+                            Resources
+                            <svg
+                                class="pui-btn__icon pui-dropdown__chevron"
+                                data-icon="trailing"
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                            >
+                                <path d="m6 9 6 6 6-6" />
+                            </svg>
+                        </button>
+                        <div class="pui-menu pui-menu--start" hidden>
+                            <a class="pui-menu__item" href="#docs"
+                                ><svg
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        d="m12 21-.1-.15c-.695-1.042-1.042-1.563-1.5-1.94a4 4 0 0 0-1.378-.737C8.453 18 7.827 18 6.575 18H5.2c-1.12 0-1.68 0-2.108-.218a2 2 0 0 1-.874-.874C2 16.48 2 15.92 2 14.8V6.2c0-1.12 0-1.68.218-2.108a2 2 0 0 1 .874-.874C3.52 3 4.08 3 5.2 3h.4c2.24 0 3.36 0 4.216.436a4 4 0 0 1 1.748 1.748C12 6.04 12 7.16 12 9.4M12 21V9.4M12 21l.1-.15c.695-1.042 1.042-1.563 1.5-1.94a3.999 3.999 0 0 1 1.378-.737C15.547 18 16.173 18 17.425 18H18.8c1.12 0 1.68 0 2.108-.218a2 2 0 0 0 .874-.874C22 16.48 22 15.92 22 14.8V6.2c0-1.12 0-1.68-.218-2.108a2 2 0 0 0-.874-.874C20.48 3 19.92 3 18.8 3h-.4c-2.24 0-3.36 0-4.216.436a4 4 0 0 0-1.748 1.748C12 6.04 12 7.16 12 9.4"
+                                    />
+                                </svg>
+                                Documentation</a
+                            >
+                            <a class="pui-menu__item" href="#api"
+                                ><svg
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    aria-hidden="true"
+                                >
+                                    <path d="m17 17 5-5-5-5M7 7l-5 5 5 5m7-14-4 18" />
+                                </svg>
+                                API reference</a
+                            >
+                            <a class="pui-menu__item" href="#help"
+                                ><svg
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3m.08 4h.01M22 12c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2s10 4.477 10 10Z"
+                                    />
+                                </svg>
+                                Help centre</a
+                            >
+                        </div>
+                    </div>
+                </nav>
+                <div class="header-actions">
+                    <button
+                        class="pui-btn pui-btn--tertiary pui-btn--icon-only"
+                        type="button"
+                        data-pui="theme-toggle"
+                        aria-label="Dark mode"
+                        data-pui-tooltip="Toggle dark mode"
+                        data-pui-tooltip-placement="bottom"
+                    >
+                        <svg
+                            class="pui-btn__icon"
+                            data-icon="leading"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M22 15.844a10.424 10.424 0 0 1-4.306.925c-5.779 0-10.463-4.684-10.463-10.462 0-1.536.33-2.994.925-4.307A10.464 10.464 0 0 0 2 11.538C2 17.316 6.684 22 12.462 22c4.243 0 7.896-2.526 9.538-6.156Z"
+                            />
+                        </svg>
+                    </button>
+                    <a class="pui-btn pui-btn--link-gray pui-btn--lg" href="#login">Log in</a>
+                    <a class="pui-btn pui-btn--primary pui-btn--lg" href="#signup">Sign up</a>
+                </div>
+            </div>
+        </header>
+
+        <main id="main">
+            <section class="section" aria-labelledby="hero-title">
+                <div class="hero container">
+                    <span class="pui-badge pui-badge--brand pui-badge--lg pui-badge--dot">New: real-time funnels</span>
+                    <h1 class="display" id="hero-title">Product analytics without the setup</h1>
+                    <p class="lead">
+                        Drop in one script and see where people get stuck, which features they love, and what to build next. No tracking plan, no data team.
+                    </p>
+                    <div class="actions">
+                        <button class="pui-btn pui-btn--secondary pui-btn--xl" type="button" data-pui-modal-open="demo-modal">
+                            <svg
+                                class="pui-btn__icon"
+                                data-icon="leading"
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    d="M21 10H3m13-8v4M8 2v4m-.2 16h8.4c1.68 0 2.52 0 3.162-.327a3 3 0 0 0 1.311-1.311C21 19.72 21 18.88 21 17.2V8.8c0-1.68 0-2.52-.327-3.162a3 3 0 0 0-1.311-1.311C18.72 4 17.88 4 16.2 4H7.8c-1.68 0-2.52 0-3.162.327a3 3 0 0 0-1.311 1.311C3 6.28 3 7.12 3 8.8v8.4c0 1.68 0 2.52.327 3.162a3 3 0 0 0 1.311 1.311C5.28 22 6.12 22 7.8 22Z"
+                                />
+                            </svg>
+                            Book a demo
+                        </button>
+                        <a class="pui-btn pui-btn--primary pui-btn--xl" href="#signup">
+                            Start free trial
+                            <svg
+                                class="pui-btn__icon"
+                                data-icon="trailing"
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                            >
+                                <path d="M5 12h14m0 0-7-7m7 7-7 7" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section section--muted" id="features" aria-labelledby="features-title">
+                <div class="container">
+                    <div class="section-heading">
+                        <span class="eyebrow">Features</span>
+                        <h2 id="features-title">Everything you need to understand usage</h2>
+                        <p>Powerful, self-serve analytics that the whole team can read.</p>
+                    </div>
+                    <div class="grid--3 grid">
+                        <div class="feature">
+                            <div class="pui-empty__icon">
+                                <svg
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        d="M13 2 4.093 12.688c-.348.418-.523.628-.525.804a.5.5 0 0 0 .185.397c.138.111.41.111.955.111H12l-1 8 8.907-10.688c.348-.418.523-.628.525-.804a.5.5 0 0 0-.185-.397c-.138-.111-.41-.111-.955-.111H12l1-8Z"
+                                    />
+                                </svg>
+                            </div>
+                            <h3>Live in minutes</h3>
+                            <p>One script tag. Events, sessions and pages are captured automatically, with no tracking plan to maintain.</p>
+                        </div>
+                        <div class="feature">
+                            <div class="pui-empty__icon">
+                                <svg
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        d="m22 7-7.869 7.869c-.396.396-.594.594-.822.668a1 1 0 0 1-.618 0c-.228-.074-.426-.272-.822-.668L9.13 12.13c-.396-.396-.594-.594-.822-.668a1 1 0 0 0-.618 0c-.228.074-.426.272-.822.668L2 17M22 7h-7m7 0v7"
+                                    />
+                                </svg>
+                            </div>
+                            <h3>Funnels and retention</h3>
+                            <p>See exactly where people drop off and which cohorts keep coming back, updated in real time.</p>
+                        </div>
+                        <div class="feature">
+                            <div class="pui-empty__icon">
+                                <svg
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        d="m9 11.5 2 2L15.5 9m4.5 3c0 4.908-5.354 8.478-7.302 9.615-.221.129-.332.194-.488.227a1.137 1.137 0 0 1-.42 0c-.156-.034-.267-.098-.488-.227C9.354 20.478 4 16.908 4 12V7.217c0-.799 0-1.199.13-1.542a2 2 0 0 1 .548-.79c.276-.243.65-.383 1.398-.664l5.362-2.01c.208-.078.312-.117.419-.133a1 1 0 0 1 .286 0c.107.016.21.055.419.133l5.362 2.01c.748.28 1.123.421 1.398.664a2 2 0 0 1 .547.79c.131.343.131.743.131 1.542V12Z"
+                                    />
+                                </svg>
+                            </div>
+                            <h3>Private by default</h3>
+                            <p>No cookies, no personal data, EU hosting. Consent banners become optional instead of mandatory.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" id="pricing" aria-labelledby="pricing-title">
+                <div class="container">
+                    <div class="section-heading">
+                        <span class="eyebrow">Pricing</span>
+                        <h2 id="pricing-title">Simple, transparent pricing</h2>
+                        <p>Start free. Upgrade when your traffic does.</p>
+                    </div>
+                    <div class="pui-tabs pui-tabs--button" data-pui="tabs">
+                        <div class="pui-tabs__list" role="tablist" aria-label="Billing period">
+                            <button class="pui-tab" type="button" role="tab" aria-selected="true">Monthly billing</button>
+                            <button class="pui-tab" type="button" role="tab">
+                                Annual billing <span class="pui-badge pui-badge--success pui-badge--sm">Save 20%</span>
+                            </button>
+                        </div>
+                        <div class="pui-tabs__panel" role="tabpanel">
+                            <div class="grid--3 grid">
+                                <article class="pui-card" aria-labelledby="plan-starter">
+                                    <header class="pui-card__header">
+                                        <h3 class="pui-card__title" id="plan-starter">Starter</h3>
+                                        <p class="price">$0 <small>per month</small></p>
+                                        <p class="pui-card__description">For side projects and early prototypes.</p>
+                                    </header>
+                                    <div class="pui-card__body">
+                                        <ul class="checklist">
+                                            <li>
+                                                <svg
+                                                    width="20"
+                                                    height="20"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    stroke-width="2"
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    aria-hidden="true"
+                                                >
+                                                    <path d="M20 6 9 17l-5-5" />
+                                                </svg>
+                                                10,000 events a month
+                                            </li>
+                                            <li>
+                                                <svg
+                                                    width="20"
+                                                    height="20"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    stroke-width="2"
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    aria-hidden="true"
+                                                >
+                                                    <path d="M20 6 9 17l-5-5" />
+                                                </svg>
+                                                1 project
+                                            </li>
+                                            <li>
+                                                <svg
+                                                    width="20"
+                                                    height="20"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    stroke-width="2"
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    aria-hidden="true"
+                                                >
+                                                    <path d="M20 6 9 17l-5-5" />
+                                                </svg>
+                                                30 days of history
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <footer class="pui-card__footer"><a class="pui-btn pui-btn--secondary pui-btn--lg" href="#signup">Get started</a></footer>
+                                </article>
+                                <article class="pui-card" aria-labelledby="plan-growth">
+                                    <header class="pui-card__header">
+                                        <h3 class="pui-card__title" id="plan-growth">
+                                            Growth <span class="pui-badge pui-badge--brand pui-badge--sm">Popular</span>
+                                        </h3>
+                                        <p class="price">$49 <small>per month</small></p>
+                                        <p class="pui-card__description">For products with real users.</p>
+                                    </header>
+                                    <div class="pui-card__body">
+                                        <ul class="checklist">
+                                            <li>
+                                                <svg
+                                                    width="20"
+                                                    height="20"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    stroke-width="2"
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    aria-hidden="true"
+                                                >
+                                                    <path d="M20 6 9 17l-5-5" />
+                                                </svg>
+                                                1 million events a month
+                                            </li>
+                                            <li>
+                                                <svg
+                                                    width="20"
+                                                    height="20"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    stroke-width="2"
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    aria-hidden="true"
+                                                >
+                                                    <path d="M20 6 9 17l-5-5" />
+                                                </svg>
+                                                Unlimited projects
+                                            </li>
+                                            <li>
+                                                <svg
+                                                    width="20"
+                                                    height="20"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    stroke-width="2"
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    aria-hidden="true"
+                                                >
+                                                    <path d="M20 6 9 17l-5-5" />
+                                                </svg>
+                                                Funnels and retention
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <footer class="pui-card__footer">
+                                        <a class="pui-btn pui-btn--primary pui-btn--lg" href="#signup">Start free trial</a>
+                                    </footer>
+                                </article>
+                                <article class="pui-card" aria-labelledby="plan-scale">
+                                    <header class="pui-card__header">
+                                        <h3 class="pui-card__title" id="plan-scale">Scale</h3>
+                                        <p class="price">$199 <small>per month</small></p>
+                                        <p class="pui-card__description">For teams that live in their data.</p>
+                                    </header>
+                                    <div class="pui-card__body">
+                                        <ul class="checklist">
+                                            <li>
+                                                <svg
+                                                    width="20"
+                                                    height="20"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    stroke-width="2"
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    aria-hidden="true"
+                                                >
+                                                    <path d="M20 6 9 17l-5-5" />
+                                                </svg>
+                                                10 million events a month
+                                            </li>
+                                            <li>
+                                                <svg
+                                                    width="20"
+                                                    height="20"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    stroke-width="2"
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    aria-hidden="true"
+                                                >
+                                                    <path d="M20 6 9 17l-5-5" />
+                                                </svg>
+                                                SSO and audit log
+                                            </li>
+                                            <li>
+                                                <svg
+                                                    width="20"
+                                                    height="20"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    stroke-width="2"
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    aria-hidden="true"
+                                                >
+                                                    <path d="M20 6 9 17l-5-5" />
+                                                </svg>
+                                                Priority support
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <footer class="pui-card__footer">
+                                        <button class="pui-btn pui-btn--secondary pui-btn--lg" type="button" data-pui-modal-open="demo-modal">
+                                            Talk to sales
+                                        </button>
+                                    </footer>
+                                </article>
+                            </div>
+                        </div>
+                        <div class="pui-tabs__panel" role="tabpanel" hidden>
+                            <div class="pui-alert pui-alert--info" role="note">
+                                <svg
+                                    class="pui-alert__icon"
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    aria-hidden="true"
+                                >
+                                    <path d="M12 16v-4m0-4h.01M22 12c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2s10 4.477 10 10Z" />
+                                </svg>
+                                <div class="pui-alert__body">
+                                    <p class="pui-alert__title">Annual plans</p>
+                                    <p>Starter stays free. Growth is $470 and Scale $1,910 a year, billed once, with the same limits as monthly.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section section--muted" id="faq" aria-labelledby="faq-title">
+                <div class="faq container">
+                    <div class="section-heading">
+                        <span class="eyebrow">FAQ</span>
+                        <h2 id="faq-title">Frequently asked questions</h2>
+                    </div>
+                    <div class="pui-accordion" data-pui="accordion" data-pui-exclusive>
+                        <details class="pui-accordion__item" open>
+                            <summary class="pui-accordion__trigger">Is there a free trial available?</summary>
+                            <div class="pui-accordion__panel"><p>Yes. Every paid plan starts with 30 days free, no card required.</p></div>
+                        </details>
+                        <details class="pui-accordion__item">
+                            <summary class="pui-accordion__trigger">Do I need a cookie banner?</summary>
+                            <div class="pui-accordion__panel"><p>Acme stores no cookies and no personal data, so in most jurisdictions you do not.</p></div>
+                        </details>
+                        <details class="pui-accordion__item">
+                            <summary class="pui-accordion__trigger">Can I export my data?</summary>
+                            <div class="pui-accordion__panel"><p>Any time, as CSV or through the API. Your data is yours.</p></div>
+                        </details>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" aria-labelledby="newsletter-title">
+                <div class="newsletter container">
+                    <div class="section-heading">
+                        <h2 id="newsletter-title">Get the monthly changelog</h2>
+                        <p>New features and product analytics tips. One email a month.</p>
+                    </div>
+                    <form
+                        onsubmit="
+                            event.preventDefault();
+                            ProperUI.toast({ title: 'Subscribed', description: 'Check your inbox to confirm.', variant: 'success' });
+                        "
+                    >
+                        <div class="pui-field">
+                            <label class="pui-label pui-sr-only" for="newsletter-email">Email</label>
+                            <input
+                                class="pui-input pui-input--lg"
+                                id="newsletter-email"
+                                type="email"
+                                name="email"
+                                placeholder="Enter your email"
+                                autocomplete="email"
+                                required
+                            />
+                        </div>
+                        <button class="pui-btn pui-btn--primary pui-btn--xl" type="submit">Subscribe</button>
+                    </form>
+                </div>
+            </section>
+        </main>
+
+        <footer class="site-footer">
+            <div class="container">
+                <a class="brand" href="#top"
+                    ><svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                    >
+                        <path
+                            d="m2 12 9.642 4.821c.131.066.197.099.266.111.06.012.123.012.184 0 .069-.012.135-.045.266-.11L22 12M2 17l9.642 4.821c.131.066.197.099.266.111.06.012.123.012.184 0 .069-.012.135-.045.266-.11L22 17M2 7l9.642-4.821c.131-.066.197-.098.266-.111a.5.5 0 0 1 .184 0c.069.013.135.045.266.11L22 7l-9.642 4.821a1.028 1.028 0 0 1-.266.111.501.501 0 0 1-.184 0c-.069-.012-.135-.045-.266-.11L2 7Z"
+                        />
+                    </svg>
+                    Acme</a
+                >
+                <p>© 2026 Acme Analytics. All rights reserved.</p>
+            </div>
+        </footer>
+
+        <dialog class="pui-modal" id="demo-modal">
+            <div class="pui-modal__header">
+                <div class="pui-modal__icon">
+                    <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                    >
+                        <path
+                            d="M21 10H3m13-8v4M8 2v4m-.2 16h8.4c1.68 0 2.52 0 3.162-.327a3 3 0 0 0 1.311-1.311C21 19.72 21 18.88 21 17.2V8.8c0-1.68 0-2.52-.327-3.162a3 3 0 0 0-1.311-1.311C18.72 4 17.88 4 16.2 4H7.8c-1.68 0-2.52 0-3.162.327a3 3 0 0 0-1.311 1.311C3 6.28 3 7.12 3 8.8v8.4c0 1.68 0 2.52.327 3.162a3 3 0 0 0 1.311 1.311C5.28 22 6.12 22 7.8 22Z"
+                        />
+                    </svg>
+                </div>
+                <h2 class="pui-modal__title">Book a demo</h2>
+                <p class="pui-modal__description">Thirty minutes with a product specialist, on your own data.</p>
+                <button class="pui-modal__close" type="button" aria-label="Close" data-pui-modal-close>
+                    <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                    >
+                        <path d="M18 6 6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <form class="pui-modal__body" id="demo-form" method="dialog">
+                <div class="pui-field">
+                    <label class="pui-label" for="demo-name">Full name</label>
+                    <input class="pui-input" id="demo-name" name="name" type="text" autocomplete="name" required />
+                </div>
+                <div class="pui-field">
+                    <label class="pui-label" for="demo-email">Work email</label>
+                    <input class="pui-input" id="demo-email" name="email" type="email" autocomplete="email" required />
+                </div>
+                <div class="pui-field">
+                    <label class="pui-label" for="demo-size">Team size</label>
+                    <div class="pui-select">
+                        <select id="demo-size" name="size">
+                            <option>1 to 10</option>
+                            <option>11 to 50</option>
+                            <option>51 to 200</option>
+                            <option>More than 200</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+            <div class="pui-modal__footer">
+                <button class="pui-btn pui-btn--secondary pui-btn--lg" type="button" data-pui-modal-close>Cancel</button>
+                <button class="pui-btn pui-btn--primary pui-btn--lg" type="submit" form="demo-form" value="book">Book demo</button>
+            </div>
+        </dialog>
+    </body>
+</html>

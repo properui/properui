@@ -1,0 +1,13 @@
+/*
+ * Textarea. Shares `.pui-field`, `.pui-label`, `.pui-hint`, `.pui-error` and its ring, focus,
+ * disabled and `aria-invalid` states with the input (see input.css, where `.pui-textarea` is
+ * declared next to `.pui-input`). This file holds only what differs.
+ * Mirrors packages/ui/src/components/base/textarea/textarea.tsx.
+ *
+ * <textarea class="pui-textarea" rows="4"></textarea>
+ */
+@layer components {
+    .pui-textarea {
+        @apply min-h-24 resize-y;
+    }
+}

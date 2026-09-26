@@ -1,0 +1,43 @@
+/*
+ * Base: the few element-level rules every Proper UI page needs, and helpers the snippets use.
+ * No colours are set on `body` so a Tailwind project's own page styles are left alone.
+ */
+@layer base {
+    html,
+    body {
+        font-family: var(--font-body);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        font-variant-ligatures: contextual;
+        font-kerning: normal;
+    }
+
+    :root.dark-mode {
+        color-scheme: dark;
+    }
+
+    :root.light-mode {
+        color-scheme: light;
+    }
+}
+
+@layer components {
+    /* Visually hidden but still read by assistive tech (the `sr-only` utility, for pages with no Tailwind build). */
+    .pui-sr-only {
+        @apply sr-only;
+    }
+
+    /* A skip link: visually hidden until it receives keyboard focus, then pinned to the top start corner. */
+    .pui-skip-link:not(:focus-visible) {
+        @apply sr-only;
+    }
+
+    .pui-skip-link:focus-visible {
+        @apply fixed start-4 top-4 z-50;
+    }
+
+    /* A native `[hidden]` must win over any `display` a component class sets. */
+    [class*="pui-"][hidden] {
+        display: none;
+    }
+}

@@ -1,0 +1,19 @@
+<!-- description: Switches on a real <input type="checkbox" role="switch">: sm and md, with a hint, on, off and disabled. -->
+<label class="pui-toggle">
+    <input type="checkbox" role="switch" name="alerts" checked />
+    <span class="pui-toggle__track" aria-hidden="true"><span class="pui-toggle__thumb"></span></span>
+    <span class="pui-toggle__text"><span class="pui-toggle__label">Email alerts</span></span>
+</label>
+<label class="pui-toggle pui-toggle--md">
+    <input type="checkbox" role="switch" name="digest" aria-describedby="toggle-digest-hint" />
+    <span class="pui-toggle__track" aria-hidden="true"><span class="pui-toggle__thumb"></span></span>
+    <span class="pui-toggle__text">
+        <span class="pui-toggle__label">Weekly digest</span>
+        <span class="pui-toggle__hint" id="toggle-digest-hint">A summary of activity every Monday.</span>
+    </span>
+</label>
+<label class="pui-toggle">
+    <input type="checkbox" role="switch" name="beta" disabled />
+    <span class="pui-toggle__track" aria-hidden="true"><span class="pui-toggle__thumb"></span></span>
+    <span class="pui-toggle__text"><span class="pui-toggle__label">Beta features</span></span>
+</label>

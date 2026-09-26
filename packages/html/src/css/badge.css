@@ -1,0 +1,127 @@
+/*
+ * Badge. Mirrors packages/ui/src/components/base/badges/badges.tsx: `Badge` (pill-color is the
+ * default type, md the default size, gray the default colour), `BadgeWithDot` (`--dot`), and the
+ * `badge-modern` type (`--modern`: neutral surface, the colour moves to the dot).
+ *
+ * <span class="pui-badge pui-badge--success pui-badge--dot">Active</span>
+ */
+@layer components {
+    .pui-badge {
+        @apply inline-flex size-max items-center gap-1.5 rounded-full px-2.5 py-0.5 text-sm font-medium whitespace-nowrap ring-1 ring-inset;
+        /* Gray is the default colour. */
+        @apply bg-utility-neutral-50 text-utility-neutral-700 ring-utility-neutral-200;
+        --pui-badge-dot: var(--color-utility-neutral-500);
+
+        & > svg {
+            @apply size-3 shrink-0 stroke-3;
+        }
+    }
+
+    .pui-badge--gray {
+        @apply bg-utility-neutral-50 text-utility-neutral-700 ring-utility-neutral-200;
+        --pui-badge-dot: var(--color-utility-neutral-500);
+    }
+
+    .pui-badge--brand {
+        @apply bg-utility-brand-50 text-utility-brand-700 ring-utility-brand-200;
+        --pui-badge-dot: var(--color-utility-brand-500);
+    }
+
+    .pui-badge--error {
+        @apply bg-utility-red-50 text-utility-red-700 ring-utility-red-200;
+        --pui-badge-dot: var(--color-utility-red-500);
+    }
+
+    .pui-badge--warning {
+        @apply bg-utility-yellow-50 text-utility-yellow-700 ring-utility-yellow-200;
+        --pui-badge-dot: var(--color-utility-yellow-500);
+    }
+
+    .pui-badge--success {
+        @apply bg-utility-green-50 text-utility-green-700 ring-utility-green-200;
+        --pui-badge-dot: var(--color-utility-green-500);
+    }
+
+    .pui-badge--blue {
+        @apply bg-utility-blue-50 text-utility-blue-700 ring-utility-blue-200;
+        --pui-badge-dot: var(--color-utility-blue-500);
+    }
+
+    .pui-badge--indigo {
+        @apply bg-utility-indigo-50 text-utility-indigo-700 ring-utility-indigo-200;
+        --pui-badge-dot: var(--color-utility-indigo-500);
+    }
+
+    .pui-badge--purple {
+        @apply bg-utility-purple-50 text-utility-purple-700 ring-utility-purple-200;
+        --pui-badge-dot: var(--color-utility-purple-500);
+    }
+
+    .pui-badge--pink {
+        @apply bg-utility-pink-50 text-utility-pink-700 ring-utility-pink-200;
+        --pui-badge-dot: var(--color-utility-pink-500);
+    }
+
+    .pui-badge--orange {
+        @apply bg-utility-orange-50 text-utility-orange-700 ring-utility-orange-200;
+        --pui-badge-dot: var(--color-utility-orange-500);
+    }
+
+    /* Sizes (pill) */
+    .pui-badge--sm {
+        @apply gap-1 px-2 py-0.5 text-xs;
+    }
+
+    .pui-badge--md {
+        @apply px-2.5 py-0.5 text-sm;
+    }
+
+    .pui-badge--lg {
+        @apply px-3 py-1 text-sm;
+    }
+
+    /* `--pill` is the default shape; the class exists so markup can say so explicitly. */
+    .pui-badge--pill {
+        @apply rounded-full;
+    }
+
+    /* Leading dot */
+    .pui-badge--dot {
+        @apply ps-2;
+
+        &::before {
+            @apply size-2 shrink-0 rounded-full;
+            content: "";
+            background-color: var(--pui-badge-dot);
+        }
+
+        &.pui-badge--sm {
+            @apply ps-1.5;
+
+            &::before {
+                @apply size-1.5;
+            }
+        }
+
+        &.pui-badge--lg {
+            @apply ps-2.5;
+        }
+    }
+
+    /* Modern: a neutral, shadowed square badge; any colour modifier only tints the dot. */
+    .pui-badge--modern {
+        @apply bg-primary text-secondary ring-primary rounded-md px-2 shadow-xs;
+
+        &.pui-badge--sm {
+            @apply px-1.5;
+        }
+
+        &.pui-badge--lg {
+            @apply rounded-lg px-2.5;
+        }
+
+        &.pui-badge--dot {
+            @apply ps-1.5;
+        }
+    }
+}

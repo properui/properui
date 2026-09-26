@@ -1,0 +1,859 @@
+<!-- description: Two complete pages (a marketing landing page and an app dashboard) built only from @properui/html: the pui- component classes, the token variables and the vanilla-JS behaviours, no framework. -->
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Dashboard · Acme</title>
+        <!--
+            Links this package's own dist/ builds. Outside the repository use the CDN:
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@properui/tokens/dist/properui.min.css" />
+            <script src="https://cdn.jsdelivr.net/npm/@properui/html/dist/properui-html.iife.js" data-auto-init defer></script>
+        -->
+        <link rel="stylesheet" href="../../../dist/properui.css" />
+        <script src="../../../dist/properui-html.iife.js" data-auto-init defer></script>
+        <style>
+            /* Page layout only: token variables for every value, logical properties for every direction. */
+            body {
+                margin: 0;
+                background: var(--color-bg-secondary);
+                color: var(--color-text-primary);
+            }
+            .shell {
+                display: grid;
+                min-block-size: 100dvh;
+            }
+            @media (min-width: 64rem) {
+                .shell {
+                    grid-template-columns: 17rem minmax(0, 1fr);
+                }
+            }
+            .sidebar {
+                display: none;
+                flex-direction: column;
+                gap: calc(var(--spacing) * 6);
+                padding: calc(var(--spacing) * 6) calc(var(--spacing) * 4);
+                background: var(--color-bg-primary);
+                border-inline-end: 1px solid var(--color-border-secondary);
+            }
+            @media (min-width: 64rem) {
+                .sidebar {
+                    display: flex;
+                }
+            }
+            .brand {
+                display: inline-flex;
+                align-items: center;
+                gap: calc(var(--spacing) * 2);
+                padding-inline: calc(var(--spacing) * 2);
+                font-weight: 600;
+                font-size: var(--text-lg);
+                color: var(--color-text-primary);
+                text-decoration: none;
+            }
+            .brand svg {
+                inline-size: calc(var(--spacing) * 8);
+                block-size: calc(var(--spacing) * 8);
+                color: var(--color-fg-brand-primary);
+            }
+            .nav {
+                list-style: none;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                flex-direction: column;
+                gap: calc(var(--spacing) * 0.5);
+            }
+            .nav .pui-btn {
+                inline-size: 100%;
+                justify-content: flex-start;
+            }
+            .nav .pui-btn[aria-current="page"] {
+                background: var(--color-bg-primary_hover, var(--color-bg-secondary));
+                color: var(--color-text-secondary);
+            }
+            .sidebar-card {
+                margin-block-start: auto;
+            }
+            .main {
+                display: flex;
+                flex-direction: column;
+                min-inline-size: 0;
+            }
+            .topbar {
+                display: flex;
+                align-items: center;
+                gap: calc(var(--spacing) * 4);
+                padding: calc(var(--spacing) * 4) calc(var(--spacing) * 4);
+                background: var(--color-bg-primary);
+                border-block-end: 1px solid var(--color-border-secondary);
+            }
+            @media (min-width: 48rem) {
+                .topbar {
+                    padding-inline: calc(var(--spacing) * 8);
+                }
+            }
+            .topbar .pui-field {
+                max-inline-size: 20rem;
+            }
+            .topbar-actions {
+                display: flex;
+                align-items: center;
+                gap: calc(var(--spacing) * 2);
+                margin-inline-start: auto;
+            }
+            .content {
+                display: flex;
+                flex-direction: column;
+                gap: calc(var(--spacing) * 8);
+                padding: calc(var(--spacing) * 8) calc(var(--spacing) * 4) calc(var(--spacing) * 12);
+            }
+            @media (min-width: 48rem) {
+                .content {
+                    padding-inline: calc(var(--spacing) * 8);
+                }
+            }
+            .page-header {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: flex-end;
+                justify-content: space-between;
+                gap: calc(var(--spacing) * 4);
+            }
+            .page-header h1 {
+                margin: calc(var(--spacing) * 4) 0 calc(var(--spacing) * 1);
+                font-size: var(--text-display-xs);
+                line-height: var(--text-display-xs--line-height);
+                font-weight: 600;
+            }
+            .page-header p {
+                margin: 0;
+                color: var(--color-text-tertiary);
+            }
+            .page-header .actions {
+                display: flex;
+                gap: calc(var(--spacing) * 3);
+            }
+            .metrics {
+                display: grid;
+                gap: calc(var(--spacing) * 6);
+            }
+            @media (min-width: 48rem) {
+                .metrics {
+                    grid-template-columns: repeat(3, minmax(0, 1fr));
+                }
+            }
+            .metric-value {
+                display: flex;
+                align-items: center;
+                gap: calc(var(--spacing) * 3);
+                font-size: var(--text-display-xs);
+                line-height: var(--text-display-xs--line-height);
+                font-weight: 600;
+                color: var(--color-text-primary);
+            }
+            .metric-label {
+                margin: 0;
+                font-size: var(--text-sm);
+                font-weight: 500;
+                color: var(--color-text-tertiary);
+            }
+        </style>
+    </head>
+    <body>
+        <div class="shell">
+            <aside class="sidebar" aria-label="Sidebar">
+                <a class="brand" href="#dashboard"
+                    ><svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                    >
+                        <path
+                            d="m2 12 9.642 4.821c.131.066.197.099.266.111.06.012.123.012.184 0 .069-.012.135-.045.266-.11L22 12M2 17l9.642 4.821c.131.066.197.099.266.111.06.012.123.012.184 0 .069-.012.135-.045.266-.11L22 17M2 7l9.642-4.821c.131-.066.197-.098.266-.111a.5.5 0 0 1 .184 0c.069.013.135.045.266.11L22 7l-9.642 4.821a1.028 1.028 0 0 1-.266.111.501.501 0 0 1-.184 0c-.069-.012-.135-.045-.266-.11L2 7Z"
+                        />
+                    </svg>
+                    Acme</a
+                >
+                <nav aria-label="Main">
+                    <ul class="nav">
+                        <li>
+                            <a class="pui-btn pui-btn--tertiary pui-btn--md" href="#dashboard" aria-current="page"
+                                ><svg
+                                    class="pui-btn__icon"
+                                    data-icon="leading"
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        d="M8 17h8M11.018 2.764 4.235 8.039c-.453.353-.68.53-.843.75a2 2 0 0 0-.318.65C3 9.704 3 9.991 3 10.565V17.8c0 1.12 0 1.68.218 2.108a2 2 0 0 0 .874.874C4.52 21 5.08 21 6.2 21h11.6c1.12 0 1.68 0 2.108-.218a2 2 0 0 0 .874-.874C21 19.48 21 18.92 21 17.8v-7.235c0-.574 0-.861-.074-1.126a2.002 2.002 0 0 0-.318-.65c-.163-.22-.39-.397-.843-.75l-6.783-5.275c-.351-.273-.527-.41-.72-.462a1 1 0 0 0-.523 0c-.194.052-.37.189-.721.462Z"
+                                    />
+                                </svg>
+                                Dashboard</a
+                            >
+                        </li>
+                        <li>
+                            <a class="pui-btn pui-btn--tertiary pui-btn--md" href="#reports"
+                                ><svg
+                                    class="pui-btn__icon"
+                                    data-icon="leading"
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    aria-hidden="true"
+                                >
+                                    <path d="M6 20V4m12 16v-4m-6 4V10" />
+                                </svg>
+                                Reports</a
+                            >
+                        </li>
+                        <li>
+                            <a class="pui-btn pui-btn--tertiary pui-btn--md" href="#projects"
+                                ><svg
+                                    class="pui-btn__icon"
+                                    data-icon="leading"
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        d="m13 7-1.116-2.231c-.32-.642-.481-.963-.72-1.198a2 2 0 0 0-.748-.462C10.1 3 9.74 3 9.022 3H5.2c-1.12 0-1.68 0-2.108.218a2 2 0 0 0-.874.874C2 4.52 2 5.08 2 6.2V7m0 0h15.2c1.68 0 2.52 0 3.162.327a3 3 0 0 1 1.311 1.311C22 9.28 22 10.12 22 11.8v4.4c0 1.68 0 2.52-.327 3.162a3 3 0 0 1-1.311 1.311C19.72 21 18.88 21 17.2 21H6.8c-1.68 0-2.52 0-3.162-.327a3 3 0 0 1-1.311-1.311C2 18.72 2 17.88 2 16.2V7Z"
+                                    />
+                                </svg>
+                                Projects</a
+                            >
+                        </li>
+                        <li>
+                            <a class="pui-btn pui-btn--tertiary pui-btn--md" href="#team"
+                                ><svg
+                                    class="pui-btn__icon"
+                                    data-icon="leading"
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        d="M22 21v-2a4.002 4.002 0 0 0-3-3.874M15.5 3.291a4.001 4.001 0 0 1 0 7.418M17 21c0-1.864 0-2.796-.305-3.53a4 4 0 0 0-2.164-2.165C13.796 15 12.864 15 11 15H8c-1.864 0-2.796 0-3.53.305a4 4 0 0 0-2.166 2.164C2 18.204 2 19.136 2 21M13.5 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z"
+                                    />
+                                </svg>
+                                Team</a
+                            >
+                        </li>
+                        <li>
+                            <a class="pui-btn pui-btn--tertiary pui-btn--md" href="#settings"
+                                ><svg
+                                    class="pui-btn__icon"
+                                    data-icon="leading"
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    aria-hidden="true"
+                                >
+                                    <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+                                    <path
+                                        d="M18.727 14.727a1.5 1.5 0 0 0 .3 1.655l.055.054a1.816 1.816 0 0 1 0 2.573 1.818 1.818 0 0 1-2.573 0l-.055-.055a1.5 1.5 0 0 0-1.654-.3 1.5 1.5 0 0 0-.91 1.373v.155a1.818 1.818 0 1 1-3.636 0V20.1a1.5 1.5 0 0 0-.981-1.373 1.5 1.5 0 0 0-1.655.3l-.054.055a1.818 1.818 0 0 1-3.106-1.287 1.818 1.818 0 0 1 .533-1.286l.054-.055a1.5 1.5 0 0 0 .3-1.654 1.5 1.5 0 0 0-1.372-.91h-.155a1.818 1.818 0 1 1 0-3.636H3.9a1.5 1.5 0 0 0 1.373-.981 1.5 1.5 0 0 0-.3-1.655l-.055-.054A1.818 1.818 0 1 1 7.491 4.99l.054.054a1.5 1.5 0 0 0 1.655.3h.073a1.5 1.5 0 0 0 .909-1.372v-.155a1.818 1.818 0 0 1 3.636 0V3.9a1.499 1.499 0 0 0 .91 1.373 1.5 1.5 0 0 0 1.654-.3l.054-.055a1.817 1.817 0 0 1 2.573 0 1.819 1.819 0 0 1 0 2.573l-.055.054a1.5 1.5 0 0 0-.3 1.655v.073a1.5 1.5 0 0 0 1.373.909h.155a1.818 1.818 0 0 1 0 3.636H20.1a1.499 1.499 0 0 0-1.373.91Z"
+                                    />
+                                </svg>
+                                Settings</a
+                            >
+                        </li>
+                    </ul>
+                </nav>
+                <div class="pui-card sidebar-card">
+                    <div class="pui-card__body">
+                        <p class="metric-label">Used space</p>
+                        <p>Your team has used 80% of its available space.</p>
+                        <div
+                            class="pui-progress pui-progress--sm"
+                            role="progressbar"
+                            aria-label="Storage used"
+                            aria-valuenow="80"
+                            aria-valuemin="0"
+                            aria-valuemax="100"
+                        >
+                            <div class="pui-progress__bar" style="width: 80%"></div>
+                        </div>
+                        <a class="pui-btn pui-btn--link" href="#billing">Upgrade plan</a>
+                    </div>
+                </div>
+            </aside>
+
+            <div class="main">
+                <header class="topbar">
+                    <div class="pui-field">
+                        <label class="pui-label pui-sr-only" for="search">Search</label>
+                        <div class="pui-field__control">
+                            <svg
+                                class="pui-field__icon-leading"
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                            >
+                                <path d="m21 21-3.5-3.5m2.5-6a8.5 8.5 0 1 1-17 0 8.5 8.5 0 0 1 17 0Z" />
+                            </svg>
+                            <input class="pui-input" id="search" type="search" placeholder="Search" />
+                        </div>
+                    </div>
+                    <div class="topbar-actions">
+                        <button
+                            class="pui-btn pui-btn--tertiary pui-btn--icon-only"
+                            type="button"
+                            data-pui="theme-toggle"
+                            aria-label="Dark mode"
+                            data-pui-tooltip="Toggle dark mode"
+                            data-pui-tooltip-placement="bottom"
+                        >
+                            <svg
+                                class="pui-btn__icon"
+                                data-icon="leading"
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    d="M22 15.844a10.424 10.424 0 0 1-4.306.925c-5.779 0-10.463-4.684-10.463-10.462 0-1.536.33-2.994.925-4.307A10.464 10.464 0 0 0 2 11.538C2 17.316 6.684 22 12.462 22c4.243 0 7.896-2.526 9.538-6.156Z"
+                                />
+                            </svg>
+                        </button>
+                        <button
+                            class="pui-btn pui-btn--tertiary pui-btn--icon-only"
+                            type="button"
+                            aria-label="Notifications"
+                            data-pui-tooltip="Notifications"
+                            data-pui-tooltip-placement="bottom"
+                        >
+                            <svg
+                                class="pui-btn__icon"
+                                data-icon="leading"
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    d="M9.354 21c.705.622 1.632 1 2.646 1s1.94-.378 2.646-1M18 8A6 6 0 1 0 6 8c0 3.09-.78 5.206-1.65 6.605-.735 1.18-1.102 1.771-1.089 1.936.015.182.054.252.2.36.133.099.732.099 1.928.099H18.61c1.196 0 1.795 0 1.927-.098.147-.11.186-.179.2-.361.014-.165-.353-.755-1.088-1.936C18.78 13.206 18 11.09 18 8Z"
+                                />
+                            </svg>
+                        </button>
+                        <div class="pui-dropdown" data-pui="dropdown">
+                            <button class="pui-btn pui-btn--tertiary pui-dropdown__trigger" type="button" aria-label="Account menu for Olivia Rhye">
+                                <span class="pui-avatar pui-avatar--sm">
+                                    <span class="pui-avatar__initials" aria-hidden="true">OR</span>
+                                    <span class="pui-avatar__status"></span>
+                                </span>
+                            </button>
+                            <div class="pui-menu" hidden>
+                                <div class="pui-menu__section">
+                                    <p class="pui-menu__heading">olivia@acme.test</p>
+                                    <a class="pui-menu__item" href="#profile"
+                                        ><svg
+                                            width="20"
+                                            height="20"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            aria-hidden="true"
+                                        >
+                                            <path
+                                                d="M20 21c0-1.396 0-2.093-.172-2.661a4 4 0 0 0-2.667-2.667c-.568-.172-1.265-.172-2.661-.172h-5c-1.396 0-2.093 0-2.661.172a4 4 0 0 0-2.667 2.667C4 18.907 4 19.604 4 21M16.5 7.5a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z"
+                                            />
+                                        </svg>
+                                        View profile</a
+                                    >
+                                    <a class="pui-menu__item" href="#settings"
+                                        ><svg
+                                            width="20"
+                                            height="20"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            aria-hidden="true"
+                                        >
+                                            <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+                                            <path
+                                                d="M18.727 14.727a1.5 1.5 0 0 0 .3 1.655l.055.054a1.816 1.816 0 0 1 0 2.573 1.818 1.818 0 0 1-2.573 0l-.055-.055a1.5 1.5 0 0 0-1.654-.3 1.5 1.5 0 0 0-.91 1.373v.155a1.818 1.818 0 1 1-3.636 0V20.1a1.5 1.5 0 0 0-.981-1.373 1.5 1.5 0 0 0-1.655.3l-.054.055a1.818 1.818 0 0 1-3.106-1.287 1.818 1.818 0 0 1 .533-1.286l.054-.055a1.5 1.5 0 0 0 .3-1.654 1.5 1.5 0 0 0-1.372-.91h-.155a1.818 1.818 0 1 1 0-3.636H3.9a1.5 1.5 0 0 0 1.373-.981 1.5 1.5 0 0 0-.3-1.655l-.055-.054A1.818 1.818 0 1 1 7.491 4.99l.054.054a1.5 1.5 0 0 0 1.655.3h.073a1.5 1.5 0 0 0 .909-1.372v-.155a1.818 1.818 0 0 1 3.636 0V3.9a1.499 1.499 0 0 0 .91 1.373 1.5 1.5 0 0 0 1.654-.3l.054-.055a1.817 1.817 0 0 1 2.573 0 1.819 1.819 0 0 1 0 2.573l-.055.054a1.5 1.5 0 0 0-.3 1.655v.073a1.5 1.5 0 0 0 1.373.909h.155a1.818 1.818 0 0 1 0 3.636H20.1a1.499 1.499 0 0 0-1.373.91Z"
+                                            />
+                                        </svg>
+                                        Settings <span class="pui-menu__shortcut">⌘S</span></a
+                                    >
+                                </div>
+                                <div class="pui-menu__separator"></div>
+                                <a class="pui-menu__item" href="#logout"
+                                    ><svg
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            d="m16 17 5-5m0 0-5-5m5 5H9m0-9H7.8c-1.68 0-2.52 0-3.162.327a3 3 0 0 0-1.311 1.311C3 5.28 3 6.12 3 7.8v8.4c0 1.68 0 2.52.327 3.162a3 3 0 0 0 1.311 1.311C5.28 21 6.12 21 7.8 21H9"
+                                        />
+                                    </svg>
+                                    Log out</a
+                                >
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <main class="content" id="main">
+                    <div class="page-header">
+                        <div>
+                            <nav class="pui-breadcrumbs" aria-label="Breadcrumb">
+                                <ol>
+                                    <li class="pui-breadcrumbs__item">
+                                        <a href="#dashboard"
+                                            ><svg
+                                                width="20"
+                                                height="20"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-width="2"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                aria-hidden="true"
+                                            >
+                                                <path
+                                                    d="M8 17h8M11.018 2.764 4.235 8.039c-.453.353-.68.53-.843.75a2 2 0 0 0-.318.65C3 9.704 3 9.991 3 10.565V17.8c0 1.12 0 1.68.218 2.108a2 2 0 0 0 .874.874C4.52 21 5.08 21 6.2 21h11.6c1.12 0 1.68 0 2.108-.218a2 2 0 0 0 .874-.874C21 19.48 21 18.92 21 17.8v-7.235c0-.574 0-.861-.074-1.126a2.002 2.002 0 0 0-.318-.65c-.163-.22-.39-.397-.843-.75l-6.783-5.275c-.351-.273-.527-.41-.72-.462a1 1 0 0 0-.523 0c-.194.052-.37.189-.721.462Z"
+                                                /></svg
+                                            ><span class="pui-sr-only">Home</span></a
+                                        >
+                                    </li>
+                                    <li class="pui-breadcrumbs__item">
+                                        <svg
+                                            class="pui-breadcrumbs__separator"
+                                            width="20"
+                                            height="20"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            aria-hidden="true"
+                                        >
+                                            <path d="m9 18 6-6-6-6" /></svg
+                                        ><a href="#dashboard" aria-current="page">Dashboard</a>
+                                    </li>
+                                </ol>
+                            </nav>
+                            <h1>Welcome back, Olivia</h1>
+                            <p>Track, manage and forecast your customers and orders.</p>
+                        </div>
+                        <div class="actions">
+                            <button
+                                class="pui-btn pui-btn--secondary pui-btn--md"
+                                type="button"
+                                data-pui-toast="Export started"
+                                data-pui-toast-description="We will email you the CSV when it is ready."
+                                data-pui-toast-variant="success"
+                            >
+                                <svg
+                                    class="pui-btn__icon"
+                                    data-icon="leading"
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        d="M21 15v1.2c0 1.68 0 2.52-.327 3.162a3 3 0 0 1-1.311 1.311C18.72 21 17.88 21 16.2 21H7.8c-1.68 0-2.52 0-3.162-.327a3 3 0 0 1-1.311-1.311C3 18.72 3 17.88 3 16.2V15m14-5-5 5m0 0-5-5m5 5V3"
+                                    />
+                                </svg>
+                                Export
+                            </button>
+                            <button class="pui-btn pui-btn--primary pui-btn--md" type="button" data-pui-modal-open="invite-modal">
+                                <svg
+                                    class="pui-btn__icon"
+                                    data-icon="leading"
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    aria-hidden="true"
+                                >
+                                    <path d="M12 5v14m-7-7h14" />
+                                </svg>
+                                Invite
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="pui-alert pui-alert--warning" role="status">
+                        <svg
+                            class="pui-alert__icon"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M12 9v4m0 4h.01M10.615 3.892 2.39 18.098c-.456.788-.684 1.182-.65 1.506a1 1 0 0 0 .406.705c.263.191.718.191 1.629.191h16.45c.91 0 1.365 0 1.628-.191a1 1 0 0 0 .407-.705c.034-.324-.195-.718-.65-1.506L13.383 3.892c-.454-.785-.681-1.178-.978-1.31a1 1 0 0 0-.813 0c-.296.132-.523.525-.978 1.31Z"
+                            />
+                        </svg>
+                        <div class="pui-alert__body">
+                            <p class="pui-alert__title">Your trial ends in 3 days</p>
+                            <p>Add a payment method to keep your dashboards and history.</p>
+                            <div class="pui-alert__actions">
+                                <a class="pui-btn pui-btn--link" href="#billing">Add payment method</a>
+                            </div>
+                        </div>
+                        <button class="pui-alert__close" type="button" aria-label="Dismiss" data-pui-dismiss>
+                            <svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                aria-hidden="true"
+                            >
+                                <path d="M18 6 6 18M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <section class="metrics" aria-label="Key metrics">
+                        <article class="pui-card">
+                            <div class="pui-card__body">
+                                <p class="metric-label">Total customers</p>
+                                <p class="metric-value">2,420 <span class="pui-badge pui-badge--success pui-badge--sm">+40%</span></p>
+                            </div>
+                        </article>
+                        <article class="pui-card">
+                            <div class="pui-card__body">
+                                <p class="metric-label">Members</p>
+                                <p class="metric-value">1,210 <span class="pui-badge pui-badge--error pui-badge--sm">−10%</span></p>
+                            </div>
+                        </article>
+                        <article class="pui-card">
+                            <div class="pui-card__body">
+                                <p class="metric-label">Active now</p>
+                                <p class="metric-value">316 <span class="pui-badge pui-badge--success pui-badge--sm">+20%</span></p>
+                            </div>
+                        </article>
+                    </section>
+
+                    <div class="pui-tabs" data-pui="tabs">
+                        <div class="pui-tabs__list" role="tablist" aria-label="Dashboard views">
+                            <button class="pui-tab" type="button" role="tab" aria-selected="true">Team</button>
+                            <button class="pui-tab" type="button" role="tab">Projects</button>
+                            <button class="pui-tab" type="button" role="tab">Activity</button>
+                        </div>
+                        <div class="pui-tabs__panel" role="tabpanel">
+                            <div class="pui-table__card">
+                                <div class="pui-table__header">
+                                    <div class="pui-table__heading">
+                                        <h2 class="pui-table__title" id="team-title">
+                                            Team members <span class="pui-badge pui-badge--modern pui-badge--sm">4 users</span>
+                                        </h2>
+                                        <p class="pui-table__description">Manage your team members and their account permissions.</p>
+                                    </div>
+                                </div>
+                                <table class="pui-table" aria-labelledby="team-title">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Name</th>
+                                            <th scope="col">Role</th>
+                                            <th scope="col">Status</th>
+                                            <th scope="col"><span class="pui-sr-only">Actions</span></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <th scope="row">
+                                                <span class="pui-avatar pui-avatar--sm"><span class="pui-avatar__initials" aria-hidden="true">OR</span></span
+                                                >Olivia Rhye
+                                            </th>
+                                            <td>Admin</td>
+                                            <td><span class="pui-badge pui-badge--success pui-badge--sm pui-badge--dot">Active</span></td>
+                                            <td>
+                                                <button class="pui-btn pui-btn--tertiary pui-btn--icon-only" type="button" aria-label="Edit Olivia Rhye">
+                                                    <svg
+                                                        class="pui-btn__icon"
+                                                        data-icon="leading"
+                                                        width="20"
+                                                        height="20"
+                                                        viewBox="0 0 24 24"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        stroke-width="2"
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        aria-hidden="true"
+                                                    >
+                                                        <path
+                                                            d="M2.876 18.116c.046-.414.069-.62.131-.814a2 2 0 0 1 .234-.485c.111-.17.259-.317.553-.61L17 3a2.828 2.828 0 1 1 4 4L7.794 20.206c-.294.294-.442.442-.611.553a2 2 0 0 1-.485.233c-.193.063-.4.086-.814.132L2.5 21.5l.376-3.384Z"
+                                                        />
+                                                    </svg>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">
+                                                <span class="pui-avatar pui-avatar--sm"><span class="pui-avatar__initials" aria-hidden="true">PB</span></span
+                                                >Phoenix Baker
+                                            </th>
+                                            <td>Editor</td>
+                                            <td><span class="pui-badge pui-badge--success pui-badge--sm pui-badge--dot">Active</span></td>
+                                            <td>
+                                                <button class="pui-btn pui-btn--tertiary pui-btn--icon-only" type="button" aria-label="Edit Phoenix Baker">
+                                                    <svg
+                                                        class="pui-btn__icon"
+                                                        data-icon="leading"
+                                                        width="20"
+                                                        height="20"
+                                                        viewBox="0 0 24 24"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        stroke-width="2"
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        aria-hidden="true"
+                                                    >
+                                                        <path
+                                                            d="M2.876 18.116c.046-.414.069-.62.131-.814a2 2 0 0 1 .234-.485c.111-.17.259-.317.553-.61L17 3a2.828 2.828 0 1 1 4 4L7.794 20.206c-.294.294-.442.442-.611.553a2 2 0 0 1-.485.233c-.193.063-.4.086-.814.132L2.5 21.5l.376-3.384Z"
+                                                        />
+                                                    </svg>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">
+                                                <span class="pui-avatar pui-avatar--sm"><span class="pui-avatar__initials" aria-hidden="true">LS</span></span
+                                                >Lana Steiner
+                                            </th>
+                                            <td>Viewer</td>
+                                            <td><span class="pui-badge pui-badge--gray pui-badge--sm pui-badge--dot">Invited</span></td>
+                                            <td>
+                                                <button class="pui-btn pui-btn--tertiary pui-btn--icon-only" type="button" aria-label="Edit Lana Steiner">
+                                                    <svg
+                                                        class="pui-btn__icon"
+                                                        data-icon="leading"
+                                                        width="20"
+                                                        height="20"
+                                                        viewBox="0 0 24 24"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        stroke-width="2"
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        aria-hidden="true"
+                                                    >
+                                                        <path
+                                                            d="M2.876 18.116c.046-.414.069-.62.131-.814a2 2 0 0 1 .234-.485c.111-.17.259-.317.553-.61L17 3a2.828 2.828 0 1 1 4 4L7.794 20.206c-.294.294-.442.442-.611.553a2 2 0 0 1-.485.233c-.193.063-.4.086-.814.132L2.5 21.5l.376-3.384Z"
+                                                        />
+                                                    </svg>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="pui-table__footer">
+                                    <nav class="pui-pagination" aria-label="Team pagination">
+                                        <a class="pui-btn pui-btn--secondary pui-pagination__prev" aria-disabled="true">Previous</a>
+                                        <p class="pui-pagination__summary">Page 1 of 2</p>
+                                        <ol class="pui-pagination__pages">
+                                            <li><a class="pui-pagination__item" href="#team-1" aria-current="page" aria-label="Page 1">1</a></li>
+                                            <li><a class="pui-pagination__item" href="#team-2" aria-label="Page 2">2</a></li>
+                                        </ol>
+                                        <a class="pui-btn pui-btn--secondary pui-pagination__next" href="#team-2">Next</a>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pui-tabs__panel" role="tabpanel" hidden>
+                            <div class="pui-card">
+                                <section class="pui-empty" aria-labelledby="projects-empty-title">
+                                    <div class="pui-empty__icon">
+                                        <svg
+                                            width="20"
+                                            height="20"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            aria-hidden="true"
+                                        >
+                                            <path
+                                                d="m13 7-1.116-2.231c-.32-.642-.481-.963-.72-1.198a2 2 0 0 0-.748-.462C10.1 3 9.74 3 9.022 3H5.2c-1.12 0-1.68 0-2.108.218a2 2 0 0 0-.874.874C2 4.52 2 5.08 2 6.2V7m0 0h15.2c1.68 0 2.52 0 3.162.327a3 3 0 0 1 1.311 1.311C22 9.28 22 10.12 22 11.8v4.4c0 1.68 0 2.52-.327 3.162a3 3 0 0 1-1.311 1.311C19.72 21 18.88 21 17.2 21H6.8c-1.68 0-2.52 0-3.162-.327a3 3 0 0 1-1.311-1.311C2 18.72 2 17.88 2 16.2V7Z"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <h3 class="pui-empty__title" id="projects-empty-title">No projects yet</h3>
+                                    <p class="pui-empty__description">Create a project to start collecting events.</p>
+                                    <div class="pui-empty__actions">
+                                        <button class="pui-btn pui-btn--primary pui-btn--md" type="button">
+                                            <svg
+                                                class="pui-btn__icon"
+                                                data-icon="leading"
+                                                width="20"
+                                                height="20"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-width="2"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                aria-hidden="true"
+                                            >
+                                                <path d="M12 5v14m-7-7h14" />
+                                            </svg>
+                                            New project
+                                        </button>
+                                    </div>
+                                </section>
+                            </div>
+                        </div>
+                        <div class="pui-tabs__panel" role="tabpanel" hidden>
+                            <div class="pui-card" aria-busy="true">
+                                <div class="pui-card__body">
+                                    <div class="pui-skeleton pui-skeleton--text" aria-hidden="true"></div>
+                                    <div class="pui-skeleton pui-skeleton--text" aria-hidden="true"></div>
+                                    <div class="pui-skeleton pui-skeleton--text" aria-hidden="true"></div>
+                                    <p class="pui-sr-only">Loading activity</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+
+        <dialog class="pui-modal pui-modal--sm" id="invite-modal">
+            <div class="pui-modal__header">
+                <div class="pui-modal__icon">
+                    <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                    >
+                        <path
+                            d="M22 21v-2a4.002 4.002 0 0 0-3-3.874M15.5 3.291a4.001 4.001 0 0 1 0 7.418M17 21c0-1.864 0-2.796-.305-3.53a4 4 0 0 0-2.164-2.165C13.796 15 12.864 15 11 15H8c-1.864 0-2.796 0-3.53.305a4 4 0 0 0-2.166 2.164C2 18.204 2 19.136 2 21M13.5 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z"
+                        />
+                    </svg>
+                </div>
+                <h2 class="pui-modal__title">Invite teammates</h2>
+                <p class="pui-modal__description">They will get an email with a link to join Acme.</p>
+                <button class="pui-modal__close" type="button" aria-label="Close" data-pui-modal-close>
+                    <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                    >
+                        <path d="M18 6 6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <form class="pui-modal__body" id="invite-form" method="dialog">
+                <div class="pui-field">
+                    <label class="pui-label" for="invite-email">Email address</label>
+                    <input class="pui-input" id="invite-email" name="email" type="email" placeholder="name@acme.test" required />
+                </div>
+                <label class="pui-toggle">
+                    <input type="checkbox" role="switch" name="admin" />
+                    <span class="pui-toggle__track" aria-hidden="true"><span class="pui-toggle__thumb"></span></span>
+                    <span class="pui-toggle__text"><span class="pui-toggle__label">Make them an admin</span></span>
+                </label>
+            </form>
+            <div class="pui-modal__footer">
+                <button class="pui-btn pui-btn--secondary pui-btn--lg" type="button" data-pui-modal-close>Cancel</button>
+                <button class="pui-btn pui-btn--primary pui-btn--lg" type="submit" form="invite-form" value="invite">Send invite</button>
+            </div>
+        </dialog>
+    </body>
+</html>

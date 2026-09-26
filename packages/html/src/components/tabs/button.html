@@ -1,0 +1,12 @@
+<!-- description: Tabs (data-pui="tabs"): underline and button styles, arrow-key navigation, roving tabindex and ARIA set by the JS. -->
+<!-- The button style. The roles are written out so the markup is valid before the script runs; the JS adds aria-controls, aria-labelledby and the tabindex. data-pui-hash keeps the selected panel's id in the URL, so a link can open a tab. -->
+<div class="pui-tabs pui-tabs--button" data-pui="tabs" data-pui-hash>
+    <div class="pui-tabs__list" role="tablist" aria-label="Report period">
+        <button class="pui-tab" type="button" role="tab" aria-selected="true">Daily</button>
+        <button class="pui-tab" type="button" role="tab">Weekly</button>
+        <button class="pui-tab" type="button" role="tab">Monthly</button>
+    </div>
+    <div class="pui-tabs__panel" role="tabpanel" id="period-daily"><p>1,240 visits today.</p></div>
+    <div class="pui-tabs__panel" role="tabpanel" id="period-weekly" hidden><p>8,310 visits this week.</p></div>
+    <div class="pui-tabs__panel" role="tabpanel" id="period-monthly" hidden><p>35,902 visits this month.</p></div>
+</div>

@@ -1,0 +1,100 @@
+/*
+ * Toast. Mirrors `IconNotification` (the outline featured icon, title, description, close) in
+ * packages/ui/src/components/application/notifications/notifications.tsx. Created by
+ * `ProperUI.toast({...})`; the `.pui-toaster` container is created on first use with
+ * `aria-live="polite"`.
+ */
+@layer components {
+    .pui-toaster {
+        @apply xs:start-auto xs:end-6 xs:bottom-6 xs:w-100 pointer-events-none fixed inset-x-4 bottom-4 z-50 m-0 flex flex-col-reverse items-stretch gap-3 p-0;
+    }
+
+    .pui-toast {
+        @apply bg-primary_alt ring-secondary_alt pointer-events-auto relative flex w-full items-start gap-4 rounded-xl p-4 shadow-lg ring-1;
+        animation: pui-toast-in 200ms ease-out;
+        --pui-toast-icon: var(--color-fg-brand-primary);
+
+        &[data-state="closing"] {
+            animation: pui-toast-out 150ms ease-in forwards;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            animation: none;
+
+            &[data-state="closing"] {
+                animation: none;
+            }
+        }
+    }
+
+    .pui-toast--success {
+        --pui-toast-icon: var(--color-fg-success-primary);
+    }
+
+    .pui-toast--error {
+        --pui-toast-icon: var(--color-fg-error-primary);
+    }
+
+    .pui-toast--warning {
+        --pui-toast-icon: var(--color-fg-warning-primary);
+    }
+
+    .pui-toast--info {
+        --pui-toast-icon: var(--color-fg-brand-primary);
+    }
+
+    /* The outline featured icon: the glyph with two concentric fading rings. */
+    .pui-toast__icon {
+        @apply relative m-2 flex size-5 shrink-0 items-center justify-center;
+        color: var(--pui-toast-icon);
+
+        &::before,
+        &::after {
+            @apply absolute rounded-full border-2 border-solid;
+            content: "";
+            border-color: color-mix(in srgb, var(--pui-toast-icon) 30%, transparent);
+        }
+
+        &::before {
+            @apply size-7;
+        }
+
+        &::after {
+            @apply size-9.5;
+            border-color: color-mix(in srgb, var(--pui-toast-icon) 10%, transparent);
+        }
+
+        & > svg {
+            @apply size-5;
+        }
+    }
+
+    .pui-toast__content {
+        @apply flex min-w-0 flex-1 flex-col gap-1 pe-8 pt-0.5;
+    }
+
+    .pui-toast__title {
+        @apply text-fg-primary m-0 text-sm font-semibold;
+    }
+
+    .pui-toast__description {
+        @apply text-fg-secondary m-0 text-sm;
+    }
+
+    .pui-toast__close {
+        @apply absolute end-2 top-2;
+    }
+
+    @keyframes pui-toast-in {
+        from {
+            opacity: 0;
+            translate: 0 calc(var(--spacing) * 2);
+        }
+    }
+
+    @keyframes pui-toast-out {
+        to {
+            opacity: 0;
+        }
+    }
+}
