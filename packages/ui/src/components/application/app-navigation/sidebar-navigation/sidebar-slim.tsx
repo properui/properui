@@ -2,7 +2,6 @@
 
 import type { FC, ReactNode } from "react";
 import { useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
 import { Button as AriaButton, DialogTrigger as AriaDialogTrigger, Popover as AriaPopover } from "react-aria-components";
 import { DotsVertical, LifeBuoy01, Settings01 } from "@properui/icons";
 import { cx } from "../../../../utils/cx";
@@ -139,42 +138,38 @@ export const SidebarNavigationSlim = ({
     );
 
     const secondarySidebar = currentItem && (
-        <AnimatePresence initial={false}>
-            {isSecondarySidebarVisible && (
-                <motion.div
-                    initial={{ width: 0, borderColor: "var(--color-border-secondary)" }}
-                    animate={{ width: SECONDARY_SIDEBAR_WIDTH, borderColor: "var(--color-border-secondary)" }}
-                    exit={{ width: 0, borderColor: "rgba(0,0,0,0)", transition: { borderColor: { type: "tween", delay: 0.05 } } }}
-                    transition={{ type: "spring", damping: 26, stiffness: 220, bounce: 0 }}
-                    className={cx(
-                        "bg-primary relative h-full overflow-x-hidden overflow-y-auto",
-                        !(hideBorder || hideRightBorder) && "box-content border-e-[1.5px]",
-                    )}
-                >
-                    <div style={{ width: SECONDARY_SIDEBAR_WIDTH }} className="flex h-full flex-col px-4 pt-6">
-                        <h3 className="text-brand-secondary text-sm font-semibold">{currentItem.label}</h3>
-                        <ul className="py-2">
-                            {currentItem.items?.map((item) => (
-                                <li key={item.label} className="py-px">
-                                    <NavItemBase current={activeUrl === item.href} href={item.href} icon={item.icon} badge={item.badge} type="link">
-                                        {item.label}
-                                    </NavItemBase>
-                                </li>
-                            ))}
-                        </ul>
-                        <div className="bg-primary sticky bottom-0 mt-auto flex justify-between pb-5">
-                            <div>
-                                <p className="text-primary text-sm font-semibold">{account.name}</p>
-                                <p className="text-tertiary text-sm">{account.email}</p>
-                            </div>
-                            <div className="absolute end-0 -top-1">
-                                <ButtonUtility size="xs" color="tertiary" tooltip="Log out" icon={DotsVertical} />
-                            </div>
-                        </div>
-                    </div>
-                </motion.div>
+        <div
+            inert={!isSecondarySidebarVisible}
+            aria-hidden={!isSecondarySidebarVisible}
+            style={{ width: isSecondarySidebarVisible ? SECONDARY_SIDEBAR_WIDTH : 0 }}
+            className={cx(
+                "bg-primary relative h-full overflow-x-hidden overflow-y-auto border-transparent transition-[width,border-color] duration-300 ease-out",
+                !(hideBorder || hideRightBorder) && "box-content border-e-[1.5px]",
+                isSecondarySidebarVisible && !(hideBorder || hideRightBorder) && "border-secondary",
             )}
-        </AnimatePresence>
+        >
+            <div style={{ width: SECONDARY_SIDEBAR_WIDTH }} className="flex h-full flex-col px-4 pt-6">
+                <h3 className="text-brand-secondary text-sm font-semibold">{currentItem.label}</h3>
+                <ul className="py-2">
+                    {currentItem.items?.map((item) => (
+                        <li key={item.label} className="py-px">
+                            <NavItemBase current={activeUrl === item.href} href={item.href} icon={item.icon} badge={item.badge} type="link">
+                                {item.label}
+                            </NavItemBase>
+                        </li>
+                    ))}
+                </ul>
+                <div className="bg-primary sticky bottom-0 mt-auto flex justify-between pb-5">
+                    <div>
+                        <p className="text-primary text-sm font-semibold">{account.name}</p>
+                        <p className="text-tertiary text-sm">{account.email}</p>
+                    </div>
+                    <div className="absolute end-0 -top-1">
+                        <ButtonUtility size="xs" color="tertiary" tooltip="Log out" icon={DotsVertical} />
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 
     return (
