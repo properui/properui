@@ -1,0 +1,145 @@
+---
+title: Data table
+section: application
+description: A React data table with sorting, search, faceted and range filters, column visibility, pinning and resizing, row selection with bulk actions, pagination, server-side mode and virtualization. Built on React Aria and styled with Tailwind CSS.
+metaTitle: React data table component | Proper UI
+metaDescription: Free and open-source React data table with sorting, filtering, column visibility, row selection, pagination, server-side mode and virtualization, built on React Aria and styled with Tailwind CSS.
+install: data-table
+source: packages/ui/src/components/application/data-table
+demoFile: data-table
+---
+
+<Preview id="filters-and-column-visibility" title="Filters and column visibility" height={960} demo="data-table:FiltersAndColumnVisibility" />
+
+## Installation
+
+<Install slug="data-table" />
+
+## Usage
+
+`DataTable` takes your records and a list of column definitions, and does the rest: sorting,
+search, filters, column visibility, selection, pagination, density, and the loading and empty states.
+
+```tsx
+import { DataTable } from "@properui/ui/components/application/data-table/data-table";
+import type { DataTableColumn } from "@properui/ui/components/application/data-table/use-data-table";
+
+const columns: DataTableColumn<Person>[] = [
+    { id: "name", header: "Name", isRowHeader: true, enableSorting: true },
+    { id: "status", header: "Status", enableSorting: true, filter: { type: "select" } },
+    { id: "salary", header: "Salary", enableSorting: true, filter: { type: "number-range" } },
+    { id: "startDate", header: "Start date", filter: { type: "date-range" } },
+];
+
+<DataTable title="People" data={people} columns={columns} selectionMode="multiple" pageSizeOptions={[10, 25, 50]} />;
+```
+
+A column reads `row[id]` unless you give it an `accessor`, and renders that value as text unless you
+give it a `cell`. Give exactly one column `isRowHeader`: it names each row for assistive technology.
+
+`Table` stays the styling primitive. `DataTable` renders the same `TableCard`, `Table.Header`,
+`Table.Row` and `TablePaginationNumbered` the [table components](/components/tables) use, so every
+visual detail is shared and `Table`'s own API is unchanged. Reach for `Table` directly when you want
+a static or hand-wired table; reach for `DataTable` when you want the behaviour.
+
+## Sorting
+
+Set `enableSorting` on a column and click its header to sort; click again to reverse. With
+`enableMultiSort`, earlier sorts are kept as tie-breakers: the column you click last becomes the
+primary sort and a small number in each sorted header shows its priority. Pass a `sortingFn` for a
+custom comparator.
+
+<Preview id="basic-sortable" title="Basic sortable" height={720} demo="data-table:BasicSortable" />
+
+## Filters and column visibility
+
+The toolbar holds the search field, one faceted button per `select` filter (its options and counts
+come from the data unless you pass `options`), and a Filters panel for `text`, `number-range` and
+`date-range` filters; the date range uses `DateRangePicker`. The Columns menu shows and hides
+columns, and `showColumnMenu` adds a sort, pin and hide menu to every header.
+
+## Selection and bulk actions
+
+`selectionMode="multiple"` adds a checkbox column. Once a row is selected, a bar shows the count,
+your `bulkActions`, and a "Clear selection" button. `onSelectionChange` reports both the React Aria
+selection and the selected records.
+
+<Preview id="selection-and-bulk-actions" title="Selection and bulk actions" height={960} demo="data-table:SelectionAndBulkActions" />
+
+## Virtualization
+
+`virtualized` renders the table through React Aria's `Virtualizer` and `TableLayout`, so only the
+rows in view exist in the DOM. Rows have a fixed height per density, the header stays in view, and
+pagination is off by default. Column pinning is not applied in this mode.
+
+<Preview id="virtualized-5000-rows" title="Virtualized 5,000 rows" height={700} demo="data-table:Virtualized5000Rows" />
+
+## Server-side mode
+
+Set `manual` and the table stops sorting, filtering and paging locally. It renders `data` as the
+current page, uses `rowCount` for the page count, and calls `onQueryChange` on mount and after every
+change with everything a request needs:
+
+```tsx
+const onQueryChange = ({ sorting, globalFilter, columnFilters, pagination }: DataTableQuery) => {
+    setIsLoading(true);
+    fetchPeople({ sorting, globalFilter, columnFilters, pagination }).then(({ rows, total }) => {
+        setResult({ rows, total });
+        setIsLoading(false);
+    });
+};
+
+<DataTable manual data={result.rows} rowCount={result.total} isLoading={isLoading} onQueryChange={onQueryChange} columns={columns} />;
+```
+
+`isLoading` swaps the rows for skeleton rows. Searching or filtering resets the query to page 1.
+Debounce or cancel stale requests yourself: the demo below drops any response that is not for the
+latest query.
+
+<Preview id="server-side-mode" title="Server-side mode" height={900} demo="data-table:ServerSideMode" />
+
+## Pinned columns and sticky header
+
+`pinned: "start"` or `pinned: "end"` keeps a column in view while the table scrolls sideways. Give
+pinned columns a `width`, which positions the columns pinned after them. `stickyHeader` keeps the
+header row visible while the body scrolls inside `maxHeight`.
+
+<Preview id="pinned-columns-sticky-header" title="Pinned columns and sticky header" height={620} demo="data-table:PinnedColumnsStickyHeader" />
+
+## Resizable columns
+
+`resizable` wraps the table in React Aria's `ResizableTableContainer` and adds a `ColumnResizer` to
+every header. Drag the handle, or focus it and use the arrow keys. `width`, `minWidth` and
+`maxWidth` on a column set its starting width and its limits.
+
+<Preview id="resizable-columns" title="Resizable columns" height={560} demo="data-table:ResizableColumns" />
+
+## Building your own layout
+
+`useDataTable` is the hook behind `DataTable`. It returns the processed `rows`, the
+`visibleColumns`, `sortDescriptor`/`onSortChange` for `Table`, and setters for every piece of state.
+Pass its return value to `DataTableToolbar`, `DataTableViewOptions`, `DataTableFacetedFilter` or
+`DataTableColumnMenu` to reuse the built-in controls in a layout of your own.
+
+## FAQs
+
+<FAQs
+    items={[
+        {
+            question: "Should I use Table or DataTable?",
+            answer: "Use Table for static or hand-wired tables and when you want full control of the markup. Use DataTable when you want sorting, filtering, column visibility, selection, pagination or virtualization handled for you. DataTable renders Table underneath, so both look the same.",
+        },
+        {
+            question: "How do I sort, filter and paginate on the server?",
+            answer: "Set manual, pass the current page as data and the total as rowCount, and fetch in onQueryChange. It is called on mount and whenever sorting, the search text, a column filter, the page or the page size changes.",
+        },
+        {
+            question: "How many rows can it handle?",
+            answer: "Client-side filtering and sorting are fine for thousands of rows. Add virtualized so only the rows in view are rendered. For much larger data sets, use manual mode and let the server do the work.",
+        },
+        {
+            question: "How do I query the grid in tests?",
+            answer: "DataTable renders React Aria's Table, which uses the ARIA grid pattern. Query it with getByRole('grid'), not getByRole('table'), and headers with getByRole('columnheader').",
+        },
+    ]}
+/>
