@@ -8,6 +8,7 @@ import { createRequire } from "node:module";
 import { runAdd } from "./commands/add.js";
 import { runAgentInit } from "./commands/agent.js";
 import { runCheck } from "./commands/check.js";
+import { runCreate } from "./commands/create.js";
 import { runDiff } from "./commands/diff.js";
 import { runIcons } from "./commands/icons.js";
 import { runInfo } from "./commands/info.js";
@@ -65,6 +66,18 @@ program
     .option("--registry <source>", REGISTRY_HELP)
     .option("-y, --yes", "accept every default; never prompt")
     .action(guard(async (options) => runInit({ ...options, cwd: program.opts().cwd })));
+
+program
+    .command("create")
+    .description("Scaffold a new Next.js or Vite project, pre-wired for Proper UI")
+    .argument("<dir>", "directory to create the project in (created if it does not exist)")
+    .option("--template <name>", "next or vite (default: next)")
+    .option("--pm <manager>", "pnpm, npm, yarn or bun (default: npm)")
+    .option("--install", "run the package manager install after scaffolding")
+    .option("--overwrite", "scaffold into a directory that already has files in it")
+    .option("--registry <source>", REGISTRY_HELP)
+    .option("-y, --yes", "accept every default; never prompt")
+    .action(guard(async (dir: string, options) => runCreate(dir, { ...options, cwd: program.opts().cwd })));
 
 program
     .command("add")
@@ -151,6 +164,7 @@ program
             .description("Install the Proper UI Skill for an AI coding tool: claude, codex, cursor, lovable, or all")
             .option("--client <client>", "claude, codex, cursor, lovable, or all", "all")
             .option("--overwrite", "replace the Skill file even if it already exists")
+            .option("--no-mcp", "skip registering the Proper UI MCP server (.mcp.json, .cursor/mcp.json, the Codex TOML block)")
             .option("-y, --yes", "accept every default; never prompt")
             .action(guard(async (options) => runAgentInit({ ...options, cwd: program.opts().cwd }))),
     );

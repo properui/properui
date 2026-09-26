@@ -663,6 +663,30 @@ function main(): void {
     const cursorRule = readFileSync(path.join(app, ".cursor", "rules", "properui.mdc"), "utf8");
     check("cursor rule has alwaysApply: true", cursorRule.includes("alwaysApply: true"));
 
+    // MCP server registration: project-level JSON configs for claude and cursor, a printed TOML
+    // block for codex (its config lives in ~/.codex, outside the project).
+    type McpConfig = { mcpServers?: Record<string, { command?: string; args?: string[] }> };
+    const readMcp = (file: string) => JSON.parse(readFileSync(file, "utf8")) as McpConfig;
+    const claudeMcp = existsSync(path.join(app, ".mcp.json")) ? readMcp(path.join(app, ".mcp.json")) : {};
+    check("agent init registers the MCP server in .mcp.json", claudeMcp.mcpServers?.properui?.args?.includes("@properui/mcp") === true);
+    const cursorMcp = existsSync(path.join(app, ".cursor", "mcp.json")) ? readMcp(path.join(app, ".cursor", "mcp.json")) : {};
+    check("agent init registers the MCP server in .cursor/mcp.json", cursorMcp.mcpServers?.properui?.command === "npx");
+    check("agent init prints the Codex MCP TOML block", agentAll.includes("[mcp_servers.properui]"));
+
+    writeFileSync(path.join(app, ".mcp.json"), JSON.stringify({ mcpServers: { other: { command: "other-server" } } }, null, 2));
+    run(app, ["agent", "init", "--client", "claude", "--yes"]);
+    const mergedMcp = readMcp(path.join(app, ".mcp.json"));
+    check("agent init merges into an existing .mcp.json", Boolean(mergedMcp.mcpServers?.other) && Boolean(mergedMcp.mcpServers?.properui));
+
+    const noMcpApp = path.join(SCRATCH, "no-mcp-app");
+    rmSync(noMcpApp, { recursive: true, force: true });
+    mkdirSync(noMcpApp, { recursive: true });
+    run(noMcpApp, ["agent", "init", "--client", "claude", "--no-mcp", "--yes"]);
+    check(
+        "agent init --no-mcp writes the Skill but no .mcp.json",
+        existsSync(path.join(noMcpApp, ".claude", "skills", "properui", "SKILL.md")) && !existsSync(path.join(noMcpApp, ".mcp.json")),
+    );
+
     // Idempotency: re-running with a pre-existing CLAUDE.md/AGENTS.md must update the marked
     // block in place, not duplicate it, and must never touch content outside the markers.
     writeFileSync(path.join(app, "CLAUDE.md"), `# My project\n\nSome existing notes.\n\n${claudeMd}`);
@@ -686,6 +710,55 @@ function main(): void {
         skillWritten === authored,
         `authored ${authored.length} chars, written ${skillWritten.length}`,
     );
+
+    // -------------------------------------------------------------- create
+    section("create — scaffold a new project from an embedded template");
+
+    const created = path.join(SCRATCH, "created-app");
+    rmSync(created, { recursive: true, force: true });
+    run(SCRATCH, ["create", "created-app", "--template", "vite", "--registry", REGISTRY]);
+
+    check("create writes package.json", existsSync(path.join(created, "package.json")));
+    check("create writes tsconfig.json with the @/* alias", readFileSync(path.join(created, "tsconfig.json"), "utf8").includes('"@/*"'));
+    check("create writes vite.config.ts", existsSync(path.join(created, "vite.config.ts")));
+    check("create writes a stylesheet importing tailwind", readFileSync(path.join(created, "src", "index.css"), "utf8").includes('@import "tailwindcss";'));
+    const createdHome = readFileSync(path.join(created, "src", "App.tsx"), "utf8");
+    check("create writes a home page rendering Button and Badge", createdHome.includes("<Button") && createdHome.includes("<Badge"));
+
+    const createdConfig = existsSync(path.join(created, "components.json"))
+        ? (JSON.parse(readFileSync(path.join(created, "components.json"), "utf8")) as { aliases?: { components?: string } })
+        : null;
+    check("create ran `init`: components.json written", Boolean(createdConfig?.aliases?.components));
+    check("create ran `add buttons badges`: buttons installed", existsSync(path.join(created, "src", "components", "base", "buttons", "button.tsx")));
+    check("create ran `add buttons badges`: badges installed", existsSync(path.join(created, "src", "components", "base", "badges", "badges.tsx")));
+    check(
+        "create wrote real theme tokens (registry was reachable, even as a local directory)",
+        readFileSync(path.join(created, "src", "styles", "theme.css"), "utf8").includes("--color-brand-600"),
+    );
+
+    // No --install was passed and the smoke harness runs non-interactively (stdin isn't a TTY),
+    // so nothing here should ever shell out to a package manager against the network: `add`'s own
+    // "no --yes, no TTY" contract (2.6) fails loudly instead, which is exactly what should happen.
+    check("create never ran an actual install: no node_modules written", !existsSync(path.join(created, "node_modules")));
+    check("create's `add` step reports the pending install instead of silently skipping it", lastStatus !== 0);
+
+    // Refuses a non-empty directory without --overwrite.
+    const occupied = path.join(SCRATCH, "occupied");
+    rmSync(occupied, { recursive: true, force: true });
+    mkdirSync(occupied, { recursive: true });
+    writeFileSync(path.join(occupied, "keep.txt"), "pre-existing file\n");
+
+    run(SCRATCH, ["create", "occupied", "--registry", REGISTRY]);
+    check("create refuses a non-empty directory without --overwrite", lastStatus !== 0 && !existsSync(path.join(occupied, "package.json")));
+    check("create left the pre-existing file alone after refusing", existsSync(path.join(occupied, "keep.txt")));
+
+    run(SCRATCH, ["create", "occupied", "--template", "next", "--overwrite", "--registry", REGISTRY]);
+    check("create --overwrite scaffolds a Next.js project into a non-empty directory", existsSync(path.join(occupied, "next.config.ts")));
+    check("create --overwrite writes the Next.js App Router home page", existsSync(path.join(occupied, "app", "page.tsx")));
+    check("create --overwrite keeps the pre-existing, unrelated file", existsSync(path.join(occupied, "keep.txt")));
+
+    const unknownTemplate = run(SCRATCH, ["create", "bad-template-app", "--template", "sveltekit", "--registry", REGISTRY]);
+    check("create rejects an unknown --template", lastStatus !== 0 && unknownTemplate.toLowerCase().includes("template"));
 
     console.log(`\n${failures === 0 ? "PASS" : "FAIL"} — ${checks - failures}/${checks} checks passed.`);
     if (failures > 0) process.exitCode = 1;
