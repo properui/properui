@@ -31,19 +31,21 @@ The registry currently holds **818 entries**: **89 published component groups** 
 
 ## Built for AI code generators
 
-Nothing here is specific to one assistant. The three surfaces below are plain HTTP and a shell command, so Claude Code,
-Codex, Cursor, v0, Bolt and Lovable can all drive them.
+Nothing here is specific to one assistant. The surfaces below are plain HTTP, a shell command and a standard MCP server,
+so Claude Code, Codex, Cursor, v0, Bolt and Lovable can all drive them.
 
-| Surface             | URL                                                                    | What an assistant does with it                                                                                                                                          |
-| ------------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Markdown docs index | [`/llms.txt`](https://properui.dev/llms.txt)                           | Finds the plain-markdown twin of every page, so it reads the same reference you do without parsing rendered HTML.                                                       |
-| Component registry  | [`/r/index.json`](https://properui.dev/r/index.json), `/r/<name>.json` | Fetches a component's real source, props, npm dependencies and registry dependencies: 797 entries.                                                                      |
-| Config schema       | [`/schema.json`](https://properui.dev/schema.json)                     | Validates and autocompletes the `components.json` that `init` writes.                                                                                                   |
-| CLI: `add`          | `npx @properui/cli@latest add <component>`                             | Writes the `.tsx` into the project, resolves the dependency chain, rewrites `@/` imports to the configured alias, and reports (or, with `--install`, runs) the install. |
-| CLI: `remove`       | `npx @properui/cli@latest remove <component>`                          | Deletes an installed entry from the project and warns if something else installed still depends on it.                                                                  |
-| CLI: `why`          | `npx @properui/cli@latest why <component>`                             | Prints what pulled a given entry in, for auditing an install you didn't expect.                                                                                         |
-| CLI: `check`        | `npx @properui/cli@latest check`                                       | The token guard: flags raw palette classes and arbitrary values in place of semantic tokens.                                                                            |
-| CLI: `icons`        | `npx @properui/cli@latest icons`                                       | Lists and installs icon components the same way `add` handles the rest of the registry.                                                                                 |
+| Surface                    | URL                                                                                               | What an assistant does with it                                                                                                                                                                                           |
+| -------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Markdown docs index        | [`/llms.txt`](https://properui.dev/llms.txt)                                                      | Finds the plain-markdown twin of every page, so it reads the same reference you do without parsing rendered HTML.                                                                                                        |
+| Component registry         | [`/r/index.json`](https://properui.dev/r/index.json), `/r/<name>.json`                            | Fetches a component's real source, props, npm dependencies and registry dependencies: 818 entries.                                                                                                                       |
+| shadcn-compatible registry | [`/r/shadcn/registry.json`](https://properui.dev/r/shadcn/registry.json), `/r/shadcn/<name>.json` | The same registry in shadcn's own format under the `@properui` namespace, so `npx shadcn@latest add @properui/<component>` and shadcn's MCP server work against it too (see [`docs/ecosystem.md`](./docs/ecosystem.md)). |
+| Config schema              | [`/schema.json`](https://properui.dev/schema.json)                                                | Validates and autocompletes the `components.json` that `init` writes.                                                                                                                                                    |
+| CLI: `add`                 | `npx @properui/cli@latest add <component>`                                                        | Writes the `.tsx` into the project, resolves the dependency chain, rewrites `@/` imports to the configured alias, and reports (or, with `--install`, runs) the install.                                                  |
+| CLI: `remove`              | `npx @properui/cli@latest remove <component>`                                                     | Deletes an installed entry from the project and warns if something else installed still depends on it.                                                                                                                   |
+| CLI: `why`                 | `npx @properui/cli@latest why <component>`                                                        | Prints what pulled a given entry in, for auditing an install you didn't expect.                                                                                                                                          |
+| CLI: `check`               | `npx @properui/cli@latest check`                                                                  | The token guard: flags raw palette classes and arbitrary values in place of semantic tokens.                                                                                                                             |
+| CLI: `icons`               | `npx @properui/cli@latest icons`                                                                  | Lists and installs icon components the same way `add` handles the rest of the registry.                                                                                                                                  |
+| MCP server                 | `npx -y @properui/mcp`                                                                            | The same registry and `add` as MCP tools (`search_components`, `get_component`, `add_component`, ...), for assistants that speak MCP.                                                                                    |
 
 Why generated code comes out better against this library specifically:
 
@@ -64,14 +66,15 @@ Why generated code comes out better against this library specifically:
 - **You review a diff.** The CLI writes plain `.tsx` you own. There is no opaque wrapper between the generated code and
   what renders.
 
-[`AGENTS.md`](./AGENTS.md) holds the conventions an assistant working in this repository should follow. There is no MCP
-server yet; it is on the [roadmap](./ROADMAP.md), and the CLI covers the same ground today.
+[`AGENTS.md`](./AGENTS.md) holds the conventions an assistant working in this repository should follow. The MCP server
+([`packages/mcp`](./packages/mcp)) registers with `claude mcp add properui -- npx -y @properui/mcp`; see
+[docs/mcp.md](./docs/mcp.md) for Cursor, Codex, Windsurf and VS Code.
 
 ## Features
 
 - **Accessible by default.** Every interactive primitive (menus, dialogs, comboboxes, tables, sliders, date pickers)
   delegates to React Aria Components. Focus management, keyboard navigation and ARIA wiring are inherited, not
-  re-implemented. Each component ships an `axe` smoke test that runs in CI: zero _detected_ violations across 125 automated suites; see
+  re-implemented. Each component ships an `axe` smoke test that runs in CI: zero _detected_ violations across 150 automated suites; see
   [the accessibility page](https://properui.dev/docs/accessibility) for what that does and does not cover.
 - **Tailwind CSS v4 tokens, no config file.** All design decisions live in `@theme` blocks in
   [`packages/ui/src/styles/theme.css`](./packages/ui/src/styles/theme.css). There is no `tailwind.config.js`.
@@ -116,7 +119,20 @@ the components need. Tailwind v4 does not scan `node_modules` by default, so add
 
 **3. Transpile the package**
 
-Next.js compiles only your own source by default, and this package ships TSX:
+Next.js compiles only your own source by default, and this package ships TSX. `withProperUI` is the one-liner —
+it appends `@properui/ui` to `transpilePackages`, deduplicated, and leaves the rest of your config alone:
+
+```ts
+// next.config.ts
+import type { NextConfig } from "next";
+import { withProperUI } from "@properui/ui/next";
+
+const nextConfig: NextConfig = {};
+
+export default withProperUI(nextConfig);
+```
+
+Equivalent by hand:
 
 ```ts
 // next.config.ts
@@ -335,7 +351,7 @@ Contributions are welcome. [CONTRIBUTING.md](./CONTRIBUTING.md) covers the setup
 test and docs page every component ships with), how to run the checks, and the changeset-based release flow.
 [docs/contributing-components.md](./docs/contributing-components.md) walks through adding a component end to end.
 
-[ROADMAP.md](./ROADMAP.md) lists what is not built yet (an MCP server, full RTL coverage, visual regression baselines
+[ROADMAP.md](./ROADMAP.md) lists what is not built yet (full RTL coverage, visual regression baselines
 and a few others) so you can see where help is most useful.
 
 By participating you agree to abide by the [Code of Conduct](./CODE_OF_CONDUCT.md). Security issues should be reported

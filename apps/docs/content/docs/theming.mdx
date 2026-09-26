@@ -85,6 +85,25 @@ brand ramp, each with a comment explaining why they're there. Re-grepping the fi
 your product's neutrals or status colors are not Tailwind's stock ramps, shadow those four scales in this same file (in addition to the eleven brand
 lines) and the "one file" claim holds for real.
 
+### Presets
+
+Instead of writing the eleven brand lines by hand, start from a preset: a brand ramp, a base gray (`gray`, `slate`, `zinc`, `neutral` or `stone`),
+a radius scale (`none`, `sm`, `md`, `lg` or `xl`) and optional fonts. Eight ship with the library: `brand` (the default purple), `blue`, `indigo`,
+`teal`, `green`, `orange`, `rose` and `slate-mono`.
+
+```bash
+npx @properui/cli@latest theme list             # the shipped presets and their codes
+npx @properui/cli@latest theme apply teal       # write it into your global stylesheet
+npx @properui/cli@latest init --preset teal     # or apply one during setup
+```
+
+The [theme generator](/docs/theme-generator) builds a custom preset from any hex colour, previews real components with it in light and dark mode,
+and gives you the CSS, a short preset code and the matching `theme apply <code>` command.
+
+A preset redeclares only primitives, inside `/* properui:theme-preset */` markers that `theme apply` replaces in place: `--color-brand-*`,
+`--color-neutral-*` (every gray semantic token reads this ramp, so redeclaring it is how the base gray changes), `--radius-xs` to `--radius-4xl`,
+and `--font-body`/`--font-display` when set.
+
 ### Where the font stack lives
 
 `--font-body` and `--font-display` in `theme.css` are the sanctioned place to set this product's font stack — not a second CSS file, not an

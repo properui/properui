@@ -1,14 +1,16 @@
 import type { MDXComponents } from "mdx/types";
 import { FAQs } from "~/components/faqs";
 import { Install } from "~/components/install";
+import { Playground } from "~/components/playground";
 import { Preview } from "~/components/preview";
 import { DottedDivider } from "~/components/primitives";
+import { ThemeGenerator } from "~/components/theme-generator";
 import { VariantGrid } from "~/components/variant-grid";
 
 /**
- * The MDX contract from docs/spec/manifest/AGENT-BRIEF.md §5 — these four blocks are the
- * only components an authoring agent may use — plus the prose defaults, whose classes come
- * from the captured reference DOM.
+ * The MDX contract from docs/spec/manifest/AGENT-BRIEF.md §5 — these are the only components
+ * an authoring agent may use (see docs/contributing-components.md for the current list) —
+ * plus the prose defaults, whose classes come from the captured reference DOM.
  */
 
 const headingLink = "[&_a]:text-current [&_a]:no-underline";
@@ -55,6 +57,8 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         Install,
         FAQs,
         VariantGrid,
+        ThemeGenerator,
+        Playground,
 
         ...components,
     };

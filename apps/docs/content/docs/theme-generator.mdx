@@ -1,0 +1,67 @@
+---
+title: Theme generator
+section: docs
+description: Pick a preset or any brand colour, choose a base gray and a radius, and get the CSS, a shareable preset code and the CLI command.
+metaTitle: Theme generator | Proper UI
+metaDescription: Generate a Proper UI theme from a preset or any hex colour. Preview real components live, then copy the @theme CSS or apply it with `npx @properui/cli theme apply`.
+---
+
+A preset is four decisions: an eleven-step brand ramp, a base gray, a radius scale and, optionally, fonts. Pick a shipped preset or type any hex
+colour (the ramp is derived in OKLCH so every step keeps the same hue and step 600 stays readable under white text), then adjust the gray and the
+radius. The preview renders real Proper UI components with the result, in light or dark mode.
+
+<ThemeGenerator />
+
+## Applying the result
+
+Any of these three does the same thing:
+
+- **CLI**: `npx @properui/cli@latest theme apply <code>` writes the block into your global stylesheet between
+  `/* properui:theme-preset */` markers. Run it again with another preset or code and only that block is replaced.
+- **During setup**: `npx @properui/cli@latest init --preset <name|code>` applies the preset as part of `init`.
+- **By hand**: paste the generated CSS after the Proper UI stylesheet import (`@import "@properui/ui/styles/globals.css"`, or your copied
+  `theme.css`). Tailwind merges `@theme` blocks in source order, so the later block wins.
+
+`npx @properui/cli@latest theme list` prints the shipped presets with their codes.
+
+## What a preset changes
+
+A preset only redeclares primitives. Every semantic token (`bg-brand-solid`, `text-primary`, `border-secondary`, `ring-brand` and the rest) reads
+them, in light and dark mode alike, so nothing else needs to change:
+
+| Decision  | Tokens it redeclares                            |
+| --------- | ----------------------------------------------- |
+| Brand     | `--color-brand-50` to `--color-brand-950`       |
+| Base gray | `--color-neutral-50` to `--color-neutral-950`   |
+| Radius    | `--radius-xs` to `--radius-4xl`                 |
+| Fonts     | `--font-body`, `--font-display` (only when set) |
+
+The base gray works by redeclaring the neutral ramp with the values of Tailwind's `gray`, `slate`, `zinc` or `stone`, because that ramp is what every
+gray surface, border and text token resolves to. The radius options scale Tailwind's stock radius scale: `none` is square, `md` is the default, `xl`
+doubles it. `rounded-full` pills stay pills.
+
+The preset code is a short url-safe string that encodes all of it, so it can be pasted into the CLI, a pull request or an agent prompt. This page's
+address updates with the code, so the link reproduces the theme.
+
+## FAQs
+
+<FAQs
+    items={[
+        {
+            question: "Do presets work with the npm package and with copied source?",
+            answer: 'Yes. Both import the same theme.css, and the generated block only redeclares token names that file already declares. Append it after @import "@properui/ui/styles/globals.css" (npm) or after the import of your copied styles/theme.css (CLI).',
+        },
+        {
+            question: "Can I edit the generated block by hand?",
+            answer: "You can, but theme apply replaces everything between the properui:theme-preset markers the next time it runs. Put hand-written overrides after the closing marker instead.",
+        },
+        {
+            question: "Why does the derived ramp not contain my exact hex colour?",
+            answer: "The generator keeps your colour's hue and chroma and places it on a fixed lightness curve, so step 600 carries white text at 4.5:1 or better and the tints and shades stay evenly spaced. If you need an exact value, edit that step in the generated CSS after applying it.",
+        },
+        {
+            question: "Does a preset change dark mode?",
+            answer: "Yes, automatically. The dark-mode block in theme.css re-maps semantic tokens onto the same brand and neutral ramps, so both modes follow the preset. Use the Light / Dark switch above the preview to check both.",
+        },
+    ]}
+/>

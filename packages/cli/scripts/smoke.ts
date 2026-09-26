@@ -711,6 +711,62 @@ function main(): void {
         `authored ${authored.length} chars, written ${skillWritten.length}`,
     );
 
+    // -------------------------------------------------------------- theme presets
+    section("Theme presets — init --preset, theme list, theme apply");
+    const themed = path.join(SCRATCH, "theme-app");
+    scaffold(themed, "@/");
+    run(themed, ["init", "--vite", "--yes", "--registry", REGISTRY, "--preset", "teal"]);
+    const themedCssFile = path.join(themed, "src", "index.css");
+    const themedCss = readFileSync(themedCssFile, "utf8");
+    const presetBlocks = (css: string) => css.split("/* properui:theme-preset */").length - 1;
+    check("init --preset writes one marked preset block", presetBlocks(themedCss) === 1);
+    check("init --preset writes the teal brand ramp", themedCss.includes("--color-brand-600: rgb(13 148 136);"));
+    check(
+        "the preset block comes after the theme import",
+        themedCss.indexOf("/* properui:theme-preset */") > themedCss.indexOf('@import "./styles/theme.css";'),
+    );
+    check("init --preset keeps the pre-existing stylesheet content", themedCss.includes("margin: 0;"));
+
+    const badPreset = path.join(SCRATCH, "theme-app-bad");
+    scaffold(badPreset, "@/");
+    run(badPreset, ["init", "--vite", "--yes", "--registry", REGISTRY, "--preset", "not-a-preset"]);
+    check("init --preset with an unknown preset exits non-zero", lastStatus !== 0);
+    check("init --preset with an unknown preset writes nothing", !existsSync(path.join(badPreset, "components.json")));
+
+    const themeListJson = run(themed, ["theme", "list", "--json"]);
+    const themeList = JSON.parse(themeListJson.slice(themeListJson.indexOf("["))) as { name: string; code: string }[];
+    check("theme list --json lists at least 8 presets", themeList.length >= 8, String(themeList.length));
+    check(
+        "theme list --json includes codes",
+        themeList.every((entry) => /^[A-Za-z0-9_-]+$/.test(entry.code)),
+    );
+    const themeListHuman = run(themed, ["theme", "list"]);
+    check("theme list marks the applied preset", /teal.*\(applied\)/.test(themeListHuman));
+
+    run(themed, ["theme", "apply", "rose"]);
+    const roseCss = readFileSync(themedCssFile, "utf8");
+    check("theme apply replaces the block in place", presetBlocks(roseCss) === 1 && roseCss.includes("--color-brand-600: rgb(225 29 72);"));
+    check("theme apply removed the previous preset", !roseCss.includes("rgb(13 148 136)"));
+
+    const roseAgain = run(themed, ["theme", "apply", "rose"]);
+    check("theme apply is idempotent", readFileSync(themedCssFile, "utf8") === roseCss && roseAgain.includes("already applied"));
+
+    const roseCode = themeList.find((entry) => entry.name === "rose")?.code ?? "";
+    const indigoCode = themeList.find((entry) => entry.name === "indigo")?.code ?? "";
+    run(themed, ["theme", "apply", indigoCode]);
+    check("theme apply accepts a preset code", readFileSync(themedCssFile, "utf8").includes("--color-brand-600: rgb(79 70 229);"));
+    check("preset codes differ per preset", roseCode !== indigoCode && roseCode.length > 0);
+
+    run(themed, ["theme", "apply", "green", "--css", "src/other.css"]);
+    check("theme apply --css writes to the named file", readFileSync(path.join(themed, "src", "other.css"), "utf8").includes("/* properui:theme-preset */"));
+
+    const beforeDry = readFileSync(themedCssFile, "utf8");
+    const dry = run(themed, ["theme", "apply", "blue", "--dry-run"]);
+    check("theme apply --dry-run writes nothing", readFileSync(themedCssFile, "utf8") === beforeDry && dry.includes("would write"));
+
+    run(themed, ["theme", "apply", "definitely-not-a-code"]);
+    check("theme apply with garbage exits non-zero", lastStatus !== 0);
+
     // -------------------------------------------------------------- create
     section("create — scaffold a new project from an embedded template");
 

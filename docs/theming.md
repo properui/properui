@@ -74,6 +74,29 @@ import:
 }
 ```
 
+## Presets
+
+Rather than writing the eleven brand lines by hand, start from a preset: a brand ramp, a base gray (`gray`, `slate`,
+`zinc`, `neutral` or `stone`), a radius scale (`none`, `sm`, `md`, `lg` or `xl`) and optional fonts. Eight ship with
+the library: `brand` (the default purple), `blue`, `indigo`, `teal`, `green`, `orange`, `rose` and `slate-mono`.
+
+```bash
+npx @properui/cli@latest theme list             # the shipped presets and their codes
+npx @properui/cli@latest theme apply teal       # write it into your global stylesheet
+npx @properui/cli@latest init --preset teal     # or apply one during setup
+```
+
+The [theme generator](https://properui.dev/docs/theme-generator) builds a custom preset from any hex colour (the ramp
+is derived in OKLCH), previews real components with it in both modes, and gives you the CSS, a short preset code and
+the matching `theme apply <code>` command. `theme apply` accepts either a name or a code.
+
+A preset redeclares only primitives, inside `/* properui:theme-preset */` markers that `theme apply` replaces in place
+on every run: `--color-brand-*`, `--color-neutral-*` (every gray semantic token reads this ramp, so redeclaring it is
+how the base gray changes), `--radius-xs` to `--radius-4xl` (pinned in `theme.css`), and `--font-body`/`--font-display`
+when set. The definitions and the generator live in
+[`packages/ui/src/styles/presets.ts`](../packages/ui/src/styles/presets.ts) (`import { generateThemeCss } from
+"@properui/ui/styles/presets"`).
+
 ## Scoping a theme to part of the app
 
 Because every semantic token resolves through `var(--color-brand-*)`, you can re-theme a subtree by overriding the brand
@@ -106,7 +129,8 @@ instead of `.dark-mode`.
 - **Typography**: `--font-body`, `--font-display`, `--font-mono`, and the `--text-display-xs ... --text-display-2xl`
   steps with their line-height and letter-spacing pairs.
 - **Shadows**: `--shadow-xs` through the skeuomorphic composites used by buttons.
-- **Spacing and radii**: derived from Tailwind v4's `--spacing` base.
+- **Spacing and radii**: spacing derives from Tailwind v4's `--spacing` base; `--radius-xs` ... `--radius-4xl` are
+  pinned in `theme.css` (the scale presets change).
 
 Override any of them in an `@theme` block of your own; the last declaration wins.
 
