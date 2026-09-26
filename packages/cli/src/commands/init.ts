@@ -12,6 +12,7 @@
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { resolvePreset } from "../../../ui/src/styles/presets.js";
 import { CONFIG_SCHEMA_URL, type ComponentsConfig, configPath, readConfig, writeConfig } from "../config.js";
 import { installCommand, installDependencies, missingDependencies } from "../deps.js";
 import { FRAMEWORK_LABEL, type Framework, type ProjectInfo, defaultCssFile, detectProject } from "../detect.js";
@@ -32,6 +33,7 @@ import {
     TYPOGRAPHY_CSS_PLACEHOLDER,
 } from "../templates.js";
 import { kleur, log, spinner } from "../ui.js";
+import { applyPresetToFile } from "./theme.js";
 
 export interface InitOptions {
     nextjs?: boolean;
@@ -47,6 +49,8 @@ export interface InitOptions {
     install?: boolean;
     /** `--no-tooling-ignores`: skip appending ESLint/Prettier ignore entries for vendored directories. */
     toolingIgnores?: boolean;
+    /** `--preset <name|code>`: apply a theme preset block to the global stylesheet (see `properui theme`). */
+    preset?: string;
 }
 
 /** Tailwind v3 is not supported — the token layer is written entirely in v4 `@theme` syntax. */
@@ -507,6 +511,8 @@ export async function runInit(options: InitOptions): Promise<void> {
     const project = detectProject(cwd, frameworkOverride(options));
     const filesTouched: string[] = [];
     const relTo = (file: string) => path.relative(cwd, file) || path.basename(file);
+    // Resolve before writing anything, so a mistyped preset fails fast instead of half-initialising.
+    const preset = options.preset ? resolvePreset(options.preset) : null;
 
     log.title("Configuring this project for Proper UI");
     log.step(`Framework       ${FRAMEWORK_LABEL[project.framework]}`);
@@ -638,6 +644,8 @@ export async function runInit(options: InitOptions): Promise<void> {
 
     const stylesheet = wireStylesheet(cwd, config, typographyTarget, STYLESHEET_INCLUDES_ANIMATE_PLUGIN, false);
     if (stylesheet.added.length > 0) filesTouched.push(relTo(stylesheet.file));
+    const presetResult = preset ? applyPresetToFile(stylesheet.file, preset) : null;
+    if (presetResult?.status === "written") filesTouched.push(relTo(presetResult.file));
 
     const wireRouter = providersEnabled && project.framework === "next-app";
     const wiring = options.manual || !providersEnabled ? null : wireProviders(project, config, wireRouter, false);
@@ -674,6 +682,11 @@ export async function runInit(options: InitOptions): Promise<void> {
         for (const line of stylesheet.added) log.plain(kleur.dim(`        ${line.split("\n")[0]}${line.includes("\n") ? " …" : ""}`));
     } else {
         log.step(`${kleur.dim("keep ")} ${path.relative(cwd, stylesheet.file)} (already wired)`);
+    }
+
+    if (presetResult) {
+        const label = presetResult.status === "written" ? kleur.green("write") : kleur.dim("keep ");
+        log.step(`${label} ${path.relative(cwd, presetResult.file)} (theme preset "${presetResult.preset.name}", code ${presetResult.code})`);
     }
 
     if (!providersEnabled) {
