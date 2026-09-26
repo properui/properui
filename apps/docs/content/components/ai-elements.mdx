@@ -1,0 +1,178 @@
+---
+title: AI elements
+section: application
+description: Accessible React components for AI chat interfaces, built with React Aria and styled with Tailwind CSS. Conversation, streaming messages, markdown responses, reasoning, tool calls, sources, suggestions, a prompt input and a model selector, with no dependency on any AI SDK.
+metaTitle: React AI chat components | Proper UI
+metaDescription: Accessible React components for AI chat interfaces, built with React Aria and styled with Tailwind CSS. Streaming messages, markdown responses, reasoning, tool calls, sources, prompt input and model selector, for any streaming source.
+install: ai-elements
+source: packages/ui/src/components/application/ai-elements
+demoFile: ai-elements
+---
+
+<Preview id="ai-chat-example" title="AI chat example" height={760} demo="ai-elements:AIChatExample" />
+
+## Installation
+
+<Install slug="ai-elements" />
+
+## Wiring it to a stream
+
+The components take plain props and callbacks, so they work with any source that yields text: `fetch` with a
+`ReadableStream`, server-sent events, a WebSocket, or a chat hook from an SDK. Keep the messages and a `status` in
+state, append each chunk to the last assistant message, and hand `status` to `AIPromptInput`:
+
+```tsx
+const [messages, setMessages] = useState<{ id: string; from: "user" | "assistant"; text: string }[]>([]);
+const [status, setStatus] = useState<AIPromptInputStatus>("ready");
+const controller = useRef<AbortController>(null);
+
+const send = async ({ text }: AIPromptSubmission) => {
+    const id = crypto.randomUUID();
+    setMessages((m) => [...m, { id: `${id}-q`, from: "user", text }, { id, from: "assistant", text: "" }]);
+    setStatus("streaming");
+    controller.current = new AbortController();
+
+    try {
+        // Any async iterable of strings works here.
+        for await (const chunk of streamCompletion(text, controller.current.signal)) {
+            setMessages((m) => m.map((msg) => (msg.id === id ? { ...msg, text: msg.text + chunk } : msg)));
+        }
+        setStatus("ready");
+    } catch {
+        setStatus(controller.current.signal.aborted ? "ready" : "error");
+    }
+};
+
+return (
+    <>
+        <AIConversation isStreaming={status === "streaming"} className="h-160">
+            <AIConversation.Content>
+                {messages.map((msg, index) => (
+                    <AIMessage key={msg.id} from={msg.from} isStreaming={status === "streaming" && index === messages.length - 1}>
+                        {msg.from === "assistant" ? <AIResponse>{msg.text}</AIResponse> : msg.text}
+                    </AIMessage>
+                ))}
+            </AIConversation.Content>
+            <AIConversation.ScrollButton />
+        </AIConversation>
+        <AIPromptInput status={status} onSubmit={send} onStop={() => controller.current?.abort()} />
+    </>
+);
+```
+
+### Using a chat hook
+
+Nothing here depends on the Vercel AI SDK, but its `useChat` hook maps onto these props one to one, so you can pass its
+values straight through:
+
+- `status` (`"ready" | "submitted" | "streaming" | "error"`) goes to `AIPromptInput`'s `status`, and
+  `status === "streaming"` to `AIConversation`'s and the last `AIMessage`'s `isStreaming`.
+- `message.role` goes to `AIMessage`'s `from`.
+- Each text part of a message goes to `AIResponse`; each reasoning part to `AIReasoning`; each tool part's name,
+  state, input and output to `AIToolCall`; each source part to `AISources.Source`.
+- `sendMessage({ text })` is your `onSubmit`, and `stop` is your `onStop`.
+- `regenerate` is the handler for a Regenerate `AIMessage.Action`.
+
+Any other hook with the same shape (a message list, a status, send and stop functions) wires up the same way.
+
+## Streaming
+
+`AIMessage` with `isStreaming` shows shimmering placeholder lines until the first token arrives, then a blinking caret
+after the last line of text. `AIReasoning` opens while its own `isStreaming` is true and collapses to
+`Thought for N seconds` when it turns false. The animations are CSS only and stop under `prefers-reduced-motion`.
+
+<Preview id="streaming-example" title="Streaming example" height={520} demo="ai-elements:StreamingExample" />
+
+## Conversation
+
+`AIConversation` sticks to the bottom while content grows, lets go as soon as the reader scrolls up, and shows
+`AIConversation.ScrollButton` until they return. The log is a keyboard-focusable `role="log"` region with
+`aria-live="polite"`; while `isStreaming` is set it is marked `aria-busy`, so screen readers announce the finished
+message once instead of every chunk.
+
+<Preview id="conversation-example" title="Conversation example" height={520} demo="ai-elements:ConversationExample" />
+
+## Message
+
+User messages sit in a bubble at the end of the row; assistant messages span it. Every message is attributed to its
+author for screen readers even when no name is shown. Put copy, regenerate and feedback buttons in `actions` with
+`AIMessage.Actions` and `AIMessage.Action`; pass `isSelected` to make an action a toggle.
+
+<Preview id="message-example" title="Message example" height={440} demo="ai-elements:MessageExample" />
+
+## Response
+
+`AIResponse` is a small, dependency-free renderer for the markdown chat models produce. It is safe to call on every
+streamed chunk: an unclosed code fence becomes a code block that runs to the end, and an unclosed `**` or backtick
+stays literal until it is closed.
+
+It supports headings (`#` to `######`, rendered from `h3` down by default, see `headingLevel`), paragraphs, one level of
+`-`, `*`, `+` and numbered lists, `>` blockquotes, `---` rules, `**bold**`, `*italic*`, inline `code`, `[links](url)`,
+and fenced code blocks, which are highlighted by the same tokeniser as `CodeSnippet`.
+
+It does not support tables, images, nested lists, setext headings, indented code blocks, reference-style links,
+footnotes, strikethrough, task lists, math or backslash escapes. Raw HTML is never interpreted, and links with a scheme
+other than `http`, `https`, `mailto` or `tel` render as text. Links open in a new tab with `rel="noopener noreferrer"`.
+If you need full CommonMark or GFM, render the text with your own markdown library inside `AIMessage` instead.
+
+<Preview id="response-example" title="Response example" height={760} demo="ai-elements:ResponseExample" />
+
+## Reasoning
+
+<Preview id="reasoning-example" title="Reasoning example" height={320} demo="ai-elements:ReasoningExample" />
+
+## Tool call
+
+<Preview id="tool-call-example" title="Tool call example" height={560} demo="ai-elements:ToolCallExample" />
+
+## Sources
+
+<Preview id="sources-example" title="Sources example" height={320} demo="ai-elements:SourcesExample" />
+
+## Suggestions
+
+<Preview id="suggestions-example" title="Suggestions example" height={240} demo="ai-elements:SuggestionsExample" />
+
+## Prompt input
+
+Enter sends and Shift+Enter adds a line (an IME composition is never interrupted). The field grows with its content up
+to a maximum height, then scrolls. Empty prompts are never sent. While `status` is `submitted` or `streaming`, the send
+button becomes Stop and Enter does nothing.
+
+Picked images get an object URL for their preview. Removing an attachment revokes it; after a submit the URLs are
+handed to you with the attachments, so revoke them with `URL.revokeObjectURL` once you no longer display them.
+
+<Preview id="prompt-input-example" title="Prompt input example" height={320} demo="ai-elements:PromptInputExample" />
+
+<Preview id="prompt-input-streaming-example" title="Prompt input streaming and disabled" height={320} demo="ai-elements:PromptInputStreamingExample" />
+
+## Model selector
+
+<Preview id="model-selector-example" title="Model selector example" height={420} demo="ai-elements:ModelSelectorExample" />
+
+## Branch
+
+<Preview id="branch-example" title="Branch example" height={240} demo="ai-elements:BranchExample" />
+
+## FAQs
+
+<FAQs
+    items={[
+        {
+            q: "Do I need an AI SDK to use these components?",
+            a: "No. Every component takes plain props and callbacks: text, a status string, and onSubmit, onStop and onChange handlers. Anything that produces text, from a fetch stream to a WebSocket to an SDK chat hook, can drive them.",
+        },
+        {
+            q: "Why is the message prop called from instead of role?",
+            a: "A role prop on a JSX element reads as an ARIA role, and eslint-plugin-jsx-a11y rejects values like user and assistant. from takes the same values, so you can pass a chat hook's message.role straight through.",
+        },
+        {
+            q: "How do screen readers hear streamed text?",
+            a: "The conversation is a polite live log. While isStreaming is set it is marked aria-busy, so assistive technology waits and reads the completed message once rather than every chunk. The caret and shimmer are decorative and hidden from assistive technology.",
+        },
+        {
+            q: "Can I use my own markdown renderer?",
+            a: "Yes. AIMessage accepts any children. Keep AIResponse for the lightweight built-in renderer, or render the text with a full markdown library when you need tables, images or nested lists.",
+        },
+    ]}
+/>
