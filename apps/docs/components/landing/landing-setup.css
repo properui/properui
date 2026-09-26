@@ -8,7 +8,7 @@
 
 .pui-landing .setup-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 18px;
     margin-top: 40px;
 }
@@ -324,6 +324,12 @@
 .pui-landing .setup-prompt-copy:focus-visible {
     outline: 2px solid var(--violet-600);
     outline-offset: 2px;
+}
+
+@media (max-width: 1180px) {
+    .pui-landing .setup-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
 @media (max-width: 900px) {

@@ -3,10 +3,10 @@
 import { useState } from "react";
 import { CopyButton } from "~/components/landing/copy-button";
 import { SetupDialog } from "~/components/landing/setup-dialog";
-import { TOOL_ORDER, TOOL_SETUPS, type ToolKey, UNIVERSAL_SETUP_COMMAND } from "~/components/landing/tool-setup";
+import { TOOL_ORDER, TOOL_SETUPS, type ToolKey, UNIVERSAL_SETUP_COMMAND, createsLabel } from "~/components/landing/tool-setup";
 
 /**
- * Landing section "setup": the four agent setup cards plus the universal setup command. Every
+ * Landing section "setup": the five agent setup cards plus the universal setup command. Every
  * command, path, note and prompt shown here (or in the dialog it opens) comes from
  * `tool-setup.ts`, which is verified against `packages/cli/src/commands/agent.ts`.
  */
@@ -28,8 +28,8 @@ export function AgentSetup() {
                     <span className="eyebrow">For AI coding agents</span>
                     <h2 id="setup-title">Set up your agent in minutes.</h2>
                     <p>
-                        Each command configures the current project: it writes a durable skill or rule so your agent knows to search Proper UI before it writes
-                        UI code.
+                        Each command configures the current project: it writes a durable skill or rule and registers the MCP server, so your agent searches
+                        Proper UI before it writes UI code. Any other MCP client connects with one line.
                     </p>
                 </div>
 
@@ -56,7 +56,7 @@ export function AgentSetup() {
                                 {tool.note ? <p className="setup-note">{tool.note}</p> : null}
 
                                 <p className="setup-creates">
-                                    {tool.mode === "url" ? "Destination: " : "Creates: "}
+                                    {createsLabel(tool)}:{" "}
                                     {tool.creates.map((entry, index) => (
                                         <span key={entry.path}>
                                             {index > 0 ? " and " : ""}

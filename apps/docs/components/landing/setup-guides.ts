@@ -62,4 +62,21 @@ export const DIALOG_STEPS: Record<ToolKey, DialogStep[]> = {
                 "Describe the interface and mention Proper UI. Lovable installs the package and uses the registry instead of a generic composition.",
         },
     ],
+    mcp: [
+        {
+            title: "Open your client's MCP settings",
+            description: () =>
+                "Open the list of MCP servers in your assistant: for example .vscode/mcp.json in VS Code, the MCP settings in Windsurf, or settings.json in Gemini CLI.",
+        },
+        {
+            title: "Add Proper UI as a stdio server",
+            description: () =>
+                "Add a server named properui that runs the command below. The client starts it on demand, and nothing is written to your project until you ask for a component.",
+        },
+        {
+            title: "Prompt normally",
+            description: () =>
+                "Describe the screen. Your assistant calls search_components and add_component to install real Proper UI source instead of inventing markup.",
+        },
+    ],
 };
