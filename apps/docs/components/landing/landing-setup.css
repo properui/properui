@@ -6,16 +6,29 @@
  * custom properties.
  */
 
+/*
+ * Five cards as three on top and two below: a six-track grid where the first three span two
+ * tracks and the last two span three. minmax(0, 1fr) keeps every track the same width, so a long
+ * command or URL wraps inside its card instead of stretching its column.
+ */
 .pui-landing .setup-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(6, minmax(0, 1fr));
     gap: 18px;
     margin-top: 40px;
 }
 
 .pui-landing .setup-card {
-    display: grid;
-    align-content: start;
+    grid-column: span 2;
+}
+
+.pui-landing .setup-card:nth-child(n + 4) {
+    grid-column: span 3;
+}
+
+.pui-landing .setup-card {
+    display: flex;
+    flex-direction: column;
     gap: 14px;
     padding: 22px;
     border: 1px solid var(--line-2);
@@ -89,8 +102,9 @@
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-    margin-top: 4px;
-    padding: 10px 4px 0;
+    /* Pinned to the bottom so the links line up across cards of different heights. */
+    margin-top: auto;
+    padding: 14px 4px 0;
     border: 0;
     border-top: 1px dashed var(--line-2);
     color: var(--violet-700);
@@ -326,21 +340,25 @@
     outline-offset: 2px;
 }
 
-@media (max-width: 1180px) {
-    .pui-landing .setup-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
 @media (max-width: 900px) {
     .pui-landing .setup-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .pui-landing .setup-card,
+    .pui-landing .setup-card:nth-child(n + 4) {
+        grid-column: span 1;
+    }
+
+    /* Five cards on two columns: the last one takes the full row. */
+    .pui-landing .setup-card:last-child {
+        grid-column: 1 / -1;
     }
 }
 
 @media (max-width: 640px) {
     .pui-landing .setup-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
     }
 
     .pui-landing .setup-universal {
@@ -348,7 +366,9 @@
         align-items: stretch;
     }
 
+    /* In a column the 340px basis would apply to height; size to content instead. */
     .pui-landing .setup-universal .command {
+        flex: 0 0 auto;
         max-width: none;
     }
 

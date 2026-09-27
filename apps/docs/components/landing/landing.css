@@ -363,6 +363,18 @@
     outline: 2px solid var(--violet-600);
     outline-offset: 2px;
 }
+/* On phones the Copy button moves under the command, so the command gets the full width and
+   wraps at spaces instead of mid-word. */
+@media (max-width: 640px) {
+    .pui-landing .command {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 10px;
+        padding: 12px 14px;
+    }
+    .pui-landing .command button {
+        justify-self: start;
+    }
+}
 
 /* Hero */
 .pui-landing .hero {
