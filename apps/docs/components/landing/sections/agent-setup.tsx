@@ -48,7 +48,13 @@ export function AgentSetup() {
                                 <div className="setup-command-row">
                                     <span>{tool.valueLabel}</span>
                                     <div className="command">
-                                        <code>{tool.copyValue}</code>
+                                        {tool.mode === "url" ? (
+                                            <a className="command-link" href={tool.copyValue} target="_blank" rel="noreferrer">
+                                                {tool.copyValue.replace(/^https:\/\//, "")}
+                                            </a>
+                                        ) : (
+                                            <code>{tool.copyValue}</code>
+                                        )}
                                         <CopyButton value={tool.copyValue}>{tool.copyLabel}</CopyButton>
                                     </div>
                                 </div>
