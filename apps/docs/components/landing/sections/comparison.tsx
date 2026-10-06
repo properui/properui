@@ -73,6 +73,15 @@ export function Comparison() {
                             src="/preview/variant/app-examples/settings-pages/settings-13"
                             title="Billing settings example rendered with Proper UI"
                             openHref="/components/settings-pages/settings-13"
+                            lightboxItem={{
+                                name: "settings-13",
+                                title: "Billing settings",
+                                kind: "screen",
+                                group: "Settings pages",
+                                thumb: null,
+                                docs: "/components/settings-pages/settings-13",
+                                preview: "/preview/variant/app-examples/settings-pages/settings-13",
+                            }}
                             height={560}
                         />
 

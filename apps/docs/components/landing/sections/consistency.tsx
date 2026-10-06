@@ -11,6 +11,9 @@ type ConsistencyScreen = {
     src: string;
     openHref: string;
     frameTitle: string;
+    /** Registry entry name and docs group, for the in-page viewer. */
+    name: string;
+    group: string;
 };
 
 // Pricing stands in for "Checkout": there is no checkout example in the registry (verified — no
@@ -24,6 +27,8 @@ const SCREENS: ConsistencyScreen[] = [
         src: "/preview/variant/app-examples/dashboards/dashboard-04",
         openHref: "/components/dashboards/dashboard-04",
         frameTitle: "Dashboard example",
+        name: "dashboard-04",
+        group: "Dashboards",
     },
     {
         id: "pricing",
@@ -31,6 +36,8 @@ const SCREENS: ConsistencyScreen[] = [
         src: "/preview/variant/marketing-examples/pricing-pages/pricing-page-03",
         openHref: "/marketing/pricing-pages/pricing-page-03",
         frameTitle: "Pricing example",
+        name: "pricing-page-03",
+        group: "Pricing pages",
     },
     {
         id: "settings",
@@ -38,6 +45,8 @@ const SCREENS: ConsistencyScreen[] = [
         src: "/preview/variant/app-examples/settings-pages/settings-13",
         openHref: "/components/settings-pages/settings-13",
         frameTitle: "Billing settings example",
+        name: "settings-13",
+        group: "Settings pages",
     },
 ];
 
@@ -50,15 +59,15 @@ const SHARED_DECISIONS = [
     "Focus, loading, error and disabled states",
 ];
 
-const withPreset = (src: string, preset: Preset) => (preset === "teal" ? `${src}?preset=teal` : src);
+const withPreset = (src: string, preset: Preset) => (preset === "teal" ? `${src}#preset=teal` : src);
 
 /**
  * Landing section "consistency" (brief Priority 5). Three real, already-rendered screens stacked
  * on mobile, side by side from tablet up (CSS grid in `landing-proof.css`, no separate tabbed
- * viewer needed at this width). The preset toggle appends `?preset=teal` to all three
- * `ExampleFrame` sources at once, which the additive change in
- * `apps/docs/app/preview/[...path]/page.tsx` uses to override the brand ramp and radius tokens
- * for that render only — verified live in the dev server, not a static before/after.
+ * viewer needed at this width). The preset toggle appends `#preset=teal` (a hash, so
+ * the prerendered preview route stays static) to all three `ExampleFrame` sources at once; the
+ * preview page reads the hash client-side to override the brand ramp and radius tokens for that
+ * render only. A hash-only change navigates inside the iframe without a reload.
  */
 export function Consistency() {
     const [preset, setPreset] = useState<Preset>("violet");
@@ -100,6 +109,15 @@ export function Consistency() {
                                 src={withPreset(screen.src, preset)}
                                 title={`${screen.frameTitle} (${preset === "teal" ? "teal, tighter radius" : "violet, default"} preset)`}
                                 openHref={screen.openHref}
+                                lightboxItem={{
+                                    name: screen.name,
+                                    title: `${screen.label} example`,
+                                    kind: "screen",
+                                    group: screen.group,
+                                    thumb: null,
+                                    docs: screen.openHref,
+                                    preview: withPreset(screen.src, preset),
+                                }}
                                 height={460}
                                 className="consist-frame"
                             />

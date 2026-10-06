@@ -1,3 +1,4 @@
+import { FlowSteps } from "~/components/landing/flow-steps";
 import type { Flow } from "~/lib/library-index";
 import { getFlows, getLibraryCounts } from "~/lib/library-index";
 
@@ -16,7 +17,7 @@ function pickFlows(flows: Flow[]): Flow[] {
 
 /**
  * Landing section "flows": three real flows as horizontal step strips. Each step is a thumbnail
- * linking to that page's docs; the strip scrolls inside its own box so the page never overflows
+ * that opens the in-page viewer (and still links to that page's docs); the strip scrolls inside its own box so the page never overflows
  * sideways on a phone.
  */
 export function FlowsShowcase() {
@@ -41,29 +42,18 @@ export function FlowsShowcase() {
                                 </h3>
                                 <span className="lib-flow-steps-count">{flow.steps.length} steps</span>
                             </header>
-                            <ol className="lib-steps">
-                                {flow.steps.map((step, index) => (
-                                    <li className="lib-step" key={`${step.item.name}-${index}`}>
-                                        <a className="lib-step-link" href={step.item.docs}>
-                                            <span className="lib-thumb">
-                                                {step.item.thumb ? <img src={step.item.thumb.light} alt="" loading="lazy" width="640" height="400" /> : null}
-                                            </span>
-                                            <span className="lib-step-title">{step.item.title}</span>
-                                        </a>
-                                        {index < flow.steps.length - 1 ? (
-                                            <svg className="lib-step-arrow" viewBox="0 0 24 24" width="24" height="24" fill="none" aria-hidden="true">
-                                                <path
-                                                    d="M5 12h14m-5-5 5 5-5 5"
-                                                    stroke="currentColor"
-                                                    strokeWidth="1.8"
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                />
-                                            </svg>
-                                        ) : null}
-                                    </li>
-                                ))}
-                            </ol>
+                            <FlowSteps
+                                flowTitle={flow.title}
+                                steps={flow.steps.map((step) => ({
+                                    name: step.item.name,
+                                    title: step.item.title,
+                                    group: step.item.group,
+                                    thumb: step.item.thumb?.light ?? null,
+                                    docs: step.item.docs,
+                                    preview: step.item.preview,
+                                    purpose: step.purpose,
+                                }))}
+                            />
                         </article>
                     ))}
                 </div>

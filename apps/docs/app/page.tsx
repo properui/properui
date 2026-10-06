@@ -7,6 +7,7 @@ import "~/components/landing/landing-proof.css";
 import "~/components/landing/landing-session.css";
 import "~/components/landing/landing-setup.css";
 import "~/components/landing/landing.css";
+import { LibraryLightboxProvider } from "~/components/landing/library-lightbox";
 import { AgentSetup } from "~/components/landing/sections/agent-setup";
 import { Comparison } from "~/components/landing/sections/comparison";
 import { Consistency } from "~/components/landing/sections/consistency";
@@ -118,18 +119,20 @@ export default function LandingPage() {
             </header>
 
             <main id="top">
-                <Hero />
-                <ProofStrip />
-                <FlowsShowcase />
-                <Why />
-                <Comparison />
-                <Consistency />
-                <Ways />
-                <AgentSetup />
-                <Session />
-                <Trust />
-                <Faq />
-                <FinalCta />
+                <LibraryLightboxProvider>
+                    <Hero />
+                    <ProofStrip />
+                    <FlowsShowcase />
+                    <Why />
+                    <Comparison />
+                    <Consistency />
+                    <Ways />
+                    <AgentSetup />
+                    <Session />
+                    <Trust />
+                    <Faq />
+                    <FinalCta />
+                </LibraryLightboxProvider>
             </main>
 
             <footer className="site-footer">

@@ -1,12 +1,24 @@
 "use client";
 
 import { type KeyboardEvent, useRef, useState } from "react";
+import { type LightboxItem, useLibraryLightbox } from "./library-lightbox";
 
-/** A card in the Screens, Sections and Components panels. `thumb` is a site-relative image path. */
-export type BrowseItem = { name: string; title: string; group: string; thumb: string | null; docs: string };
+/** A card in the Screens, Sections and Components panels. `thumb` is a site-relative image path; `preview` the chrome-less render route (null for components). */
+export type BrowseItem = {
+    name: string;
+    title: string;
+    kind: "screen" | "section" | "component";
+    group: string;
+    thumb: string | null;
+    docs: string;
+    preview: string | null;
+};
 
-/** A card in the Flows panel: the first few step thumbnails plus the real step count. */
-export type BrowseFlow = { id: string; title: string; stepCount: number; steps: Array<{ title: string; thumb: string | null }> };
+/** One step of a flow, with everything the viewer needs. */
+export type BrowseFlowStep = { name: string; title: string; group: string; thumb: string | null; docs: string; preview: string | null; purpose: string };
+
+/** A card in the Flows panel: every step (the card shows the first few thumbnails; the viewer opens over all of them) plus the real step count. */
+export type BrowseFlow = { id: string; title: string; stepCount: number; steps: BrowseFlowStep[] };
 
 export type BrowseCounts = { screens: number; flows: number; sections: number; components: number };
 
@@ -34,46 +46,114 @@ function Thumb({ src }: { src: string | null }) {
     return <span className="lib-thumb">{src ? <img src={src} alt="" loading="lazy" width="640" height="400" /> : null}</span>;
 }
 
+const toLightboxItem = (item: BrowseItem): LightboxItem => ({
+    name: item.name,
+    title: item.title,
+    kind: item.kind,
+    group: item.group,
+    thumb: item.thumb,
+    docs: item.docs,
+    preview: item.preview,
+});
+
+/** A flow's steps as viewer items; the group is the flow's title so the header reads "Flow step, Auth, <purpose>". */
+const flowToLightboxItems = (flow: BrowseFlow): LightboxItem[] =>
+    flow.steps.map((step) => ({
+        name: step.name,
+        title: step.title,
+        kind: "flow-step",
+        group: flow.title,
+        thumb: step.thumb,
+        docs: step.docs,
+        preview: step.preview,
+        purpose: step.purpose,
+    }));
+
+/**
+ * Each card's main surface is a button that opens the in-page viewer over the tab's items; a small
+ * "Docs" link under it keeps the real docs page one click away (and crawlable).
+ */
 function ItemGrid({ items }: { items: BrowseItem[] }) {
+    const lightbox = useLibraryLightbox();
+    const lightboxItems = items.map(toLightboxItem);
+
     return (
         <ul className="lib-grid">
-            {items.map((item) => (
+            {items.map((item, index) => (
                 <li key={item.name}>
-                    <a className={item.thumb ? "lib-card" : "lib-card lib-card-plain"} href={item.docs}>
-                        {item.thumb ? <Thumb src={item.thumb} /> : null}
-                        <span className="lib-card-title">{item.title}</span>
-                        <span className="lib-card-group">{item.group}</span>
-                    </a>
+                    <div className={item.thumb ? "lib-card" : "lib-card lib-card-plain"}>
+                        <button
+                            type="button"
+                            className="lib-card-open"
+                            aria-haspopup="dialog"
+                            onClick={(event) => lightbox.open(lightboxItems, index, event.currentTarget)}
+                        >
+                            {item.thumb ? <Thumb src={item.thumb} /> : null}
+                            <span className="lib-card-title">{item.title}</span>
+                            <span className="lib-card-group">{item.group}</span>
+                        </button>
+                        <a className="lib-card-docs" href={item.docs} aria-label={`${item.title} docs`}>
+                            Docs<span aria-hidden="true"> &rarr;</span>
+                        </a>
+                    </div>
                 </li>
             ))}
         </ul>
     );
 }
 
+/**
+ * A flow card links to the flow's page; its step thumbnails are buttons that open the viewer over
+ * that flow's steps (all of them, not only the few drawn).
+ */
 function FlowGrid({ flows }: { flows: BrowseFlow[] }) {
+    const lightbox = useLibraryLightbox();
+
     return (
         <ul className="lib-flow-grid">
             {flows.map((flow) => {
-                const extra = flow.stepCount - Math.min(flow.steps.length, FLOW_STEPS_SHOWN);
+                const shown = flow.steps.slice(0, FLOW_STEPS_SHOWN);
+                const extra = flow.stepCount - shown.length;
+                const items = flowToLightboxItems(flow);
                 return (
                     <li key={flow.id}>
-                        <a className="lib-card lib-flow-card" href={`/flows/${flow.id}`}>
+                        <div className="lib-card lib-flow-card">
                             <span className="lib-flow-strip">
-                                {flow.steps.slice(0, FLOW_STEPS_SHOWN).map((step, index) => (
-                                    <Thumb key={`${step.title}-${index}`} src={step.thumb} />
+                                {shown.map((step, index) => (
+                                    <button
+                                        type="button"
+                                        className="lib-flow-step"
+                                        key={`${step.name}-${index}`}
+                                        aria-haspopup="dialog"
+                                        aria-label={`View step ${index + 1} of ${flow.title}: ${step.title}`}
+                                        onClick={(event) => lightbox.open(items, index, event.currentTarget)}
+                                    >
+                                        <Thumb src={step.thumb} />
+                                    </button>
                                 ))}
-                                {extra > 0 ? <span className="lib-flow-more">+{extra}</span> : null}
+                                {extra > 0 ? (
+                                    <button
+                                        type="button"
+                                        className="lib-flow-more"
+                                        aria-haspopup="dialog"
+                                        aria-label={`View all ${flow.stepCount} steps of ${flow.title}`}
+                                        onClick={(event) => lightbox.open(items, shown.length, event.currentTarget)}
+                                    >
+                                        +{extra}
+                                    </button>
+                                ) : null}
                             </span>
-                            <span className="lib-card-title">{flow.title}</span>
-                            <span className="lib-card-group">{flow.stepCount} steps</span>
-                        </a>
+                            <a className="lib-flow-title-link" href={`/flows/${flow.id}`}>
+                                <span className="lib-card-title">{flow.title}</span>
+                                <span className="lib-card-group">{flow.stepCount} steps</span>
+                            </a>
+                        </div>
                     </li>
                 );
             })}
         </ul>
     );
 }
-
 /**
  * Browse tabs for the home hero: Screens, Flows, Sections, Components. Same accessible tabs
  * pattern as `sections/example-showcase.tsx` (roving tabindex, arrow/Home/End keys). Every panel

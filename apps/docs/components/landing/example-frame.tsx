@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { type LightboxItem, isPlainClick, useOptionalLibraryLightbox } from "~/components/landing/library-lightbox";
 import { cx } from "~/lib/cx";
 
 export type ExampleFrameProps = {
@@ -20,6 +21,12 @@ export type ExampleFrameProps = {
      */
     renderWidth?: number;
     className?: string;
+    /**
+     * When set and a `LibraryLightboxProvider` is mounted, a plain click on the "Open example" link
+     * opens this item in the in-page viewer instead of navigating. Modified clicks (new tab) and
+     * pages without a provider (the /mcp page) keep the plain link.
+     */
+    lightboxItem?: LightboxItem;
 };
 
 /**
@@ -27,7 +34,17 @@ export type ExampleFrameProps = {
  * `/preview` route. Used by the "difference", "examples" and "consistency" landing sections so
  * every visual proof point is a genuinely rendered Proper UI page, not a screenshot or mockup.
  */
-export function ExampleFrame({ src, title, openHref, openLabel = "Open example", height = 520, renderWidth = 1280, className }: ExampleFrameProps) {
+export function ExampleFrame({
+    src,
+    title,
+    openHref,
+    openLabel = "Open example",
+    height = 520,
+    renderWidth = 1280,
+    className,
+    lightboxItem,
+}: ExampleFrameProps) {
+    const lightbox = useOptionalLibraryLightbox();
     const box = useRef<HTMLDivElement>(null);
     const [scale, setScale] = useState(1);
 
@@ -51,7 +68,17 @@ export function ExampleFrame({ src, title, openHref, openLabel = "Open example",
                     style={{ width: renderWidth, height: height / scale, transform: `scale(${scale})`, transformOrigin: "top left" }}
                 />
             </div>
-            <a className="ex-frame-link" href={openHref} target="_blank" rel="noreferrer">
+            <a
+                className="ex-frame-link"
+                href={openHref}
+                target="_blank"
+                rel="noreferrer"
+                onClick={(event) => {
+                    if (!lightbox || !lightboxItem || !isPlainClick(event)) return;
+                    event.preventDefault();
+                    lightbox.open([lightboxItem], 0, event.currentTarget);
+                }}
+            >
                 {openLabel} <span aria-hidden="true">&rarr;</span>
             </a>
         </div>

@@ -451,6 +451,328 @@
     text-align: center;
 }
 
+/* Cards: the main surface is a button that opens the viewer; a small Docs link sits under it. */
+.pui-landing .lib-card-open {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 2px;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    color: inherit;
+    background: transparent;
+    cursor: pointer;
+    font: inherit;
+    text-align: start;
+}
+.pui-landing .lib-card-open:focus-visible,
+.pui-landing .lib-flow-step:focus-visible,
+.pui-landing .lib-flow-more:focus-visible,
+.pui-landing .lib-flow-title-link:focus-visible,
+.pui-landing .lib-card-docs:focus-visible {
+    outline: 2px solid var(--violet-600);
+    outline-offset: 3px;
+}
+.pui-landing .lib-card-docs {
+    align-self: flex-start;
+    margin-top: 6px;
+    padding: 2px 4px;
+    border-radius: 6px;
+    color: var(--violet-700);
+    font-size: 14px;
+    font-weight: 650;
+}
+.pui-landing .lib-card-plain .lib-card-docs {
+    padding-inline: 0;
+}
+.pui-landing .lib-card-docs:hover {
+    text-decoration: underline;
+}
+
+/* Flow cards: each thumbnail is its own button, the title links to the flow page. */
+.pui-landing .lib-flow-step {
+    flex: 1 1 0;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+}
+.pui-landing .lib-flow-step:hover .lib-thumb {
+    border-color: var(--violet-400);
+}
+.pui-landing button.lib-flow-more {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    cursor: pointer;
+    font-family: inherit;
+}
+.pui-landing button.lib-flow-more:hover {
+    background: var(--violet-100);
+}
+.pui-landing .lib-flow-title-link {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    border-radius: 6px;
+}
+.pui-landing .lib-flow-title-link:hover .lib-card-title {
+    color: var(--violet-700);
+    text-decoration: underline;
+}
+
+/* "Open example" under an ExampleFrame when it opens the viewer. */
+.pui-landing .ex-frame .ex-frame-link {
+    min-height: 24px;
+    font-size: 14px;
+}
+
+/*
+ * Viewer (library-lightbox.tsx): one native <dialog> at 95% of the viewport. It lives inside the
+ * .pui-landing tree, so the descendant selectors still apply in the top layer.
+ */
+.pui-landing .lib-lightbox {
+    width: 95vw;
+    height: 95vh;
+    height: 95dvh;
+    max-width: none;
+    max-height: none;
+    margin: auto;
+    padding: 0;
+    overflow: hidden;
+    overscroll-behavior: contain;
+    border: 1px solid var(--line-2);
+    border-radius: 16px;
+    color: var(--ink);
+    background: #fff;
+    box-shadow: 0 32px 80px -24px rgb(10 13 18 / 0.5);
+}
+.pui-landing .lib-lightbox::backdrop {
+    background: rgb(10 13 18 / 0.72);
+}
+.pui-landing .lib-lightbox[open] {
+    display: flex;
+    flex-direction: column;
+    animation: lib-lightbox-in 0.18s ease-out;
+}
+@keyframes lib-lightbox-in {
+    from {
+        transform: translateY(8px) scale(0.99);
+        opacity: 0;
+    }
+    to {
+        transform: none;
+        opacity: 1;
+    }
+}
+
+.pui-landing .lib-lightbox-head {
+    display: flex;
+    flex: none;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px 20px;
+    padding: 14px 16px 10px;
+}
+.pui-landing .lib-lightbox-titlewrap {
+    flex: 1 1 240px;
+    min-width: 0;
+}
+.pui-landing .lib-lightbox-title {
+    margin: 0;
+    font-size: 20px;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    overflow-wrap: anywhere;
+}
+.pui-landing .lib-lightbox-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 10px;
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.4;
+}
+.pui-landing .lib-lightbox-purpose {
+    color: var(--ink-2);
+    overflow-wrap: anywhere;
+}
+.pui-landing .lib-lightbox .lib-badge[data-kind="flow-step"] {
+    color: var(--good);
+    border-color: #abefc6;
+    background: var(--good-bg);
+}
+.pui-landing .lib-lightbox-actions {
+    display: flex;
+    flex: none;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+.pui-landing .lib-lightbox-action,
+.pui-landing .lib-lightbox-nav,
+.pui-landing .lib-lightbox-viewport {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 0 14px;
+    border: 1px solid var(--line-2);
+    border-radius: 10px;
+    color: var(--ink);
+    background: #fff;
+    cursor: pointer;
+    font: 650 14px/1 var(--body);
+    white-space: nowrap;
+}
+.pui-landing .lib-lightbox-action:hover,
+.pui-landing .lib-lightbox-nav:hover,
+.pui-landing .lib-lightbox-viewport:hover {
+    background: var(--soft);
+    border-color: var(--violet-400);
+}
+.pui-landing .lib-lightbox-close {
+    color: #fff;
+    border-color: var(--violet-600);
+    background: var(--violet-600);
+}
+.pui-landing .lib-lightbox-close:hover {
+    color: #fff;
+    border-color: var(--violet-700);
+    background: var(--violet-700);
+}
+.pui-landing .lib-lightbox-action:focus-visible,
+.pui-landing .lib-lightbox-nav:focus-visible,
+.pui-landing .lib-lightbox-viewport:focus-visible,
+.pui-landing .lib-lightbox .lib-lightbox-command button:focus-visible {
+    outline: 2px solid var(--violet-600);
+    outline-offset: 2px;
+}
+
+.pui-landing .lib-lightbox-toolbar {
+    display: flex;
+    flex: none;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 16px;
+    padding: 0 16px 12px;
+}
+.pui-landing .lib-lightbox .lib-lightbox-command {
+    flex: 1 1 360px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    max-width: 560px;
+    padding: 6px 6px 6px 14px;
+}
+.pui-landing .lib-lightbox .lib-lightbox-command code {
+    font-size: 14px;
+}
+.pui-landing .lib-lightbox .lib-lightbox-command button {
+    min-height: 36px;
+    font-size: 14px;
+}
+.pui-landing .lib-lightbox-viewports {
+    display: inline-flex;
+    gap: 6px;
+}
+.pui-landing .lib-lightbox-viewport[aria-pressed="true"] {
+    color: var(--violet-700);
+    border-color: var(--violet-600);
+    background: var(--violet-50);
+}
+.pui-landing .lib-lightbox-viewport-width {
+    margin-inline-start: 6px;
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.pui-landing .lib-lightbox-stage {
+    position: relative;
+    flex: 1 1 0;
+    min-height: 0;
+    overflow: hidden;
+    border-block: 1px solid var(--line);
+    background: var(--soft);
+}
+.pui-landing .lib-lightbox-frame {
+    position: absolute;
+    top: 0;
+    border: 0;
+    background: #fff;
+}
+.pui-landing .lib-lightbox-frame[data-viewport="mobile"] {
+    box-shadow: 0 0 0 1px var(--line-2);
+}
+.pui-landing .lib-lightbox-loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: var(--soft);
+    pointer-events: none;
+}
+.pui-landing .lib-lightbox-poster {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    opacity: 0.35;
+}
+.pui-landing .lib-lightbox-loading-chip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    border: 1px solid var(--line-2);
+    border-radius: 999px;
+    color: var(--ink-2);
+    background: #fff;
+    font-size: 14px;
+    font-weight: 600;
+}
+.pui-landing .lib-lightbox-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--violet-200);
+    border-top-color: var(--violet-600);
+    border-radius: 50%;
+    animation: lib-lightbox-spin 0.8s linear infinite;
+}
+@keyframes lib-lightbox-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.pui-landing .lib-lightbox-foot {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 16px;
+}
+.pui-landing .lib-lightbox-count {
+    color: var(--ink-2);
+    font-size: 14px;
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+}
+
 @media (max-width: 960px) {
     .pui-landing .lib-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -474,9 +796,36 @@
         width: 48px;
         height: 30px;
     }
+    .pui-landing .lib-lightbox {
+        border-radius: 12px;
+    }
+    .pui-landing .lib-lightbox-head {
+        padding: 10px 12px 8px;
+    }
+    .pui-landing .lib-lightbox-title {
+        font-size: 17px;
+    }
+    .pui-landing .lib-lightbox-toolbar {
+        padding: 0 12px 10px;
+    }
+    .pui-landing .lib-lightbox-foot {
+        padding: 8px 12px;
+    }
+    .pui-landing .lib-lightbox-action {
+        padding: 0 10px;
+    }
+    .pui-landing .lib-lightbox-nav {
+        flex: 1 1 0;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
+    .pui-landing .lib-lightbox[open] {
+        animation: none;
+    }
+    .pui-landing .lib-lightbox-spinner {
+        animation-duration: 3s;
+    }
     .pui-landing .lib-card,
     .pui-landing .lib-tab {
         transition: none;

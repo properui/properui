@@ -5,14 +5,15 @@ import { type LibraryItem, getFlows, getLibraryCounts, getLibraryItems } from "~
 
 const PER_TAB = 8;
 const FLOWS_SHOWN = 4;
-const FLOW_STEP_THUMBS = 4;
 
 const toBrowseItem = (item: LibraryItem): BrowseItem => ({
     name: item.name,
     title: item.title,
+    kind: item.kind === "section" || item.kind === "component" ? item.kind : "screen",
     group: item.group,
     thumb: item.thumb?.light ?? null,
     docs: item.docs,
+    preview: item.preview,
 });
 
 /**
@@ -57,7 +58,15 @@ export function Hero() {
             id: flow.id,
             title: flow.title,
             stepCount: flow.steps.length,
-            steps: flow.steps.slice(0, FLOW_STEP_THUMBS).map((step) => ({ title: step.item.title, thumb: step.item.thumb?.light ?? null })),
+            steps: flow.steps.map((step) => ({
+                name: step.item.name,
+                title: step.item.title,
+                group: step.item.group,
+                thumb: step.item.thumb?.light ?? null,
+                docs: step.item.docs,
+                preview: step.item.preview,
+                purpose: step.purpose,
+            })),
         }));
 
     const microproof = ["React 19", "Vue, Angular & HTML", "MCP server", `${AXE_SUITES} axe suites, ${AXE_VIOLATIONS} violations`, "MIT, no paid tier"];
