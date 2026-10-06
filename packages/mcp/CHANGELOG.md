@@ -1,5 +1,11 @@
 # @properui/mcp
 
+## 0.3.1
+
+### Patch Changes
+
+- a73a2ad: `search_flows` results include each flow's docs page (`docsUrl` in `structuredContent`, a `docs:` line in the text) when the registry publishes one.
+
 ## 0.3.0
 
 ### Minor Changes
