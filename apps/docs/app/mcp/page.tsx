@@ -495,6 +495,9 @@ export default function McpPage() {
                             <strong>Explore</strong>
                             <a href="/components">Components</a>
                             <a href="/#flows">Flows</a>
+                            <a href="/for/claude-code">For Claude Code</a>
+                            <a href="/guides/consistent-ai-dashboards">Consistent AI dashboards</a>
+                            <a href="/compare/shadcn-ui">Proper UI vs shadcn/ui</a>
                             <a href="/docs/agents">For AI agents</a>
                             <a href="/docs/mcp">MCP reference</a>
                             <a href="/docs">Documentation</a>

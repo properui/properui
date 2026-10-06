@@ -1,0 +1,57 @@
+{
+    "condition": "tailwind",
+    "measuredAt": "2026-10-06T17:45:22.883Z",
+    "build": {
+        "passed": true,
+        "seconds": 4
+    },
+    "files": {
+        "authored": [
+            "src/app/settings/billing/cancel-dialog.tsx",
+            "src/app/settings/billing/data.ts",
+            "src/app/settings/billing/format.ts",
+            "src/app/settings/billing/invoice-table.tsx",
+            "src/app/settings/billing/page.tsx",
+            "src/app/settings/billing/payment-method.tsx",
+            "src/app/settings/billing/plan-card.tsx",
+            "src/app/settings/billing/usage-meter.tsx"
+        ],
+        "authoredCount": 8,
+        "authoredLines": 440,
+        "libraryCount": 0,
+        "libraryLines": 0
+    },
+    "tokens": {
+        "rawPaletteClasses": 124,
+        "arbitraryValues": 2,
+        "darkVariants": 59
+    },
+    "page": {
+        "desktop": {
+            "status": 200,
+            "axeViolations": 0,
+            "axeNodes": 0,
+            "axe": [],
+            "horizontalOverflow": false,
+            "consoleErrors": []
+        },
+        "mobile": {
+            "status": 200,
+            "axeViolations": 0,
+            "axeNodes": 0,
+            "axe": [],
+            "horizontalOverflow": true,
+            "consoleErrors": []
+        }
+    },
+    "dialog": {
+        "opened": true,
+        "roleDialog": true,
+        "focusInside": true,
+        "escapeCloses": true
+    },
+    "setup": {
+        "seconds": 0,
+        "command": "none (Tailwind v4 ships with the scaffold)"
+    }
+}

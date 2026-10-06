@@ -37,8 +37,15 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     alternates: { canonical: CANONICAL },
     icons: { icon: "/favicon.svg" },
-    openGraph: { title: TITLE, description: DESCRIPTION, url: CANONICAL, siteName: SITE_NAME, type: "website" },
-    twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
+    openGraph: {
+        title: TITLE,
+        description: DESCRIPTION,
+        url: CANONICAL,
+        siteName: SITE_NAME,
+        type: "website",
+        images: [{ url: `${CANONICAL}og.png`, width: 1200, height: 630, alt: "Proper UI: web-app design references your AI can install" }],
+    },
+    twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION, images: [`${CANONICAL}og.png`] },
 };
 
 /** The four browsable collections, in the order the library presents them. Every route exists under `app/`. */
@@ -149,6 +156,9 @@ export default function LandingPage() {
                             <strong>Explore</strong>
                             <a href="/components">Components</a>
                             <a href="/flows">Flows</a>
+                            <a href="/for/claude-code">For Claude Code</a>
+                            <a href="/guides/consistent-ai-dashboards">Consistent AI dashboards</a>
+                            <a href="/compare/shadcn-ui">Proper UI vs shadcn/ui</a>
                             <a href="/docs/agents">For AI agents</a>
                             <a href="/docs">Documentation</a>
                         </div>

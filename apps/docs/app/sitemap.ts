@@ -3,7 +3,18 @@ import { getAllContentPages } from "~/lib/content";
 import { getFlows } from "~/lib/library-index";
 import { absoluteUrl } from "~/lib/site";
 
-const STATIC_ROUTES = ["/", "/mcp", "/docs", "/components", "/application-ui", "/marketing", "/flows"];
+const STATIC_ROUTES = [
+    "/",
+    "/mcp",
+    "/for/claude-code",
+    "/guides/consistent-ai-dashboards",
+    "/compare/shadcn-ui",
+    "/docs",
+    "/components",
+    "/application-ui",
+    "/marketing",
+    "/flows",
+];
 
 export default function sitemap(): MetadataRoute.Sitemap {
     const lastModified = new Date();

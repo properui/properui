@@ -1,5 +1,13 @@
 # @properui/mcp
 
+## 0.3.2
+
+### Patch Changes
+
+- Adds `mcpName` (`io.github.properui/properui`) to package.json, which the official MCP Registry
+  uses to verify that the npm package matches its listing, and ships `server.json` describing the
+  stdio package and the remote endpoint.
+
 ## 0.3.1
 
 ### Patch Changes

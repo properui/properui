@@ -1,0 +1,48 @@
+{
+    "condition": "properui",
+    "measuredAt": "2026-10-06T17:46:31.481Z",
+    "build": {
+        "passed": true,
+        "seconds": 4
+    },
+    "files": {
+        "authored": ["src/app/settings/billing/billing-data.ts", "src/app/settings/billing/billing-settings.tsx", "src/app/settings/billing/page.tsx"],
+        "authoredCount": 3,
+        "authoredLines": 273,
+        "libraryCount": 165,
+        "libraryLines": 18082
+    },
+    "tokens": {
+        "rawPaletteClasses": 0,
+        "arbitraryValues": 0,
+        "darkVariants": 0
+    },
+    "page": {
+        "desktop": {
+            "status": 200,
+            "axeViolations": 0,
+            "axeNodes": 0,
+            "axe": [],
+            "horizontalOverflow": false,
+            "consoleErrors": []
+        },
+        "mobile": {
+            "status": 200,
+            "axeViolations": 0,
+            "axeNodes": 0,
+            "axe": [],
+            "horizontalOverflow": false,
+            "consoleErrors": []
+        }
+    },
+    "dialog": {
+        "opened": true,
+        "roleDialog": true,
+        "focusInside": true,
+        "escapeCloses": true
+    },
+    "setup": {
+        "seconds": 19,
+        "command": "npx @properui/cli@latest init --install --yes && npx @properui/cli@latest agent init --client claude"
+    }
+}

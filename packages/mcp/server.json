@@ -1,0 +1,30 @@
+{
+    "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+    "name": "io.github.properui/properui",
+    "title": "Proper UI",
+    "description": "Search real web-app screens, flows, sections and components, then install the source.",
+    "repository": {
+        "url": "https://github.com/properui/properui",
+        "source": "github",
+        "subfolder": "packages/mcp"
+    },
+    "websiteUrl": "https://properui.dev/mcp",
+    "version": "0.3.2",
+    "packages": [
+        {
+            "registryType": "npm",
+            "registryBaseUrl": "https://registry.npmjs.org",
+            "identifier": "@properui/mcp",
+            "version": "0.3.2",
+            "transport": {
+                "type": "stdio"
+            }
+        }
+    ],
+    "remotes": [
+        {
+            "type": "streamable-http",
+            "url": "https://properui.dev/api/mcp"
+        }
+    ]
+}

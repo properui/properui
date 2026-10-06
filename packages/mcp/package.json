@@ -1,6 +1,7 @@
 {
     "name": "@properui/mcp",
-    "version": "0.3.1",
+    "version": "0.3.2",
+    "mcpName": "io.github.properui/properui",
     "description": "Model Context Protocol server for Proper UI: lets an AI coding assistant search, read and install registry components directly.",
     "keywords": [
         "mcp",

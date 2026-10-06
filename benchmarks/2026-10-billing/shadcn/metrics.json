@@ -1,0 +1,65 @@
+{
+    "condition": "shadcn",
+    "measuredAt": "2026-10-06T17:44:57.999Z",
+    "build": {
+        "passed": true,
+        "seconds": 5
+    },
+    "files": {
+        "authored": [
+            "src/app/settings/billing/cancel-subscription.tsx",
+            "src/app/settings/billing/download-invoice.tsx",
+            "src/app/settings/billing/page.tsx",
+            "src/lib/billing.ts"
+        ],
+        "authoredCount": 4,
+        "authoredLines": 499,
+        "libraryCount": 6,
+        "libraryLines": 567
+    },
+    "tokens": {
+        "rawPaletteClasses": 0,
+        "arbitraryValues": 0,
+        "darkVariants": 0
+    },
+    "page": {
+        "desktop": {
+            "status": 200,
+            "axeViolations": 1,
+            "axeNodes": 2,
+            "axe": [
+                {
+                    "id": "color-contrast",
+                    "impact": "serious",
+                    "nodes": 2
+                }
+            ],
+            "horizontalOverflow": false,
+            "consoleErrors": []
+        },
+        "mobile": {
+            "status": 200,
+            "axeViolations": 1,
+            "axeNodes": 2,
+            "axe": [
+                {
+                    "id": "color-contrast",
+                    "impact": "serious",
+                    "nodes": 2
+                }
+            ],
+            "horizontalOverflow": false,
+            "consoleErrors": []
+        }
+    },
+    "dialog": {
+        "opened": true,
+        "roleDialog": true,
+        "focusInside": true,
+        "escapeCloses": true
+    },
+    "setup": {
+        "seconds": 32,
+        "command": "npx shadcn@latest init -d"
+    }
+}
