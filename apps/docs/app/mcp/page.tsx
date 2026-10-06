@@ -98,7 +98,7 @@ const SAMPLE_RESULT = `{
   "name": "dashboard-04",
   "title": "Dashboard 04",
   "layer": "app-examples",
-  "thumbnail": "https://properui.dev/thumbs/app-examples/dashboards/dashboard-04.webp",
+  "thumbnail": "/thumbs/app-examples/dashboards/dashboard-04.webp",
   "docs": "https://properui.dev/components/dashboards/dashboard-04",
   "composes_with": ["app-navigation", "charts", "metrics", "table", "tabs"],
   "token_contract": ["bg-primary", "border-secondary", "text-primary", "text-tertiary"],
