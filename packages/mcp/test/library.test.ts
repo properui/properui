@@ -272,6 +272,9 @@ describe("search_flows", () => {
         expect(data.results[0].steps[1].purpose).toMatch(/payment method/);
         expect(data.results[0].steps[1].thumbnail.light).toContain("/thumbs/app-examples/settings-pages/settings-13.webp");
         expect(data.results[0].addCommand).toBe("npx @properui/cli@latest add pricing-dual-action settings-13");
+        expect(data.results[0].docsUrl).toMatch(/\/flows\/billing$/);
+        expect(text).toContain("docs: ");
+        expect(text).toContain("/flows/billing");
         expect(text).toContain("Install every step:");
         expect(text).toContain("![thumb]");
     });

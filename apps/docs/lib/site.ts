@@ -11,7 +11,7 @@ export const GITHUB_URL = `https://github.com/${GITHUB_ORG}/${GITHUB_REPO}`;
 export const GITHUB_BRANCH = "main";
 
 /** The CLI package name used by every `npx … add <slug>` snippet. */
-export const CLI_PACKAGE = "properui";
+export const CLI_PACKAGE = "@properui/cli";
 
 export const absoluteUrl = (pathname: string) => `${SITE_URL}${pathname.startsWith("/") ? pathname : `/${pathname}`}`;
 

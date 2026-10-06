@@ -224,7 +224,7 @@ export default function McpPage() {
 
                     <nav className="main-nav" aria-label="Main navigation">
                         <a href="/components">Components</a>
-                        <a href="/#examples">Examples</a>
+                        <a href="/#flows">Flows</a>
                         <a href="/#setup">For AI</a>
                         <a href="/mcp" aria-current="page">
                             MCP
@@ -494,7 +494,7 @@ export default function McpPage() {
                         <div>
                             <strong>Explore</strong>
                             <a href="/components">Components</a>
-                            <a href="/#examples">Examples</a>
+                            <a href="/#flows">Flows</a>
                             <a href="/docs/agents">For AI agents</a>
                             <a href="/docs/mcp">MCP reference</a>
                             <a href="/docs">Documentation</a>

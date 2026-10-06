@@ -1538,7 +1538,7 @@ const build = () => {
     writeFileSync(path.join(OUT, "thumbs.json"), `${JSON.stringify(thumbs, null, 2)}\n`);
 
     // ---- dist/flows.json — curated journeys from src/flows.ts, already validated above.
-    writeFileSync(path.join(OUT, "flows.json"), `${JSON.stringify({ flows: FLOWS }, null, 2)}\n`);
+    writeFileSync(path.join(OUT, "flows.json"), `${JSON.stringify({ flows: FLOWS.map((flow) => ({ ...flow, docs: `/flows/${flow.id}` })) }, null, 2)}\n`);
 
     // ---- Stats --------------------------------------------------------------
     // Single generated source for every count quoted in the README and the landing page

@@ -5,6 +5,7 @@
             "title": "Authentication",
             "description": "Recover access to an account: ask for a reset link, then confirm the email address.",
             "tags": ["login", "password", "recovery", "email"],
+            "docs": "/flows/auth",
             "steps": [
                 { "entry": "step-1-forgot-password", "purpose": "Ask for the email address that receives the reset link." },
                 { "entry": "simple-verification", "purpose": "Confirm the address with a one-time code." }
@@ -15,6 +16,7 @@
             "title": "Billing",
             "description": "Show plans, then manage the subscription from account settings.",
             "tags": ["billing", "plans", "subscription", "payment"],
+            "docs": "/flows/billing",
             "steps": [
                 { "entry": "pricing-dual-action", "purpose": "Compare plans before choosing one." },
                 { "entry": "settings-13", "purpose": "Manage the plan, payment method and invoices." }

@@ -27,6 +27,7 @@ export type CaptureRoute = {
 export const ROUTES: CaptureRoute[] = [
     { slug: "home", route: "/", label: "Docs home" },
     { slug: "mcp", route: "/mcp", label: "MCP product page" },
+    { slug: "flows", route: "/flows", label: "Flows index" },
     { slug: "docs-introduction", route: "/docs/introduction", label: "Docs: introduction" },
     { slug: "docs-quality", route: "/docs/quality", label: "Docs: quality page" },
     { slug: "docs-rtl", route: "/docs/rtl", label: "Docs: RTL support page" },

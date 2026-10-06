@@ -1,0 +1,127 @@
+/*
+ * Section styles for the "why", "ways" and "session" sections of the landing page, scoped under
+ * .pui-landing. Shared classes (.section, .section-heading, .command, .eyebrow) live in landing.css.
+ */
+
+/* why- : five reasons the references are trustworthy */
+.pui-landing .why-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 18px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.pui-landing .why-card {
+    grid-column: span 2;
+    padding: 24px;
+    border: 1px solid var(--line-2);
+    border-radius: 16px;
+    background: #fff;
+}
+.pui-landing .why-card:nth-child(n + 4) {
+    grid-column: span 3;
+}
+.pui-landing .why-card h3 {
+    margin: 0;
+    font-size: 18px;
+    letter-spacing: -0.02em;
+}
+.pui-landing .why-card p {
+    margin: 10px 0 0;
+    color: var(--ink-2);
+    font-size: 16px;
+    line-height: 1.6;
+}
+.pui-landing .why-card code {
+    color: var(--violet-800);
+    font: 14px/1.4 var(--mono);
+}
+
+/* ways- : four ways to use the library */
+.pui-landing .ways {
+    background: var(--soft);
+}
+.pui-landing .ways-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+.pui-landing .ways-card {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 14px;
+    padding: 24px;
+    border: 1px solid var(--line-2);
+    border-radius: 16px;
+    background: #fff;
+}
+.pui-landing .ways-card h3 {
+    margin: 0;
+    font-size: 20px;
+    letter-spacing: -0.02em;
+}
+.pui-landing .ways-card > p {
+    margin: 0;
+    color: var(--ink-2);
+    font-size: 16px;
+    line-height: 1.6;
+}
+.pui-landing .ways-command > span {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 750;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+.pui-landing .ways-link {
+    margin-top: auto;
+    padding-top: 4px;
+    color: var(--violet-700);
+    font-size: 16px;
+    font-weight: 650;
+    text-decoration: none;
+}
+.pui-landing .ways-link:hover {
+    text-decoration: underline;
+}
+.pui-landing .ways-link:focus-visible {
+    border-radius: 4px;
+    outline: 2px solid var(--violet-600);
+    outline-offset: 3px;
+}
+
+/* session- : the recorded Claude Code run */
+.pui-landing .session-frame {
+    max-width: 1040px;
+    margin: 0 auto;
+}
+
+@media (max-width: 900px) {
+    .pui-landing .why-card,
+    .pui-landing .why-card:nth-child(n + 4) {
+        grid-column: span 3;
+    }
+    .pui-landing .why-card:last-child {
+        grid-column: span 6;
+    }
+}
+
+@media (max-width: 720px) {
+    .pui-landing .why-grid,
+    .pui-landing .ways-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .pui-landing .why-card,
+    .pui-landing .why-card:nth-child(n + 4),
+    .pui-landing .why-card:last-child {
+        grid-column: auto;
+    }
+    .pui-landing .why-card,
+    .pui-landing .ways-card {
+        padding: 20px;
+    }
+}

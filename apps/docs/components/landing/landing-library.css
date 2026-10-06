@@ -1,0 +1,487 @@
+/*
+ * Home hero library browser, search box and flows showcase. Everything is scoped under
+ * `.pui-landing` with the `lib-` prefix; buttons, headings and the container come from
+ * `landing.css`. Light theme only, like the rest of the landing page.
+ */
+
+/* Hero overrides: the headline is a full sentence trio, so it runs a little smaller and wider. */
+.pui-landing .hero.lib-hero {
+    padding-bottom: 64px;
+}
+.pui-landing .hero.lib-hero h1 {
+    max-width: 920px;
+    font-size: clamp(2rem, 4.4vw, 3.5rem);
+}
+.pui-landing .hero.lib-hero .hero-copy > p {
+    max-width: 720px;
+}
+
+/* Search */
+.pui-landing .lib-search {
+    position: relative;
+    z-index: 3;
+    width: min(680px, 100%);
+    margin-top: 32px;
+    text-align: start;
+}
+.pui-landing .lib-search-label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--ink-2);
+    font-size: 14px;
+    font-weight: 650;
+}
+.pui-landing .lib-search-field {
+    position: relative;
+}
+.pui-landing .lib-search-icon {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 16px;
+    margin-block: auto;
+    color: var(--muted);
+    pointer-events: none;
+}
+.pui-landing .lib-search-input {
+    width: 100%;
+    height: 54px;
+    padding: 0 16px;
+    padding-inline-start: 46px;
+    border: 1px solid var(--line-2);
+    border-radius: 12px;
+    color: var(--ink);
+    background: #fff;
+    box-shadow: 0 1px 2px rgb(10 13 18 / 0.05);
+    font: 16px/24px var(--body);
+}
+.pui-landing .lib-search-input::placeholder {
+    color: var(--muted);
+}
+.pui-landing .lib-search-input:disabled {
+    background: var(--soft);
+    cursor: not-allowed;
+}
+.pui-landing .lib-search-input:focus-visible {
+    outline: 3px solid var(--violet-200);
+    outline-offset: 0;
+    border-color: var(--violet-600);
+}
+.pui-landing .lib-search-note {
+    margin: 8px 0 0;
+    color: var(--ink-2);
+    font-size: 14px;
+}
+.pui-landing .lib-search-panel {
+    position: absolute;
+    inset-inline: 0;
+    top: 100%;
+    margin-top: 8px;
+    max-height: min(520px, 70vh);
+    overflow-y: auto;
+    border: 1px solid var(--line-2);
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 16px 40px rgb(10 13 18 / 0.16);
+}
+.pui-landing .lib-search-message {
+    margin: 0;
+    padding: 14px 16px;
+    color: var(--ink-2);
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
+.pui-landing .lib-search-list {
+    margin: 0;
+    padding: 6px;
+    list-style: none;
+}
+.pui-landing .lib-search-list[hidden] {
+    display: none;
+}
+.pui-landing .lib-search-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+.pui-landing .lib-search-option[data-active] {
+    background: var(--violet-50);
+    outline: 2px solid var(--violet-600);
+    outline-offset: -2px;
+}
+.pui-landing .lib-search-thumb {
+    flex: none;
+    width: 64px;
+    height: 40px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--soft);
+}
+.pui-landing .lib-search-thumb img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top left;
+}
+.pui-landing .lib-search-text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+}
+.pui-landing .lib-search-title {
+    overflow: hidden;
+    color: var(--ink);
+    font-size: 15px;
+    font-weight: 650;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.pui-landing .lib-search-group {
+    overflow: hidden;
+    color: var(--muted);
+    font-size: 14px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.pui-landing .lib-badge {
+    flex: none;
+    padding: 2px 8px;
+    border: 1px solid var(--line-2);
+    border-radius: 999px;
+    color: var(--ink-2);
+    background: var(--soft);
+    font-size: 14px;
+    line-height: 20px;
+}
+.pui-landing .lib-badge[data-kind="screen"] {
+    color: var(--violet-700);
+    border-color: var(--violet-200);
+    background: var(--violet-50);
+}
+.pui-landing .lib-badge[data-kind="flow"] {
+    color: var(--good);
+    border-color: #abefc6;
+    background: var(--good-bg);
+}
+
+/* Browse tabs */
+.pui-landing .lib-browser {
+    width: min(1100px, 100%);
+    margin-top: 40px;
+    text-align: start;
+}
+.pui-landing .lib-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    padding-bottom: 0;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--line-2);
+}
+.pui-landing .lib-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 8px 14px;
+    margin-bottom: -1px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    border-radius: 8px 8px 0 0;
+    color: var(--ink-2);
+    background: transparent;
+    cursor: pointer;
+    font: 650 15px/20px var(--body);
+    white-space: nowrap;
+    transition:
+        color 0.14s ease,
+        border-color 0.14s ease;
+}
+.pui-landing .lib-tab:hover {
+    color: var(--ink);
+}
+.pui-landing .lib-tab[aria-selected="true"] {
+    color: var(--violet-700);
+    border-bottom-color: var(--violet-600);
+}
+.pui-landing .lib-tab:focus-visible,
+.pui-landing .lib-panel:focus-visible {
+    outline: 2px solid var(--violet-600);
+    outline-offset: 2px;
+}
+.pui-landing .lib-tab-count {
+    padding: 0 8px;
+    border-radius: 999px;
+    color: var(--ink-2);
+    background: var(--violet-100);
+    font-size: 14px;
+    font-weight: 600;
+}
+.pui-landing .lib-panel[hidden] {
+    display: none;
+}
+
+/* Cards and thumbnails: the image box has a fixed aspect ratio so nothing shifts as images load. */
+.pui-landing .lib-grid,
+.pui-landing .lib-flow-grid {
+    display: grid;
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.pui-landing .lib-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.pui-landing .lib-flow-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.pui-landing .lib-card {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    height: 100%;
+    padding: 8px 8px 12px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgb(10 13 18 / 0.05);
+    transition:
+        border-color 0.14s ease,
+        box-shadow 0.14s ease,
+        transform 0.14s ease;
+}
+.pui-landing .lib-card:hover {
+    border-color: var(--violet-400);
+    box-shadow: 0 8px 24px rgb(44 28 95 / 0.12);
+    transform: translateY(-2px);
+}
+.pui-landing .lib-card:focus-visible,
+.pui-landing .lib-step-link:focus-visible,
+.pui-landing .lib-flow-head a:focus-visible,
+.pui-landing .lib-browse-all a:focus-visible {
+    outline: 2px solid var(--violet-600);
+    outline-offset: 3px;
+}
+.pui-landing .lib-card-plain {
+    padding: 14px 16px;
+}
+.pui-landing .lib-thumb {
+    display: block;
+    flex: none;
+    aspect-ratio: 16 / 10;
+    margin-bottom: 8px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--soft);
+}
+.pui-landing .lib-thumb img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top left;
+}
+.pui-landing .lib-card-title {
+    padding-inline: 4px;
+    color: var(--ink);
+    font-size: 15px;
+    font-weight: 650;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+}
+.pui-landing .lib-card-group {
+    padding-inline: 4px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+.pui-landing .lib-card-plain .lib-card-title,
+.pui-landing .lib-card-plain .lib-card-group {
+    padding-inline: 0;
+}
+
+/* Flow cards: a horizontal strip of step thumbnails. */
+.pui-landing .lib-flow-strip {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+.pui-landing .lib-flow-strip .lib-thumb {
+    flex: 1 1 0;
+    min-width: 0;
+    margin-bottom: 0;
+}
+.pui-landing .lib-flow-more {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    border-radius: 8px;
+    color: var(--violet-700);
+    background: var(--violet-50);
+    font-size: 14px;
+    font-weight: 650;
+}
+
+.pui-landing .lib-browse-all {
+    margin: 20px 0 0;
+    text-align: center;
+}
+.pui-landing .lib-browse-all a {
+    color: var(--violet-700);
+    font-size: 15px;
+    font-weight: 650;
+}
+.pui-landing .lib-browse-all a:hover {
+    text-decoration: underline;
+}
+
+/* Lines under the browser */
+.pui-landing .hero.lib-hero .lib-install-line {
+    max-width: 720px;
+    margin: 32px 0 0;
+    color: var(--ink-2);
+    font-size: 16px;
+    line-height: 1.6;
+}
+.pui-landing .lib-install-line code {
+    padding: 2px 6px;
+    border: 1px solid var(--line-2);
+    border-radius: 6px;
+    background: #fff;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
+.pui-landing .hero.lib-hero .lib-microproof {
+    margin: 14px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+}
+.pui-landing .lib-microproof-item {
+    white-space: nowrap;
+}
+
+/* Flows showcase */
+.pui-landing .lib-flows {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+.pui-landing .lib-flow {
+    min-width: 0;
+    padding: 20px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgb(10 13 18 / 0.05);
+}
+.pui-landing .lib-flow-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 16px;
+    margin-bottom: 16px;
+}
+.pui-landing .lib-flow-head h3 {
+    margin: 0;
+    font-size: 20px;
+    letter-spacing: -0.02em;
+}
+.pui-landing .lib-flow-head h3 a:hover {
+    color: var(--violet-700);
+    text-decoration: underline;
+}
+.pui-landing .lib-flow-steps-count {
+    color: var(--muted);
+    font-size: 14px;
+}
+.pui-landing .lib-steps {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    margin: 0;
+    padding: 4px 4px 12px;
+    overflow-x: auto;
+    list-style: none;
+    scroll-snap-type: x proximity;
+}
+.pui-landing .lib-step {
+    display: flex;
+    flex: none;
+    align-items: flex-start;
+    scroll-snap-align: start;
+}
+.pui-landing .lib-step-link {
+    display: block;
+    width: 200px;
+    border-radius: 8px;
+}
+.pui-landing .lib-step-link:hover .lib-thumb {
+    border-color: var(--violet-400);
+}
+.pui-landing .lib-step-link .lib-thumb {
+    margin-bottom: 8px;
+}
+.pui-landing .lib-step-title {
+    display: block;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 650;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+.pui-landing .lib-step-arrow {
+    flex: none;
+    margin: 36px 8px 0;
+    color: var(--violet-500);
+}
+.pui-landing .lib-flows-cta {
+    margin: 40px 0 0;
+    text-align: center;
+}
+
+@media (max-width: 960px) {
+    .pui-landing .lib-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+@media (max-width: 640px) {
+    .pui-landing .lib-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+    .pui-landing .lib-flow-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .pui-landing .lib-step-link {
+        width: 160px;
+    }
+    .pui-landing .lib-flow {
+        padding: 14px;
+    }
+    .pui-landing .lib-search-thumb {
+        width: 48px;
+        height: 30px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pui-landing .lib-card,
+    .pui-landing .lib-tab {
+        transition: none;
+    }
+    .pui-landing .lib-card:hover {
+        transform: none;
+    }
+}

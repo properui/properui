@@ -1,44 +1,100 @@
-import { HeroVideo } from "~/components/landing/hero-video";
-import { AXE_SUITES, AXE_VIOLATIONS, PAGE_EXAMPLES, PUBLISHED_GROUPS } from "~/components/landing/stats";
-import { ToolSelector } from "~/components/landing/tool-selector";
+import { type BrowseFlow, type BrowseItem, LibraryBrowser } from "~/components/landing/library-browser";
+import { LibrarySearch } from "~/components/landing/library-search";
+import { AXE_SUITES, AXE_VIOLATIONS } from "~/components/landing/stats";
+import { type LibraryItem, getFlows, getLibraryCounts, getLibraryItems } from "~/lib/library-index";
+
+const PER_TAB = 8;
+const FLOWS_SHOWN = 4;
+const FLOW_STEP_THUMBS = 4;
+
+const toBrowseItem = (item: LibraryItem): BrowseItem => ({
+    name: item.name,
+    title: item.title,
+    group: item.group,
+    thumb: item.thumb?.light ?? null,
+    docs: item.docs,
+});
 
 /**
- * Landing hero (brief Priority 1). The claim is deliberately checkable: "installs real
- * components" is literally what the CLI's `add` and the MCP server's `add_component` do, and
- * every number in the subhead and the microproof line is read from the built registry
- * (`~/components/landing/stats`), so the copy cannot drift from what ships. "Vue, Angular &
- * HTML" names the platforms the tokens, `@properui/html` and `@properui/elements` packages
- * serve; the React-only scope is spelled out on /docs/frameworks. The interactive tool selector
- * and setup preview live in `ToolSelector` (a client component) so the primary CTA can focus the
- * selector's checked radio.
+ * Up to `limit` items of one kind, taking one per group in turn so the first row is not eight
+ * variants of the same page. Screens and sections need a real thumbnail; components have none
+ * today and render as plain text cards. The slice is deliberately small: the whole
+ * library never goes into the page's HTML.
+ */
+function pick(items: LibraryItem[], kind: LibraryItem["kind"], limit: number): BrowseItem[] {
+    const byGroup = new Map<string, LibraryItem[]>();
+    for (const item of items) {
+        if (item.kind !== kind || (kind !== "component" && !item.thumb)) continue;
+        byGroup.set(item.group, [...(byGroup.get(item.group) ?? []), item]);
+    }
+    const queues = [...byGroup.values()];
+    const picked: LibraryItem[] = [];
+    for (let round = 0; picked.length < limit && queues.some((queue) => queue[round]); round += 1) {
+        for (const queue of queues) {
+            const item = queue[round];
+            if (item && picked.length < limit) picked.push(item);
+        }
+    }
+    return picked.map(toBrowseItem);
+}
+
+/**
+ * Landing hero: a design-reference library entry point. A search box over everything, browse
+ * tabs with real thumbnails, and the install story underneath. Every number comes from
+ * `getLibraryCounts()` (the built registry) or `~/components/landing/stats`, so the copy cannot
+ * drift from what ships.
+ *
+ * Setup (`ToolSelector`) and the hero video (`HeroVideo`) are no longer rendered here; the page
+ * places them further down.
  */
 export function Hero() {
+    const items = getLibraryItems();
+    const counts = getLibraryCounts();
+
+    const flows: BrowseFlow[] = getFlows()
+        .slice(0, FLOWS_SHOWN)
+        .map((flow) => ({
+            id: flow.id,
+            title: flow.title,
+            stepCount: flow.steps.length,
+            steps: flow.steps.slice(0, FLOW_STEP_THUMBS).map((step) => ({ title: step.item.title, thumb: step.item.thumb?.light ?? null })),
+        }));
+
+    const microproof = ["React 19", "Vue, Angular & HTML", "MCP server", `${AXE_SUITES} axe suites, ${AXE_VIOLATIONS} violations`, "MIT, no paid tier"];
+
     return (
-        <section className="hero" id="top-hero">
+        <section className="hero lib-hero" id="top-hero">
             <div className="hero-grid" aria-hidden="true" />
             <div className="hero-glow" aria-hidden="true" />
             <div className="hero-copy container">
-                <span className="eyebrow">THE DESIGN SYSTEM FOR AI-BUILT PRODUCTS</span>
-                <h1>Your AI stops inventing UI. It installs real components.</h1>
+                <span className="eyebrow">WEB-APP DESIGN REFERENCES YOUR AI CAN INSTALL</span>
+                <h1>Real screens, flows and sections. Searchable by your agent. Installable in one command.</h1>
                 <p>
-                    Claude, Codex, Cursor, Lovable and any MCP client search {PUBLISHED_GROUPS} component groups and {PAGE_EXAMPLES} full pages, then install
-                    the real source. Every component is axe-tested, built on your tokens, and consistent on every screen.
+                    {counts.screens} full pages, {counts.flows} flows, {counts.sections} website sections and {counts.components} component groups, all from one
+                    design system, axe-tested, free and MIT.
                 </p>
 
-                <ToolSelector
-                    microproof={[
-                        "React 19",
-                        "Vue, Angular & HTML",
-                        "MCP server",
-                        `${AXE_SUITES} axe suites, ${AXE_VIOLATIONS} violations`,
-                        "MIT licensed, no paid tier",
-                    ]}
+                <LibrarySearch />
+
+                <LibraryBrowser
+                    screens={pick(items, "screen", PER_TAB)}
+                    sections={pick(items, "section", PER_TAB)}
+                    components={pick(items, "component", PER_TAB)}
+                    flows={flows}
+                    counts={counts}
                 />
 
-                <div className="hero-video">
-                    <p className="hero-video-caption">A real Claude Code session: one prompt, a production billing page, built from Proper UI components.</p>
-                    <HeroVideo />
-                </div>
+                <p className="lib-install-line">
+                    Pick anything. Your agent runs <code>npx @properui/cli@latest add &lt;name&gt;</code> or calls the MCP and gets the real source.
+                </p>
+                <p className="lib-microproof">
+                    {microproof.map((item, index) => (
+                        <span className="lib-microproof-item" key={item}>
+                            {item}
+                            {index < microproof.length - 1 ? " ·" : ""}{" "}
+                        </span>
+                    ))}
+                </p>
             </div>
         </section>
     );

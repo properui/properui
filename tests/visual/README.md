@@ -2,7 +2,7 @@
 
 `tests/visual/baseline/` is a committed set of WebP screenshots — a curated ~25-route sample of
 the docs site (see `tests/visual/routes.ts`) at two viewports (1280x800 desktop, 390x844 mobile),
-in light and dark, plus a handful of `dir="rtl"` passes. 110 images total. `scripts/visual-check.ts`
+in light and dark, plus a handful of `dir="rtl"` passes. 114 images total. `scripts/visual-check.ts`
 re-captures the same routes and diffs each against its baseline with pixelmatch; `pnpm visual:check`
 fails if any capture exceeds `DIFF_THRESHOLD_PCT` (see `tests/visual/routes.ts`), if a baseline is
 missing, or if a capture's dimensions don't match.
@@ -18,7 +18,7 @@ actually changed. Chasing that kind of noise a route at a time is a waste of tim
 capture and check on the same platform, always.
 
 Because of this, `DIFF_THRESHOLD_PCT` is deliberately tight (currently 1%, see the comment in
-`tests/visual/routes.ts`) — same-platform Linux-vs-Linux reruns of the full 106-image set measured
+`tests/visual/routes.ts`) — same-platform Linux-vs-Linux reruns of the full 114-image set measured
 **0.00% differing pixels** with no exceptions. A real regression should read far above that.
 
 `pnpm visual:check` still works on any platform for a quick local sanity check while iterating, but

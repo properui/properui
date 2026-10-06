@@ -31,7 +31,7 @@ export function ToolSelector({ microproof }: { microproof: string[] }) {
                 <button type="button" className="button button-primary button-xl" onClick={focusToolSelector}>
                     Set up your agent
                 </button>
-                <a className="button button-secondary button-xl" href="#examples">
+                <a className="button button-secondary button-xl" href="#flows">
                     Explore components
                 </a>
             </div>

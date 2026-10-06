@@ -6,6 +6,21 @@
  */
 const QUESTIONS: Array<{ question: string; answer: React.ReactNode }> = [
     {
+        question: "How is this different from a library of screenshots?",
+        answer: (
+            <>
+                The references are components with source, not pictures. Your agent installs the one it picks, with its tokens and accessibility behaviour,
+                instead of imitating an image and guessing the markup.
+            </>
+        ),
+    },
+    {
+        question: "Where do the screens come from?",
+        answer: (
+            <>They are built in this repository from one design system. Demo data and assets are placeholders, and nothing is scraped from other products.</>
+        ),
+    },
+    {
         question: "Why does AI need a UI library designed for agents?",
         answer: (
             <>

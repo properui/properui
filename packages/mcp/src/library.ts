@@ -42,6 +42,8 @@ export interface Flow {
     title: string;
     description: string;
     tags: string[];
+    /** Site-relative docs page for the flow, e.g. `/flows/billing`. Absent in registries that predate it. */
+    docs?: string;
     steps: FlowStep[];
 }
 
@@ -440,6 +442,7 @@ export interface FlowItem {
     title: string;
     description: string;
     tags: string[];
+    docsUrl: string | null;
     steps: FlowStepItem[];
     /** Entries named by the flow that the registry index does not contain. */
     unresolvedSteps: string[];
@@ -473,6 +476,7 @@ export async function searchFlows(ctx: ServerContext, input: { query: string; li
             title: clean(flow.title),
             description: clean(flow.description),
             tags: flow.tags,
+            docsUrl: flow.docs ? catalog.siteUrl + flow.docs : null,
             steps,
             unresolvedSteps,
             addCommand: `${ADD_COMMAND} ${[...new Set(steps.map((step) => step.name))].join(" ")}`,
@@ -482,6 +486,7 @@ export async function searchFlows(ctx: ServerContext, input: { query: string; li
     const lines = [`${matches.length} flows match ${quote(input.query)}${items.length < matches.length ? `, showing ${items.length}` : ""}.`, ""];
     items.forEach((flow, index) => {
         lines.push(`${index + 1}. **${flow.title}** (\`${flow.id}\`): ${flow.description}`);
+        if (flow.docsUrl) lines.push(`   docs: ${flow.docsUrl}`);
         flow.steps.forEach((step, stepIndex) => {
             const parts = [`   ${stepIndex + 1}. ${step.title} (\`${step.name}\`): ${step.purpose}`];
             if (step.thumbnail) parts.push(`![thumb](${step.thumbnail.light})`);

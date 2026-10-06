@@ -2,25 +2,28 @@ import type { Metadata } from "next";
 import { BrandMark } from "~/components/landing/brand-mark";
 import "~/components/landing/landing-animations.css";
 import "~/components/landing/landing-content.css";
+import "~/components/landing/landing-library.css";
 import "~/components/landing/landing-proof.css";
+import "~/components/landing/landing-session.css";
 import "~/components/landing/landing-setup.css";
 import "~/components/landing/landing.css";
 import { AgentSetup } from "~/components/landing/sections/agent-setup";
 import { Comparison } from "~/components/landing/sections/comparison";
 import { Consistency } from "~/components/landing/sections/consistency";
-import { ExampleShowcase } from "~/components/landing/sections/example-showcase";
 import { Faq } from "~/components/landing/sections/faq";
 import { FinalCta } from "~/components/landing/sections/final-cta";
+import { FlowsShowcase } from "~/components/landing/sections/flows-showcase";
 import { Hero } from "~/components/landing/sections/hero";
-import { McpCallout } from "~/components/landing/sections/mcp-callout";
 import { ProofStrip } from "~/components/landing/sections/proof-strip";
+import { Session } from "~/components/landing/sections/session";
 import { Trust } from "~/components/landing/sections/trust";
-import { Workflow } from "~/components/landing/sections/workflow";
+import { Ways } from "~/components/landing/sections/ways";
+import { Why } from "~/components/landing/sections/why";
 import { SITE_NAME } from "~/lib/site";
 
-const TITLE = "Proper UI: Your AI stops inventing UI. It installs real components.";
+const TITLE = "Proper UI: web-app design references your AI can install";
 const DESCRIPTION =
-    "The design system for AI coding agents. Claude Code, Codex, Cursor, Lovable and any MCP client search Proper UI's registry and install real, axe-tested React components, with tokens, HTML components and custom elements for Vue, Angular and plain HTML.";
+    "Search real web-app screens, flows, sections and components from Claude Code, Cursor, Codex or ChatGPT, then install the source. Free and MIT.";
 
 /** Canonical origin for the marketing site, which is not the docs origin in `~/lib/site`. */
 const CANONICAL = "https://properui.dev/";
@@ -37,18 +40,39 @@ export const metadata: Metadata = {
     twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
 };
 
-/** JSON-LD SoftwareSourceCode block; every field is a real, verified fact about this repository. */
-const JSON_LD = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareSourceCode",
-    name: "Proper UI",
-    description: DESCRIPTION,
-    url: "https://properui.dev/",
-    codeRepository: "https://github.com/properui/properui",
-    programmingLanguage: ["TypeScript", "TSX", "CSS"],
-    runtimePlatform: "React 19",
-    license: "https://github.com/properui/properui/blob/main/LICENSE",
-};
+/** The four browsable collections, in the order the library presents them. Every route exists under `app/`. */
+const COLLECTIONS = [
+    { name: "Components", path: "/components" },
+    { name: "Flows", path: "/flows" },
+    { name: "Marketing sections", path: "/marketing" },
+    { name: "Application UI", path: "/application-ui" },
+];
+
+/** JSON-LD: a SoftwareSourceCode block plus an ItemList of the four collections; every field is a real, verified fact about this repository. */
+const JSON_LD = [
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareSourceCode",
+        name: "Proper UI",
+        description: DESCRIPTION,
+        url: "https://properui.dev/",
+        codeRepository: "https://github.com/properui/properui",
+        programmingLanguage: ["TypeScript", "TSX", "CSS"],
+        runtimePlatform: "React 19",
+        license: "https://github.com/properui/properui/blob/main/LICENSE",
+    },
+    {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        name: "Proper UI collections",
+        itemListElement: COLLECTIONS.map((collection, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            name: collection.name,
+            url: `https://properui.dev${collection.path}`,
+        })),
+    },
+];
 
 /**
  * The marketing landing page, rebuilt from `docs/spec/landing-variants/variant-b.html` (the
@@ -76,7 +100,8 @@ export default function LandingPage() {
 
                     <nav className="main-nav" aria-label="Main navigation">
                         <a href="/components">Components</a>
-                        <a href="#examples">Examples</a>
+                        <a href="/flows">Flows</a>
+                        <a href="#ways">Ways to use it</a>
                         <a href="#setup">For AI</a>
                         <a href="/docs">Documentation</a>
                         <a href="https://github.com/properui/properui" target="_blank" rel="noreferrer">
@@ -95,12 +120,13 @@ export default function LandingPage() {
             <main id="top">
                 <Hero />
                 <ProofStrip />
+                <FlowsShowcase />
+                <Why />
                 <Comparison />
-                <ExampleShowcase />
                 <Consistency />
-                <Workflow />
+                <Ways />
                 <AgentSetup />
-                <McpCallout />
+                <Session />
                 <Trust />
                 <Faq />
                 <FinalCta />
@@ -119,7 +145,7 @@ export default function LandingPage() {
                         <div>
                             <strong>Explore</strong>
                             <a href="/components">Components</a>
-                            <a href="#examples">Examples</a>
+                            <a href="/flows">Flows</a>
                             <a href="/docs/agents">For AI agents</a>
                             <a href="/docs">Documentation</a>
                         </div>
