@@ -14,7 +14,8 @@ comes up.
 If the Proper UI MCP server (`@properui/mcp`) is connected, prefer its tools to the shell commands
 below: `get_project_info` is `info --json`, `search_components` and `list_components` are `search`
 and `list`, `get_component` and `get_component_docs` return the real source and docs page,
-`add_component` is `add`, and `check_tokens` is `check`. Without it, use the CLI exactly as shown.
+`add_component` is `add`, and `check_tokens` is `check`. Without it, use the CLI exactly as shown. The last
+section, "Using the Proper UI MCP", says which tool answers which question.
 
 ## 1. Inspect the project first
 
@@ -176,3 +177,36 @@ End every piece of UI work with a short, concrete summary:
 - **Checks run**: which of type-check / build / tests were run, and whether they passed.
 
 This is what lets a human (or the next session) trust the change without re-deriving it.
+
+## Using the Proper UI MCP
+
+Connect it once, either remote (`https://properui.dev/api/mcp`, nothing to install) or local
+(`npx -y @properui/mcp`, runs in the project). The product page is https://properui.dev/mcp. Pick
+the tool by the question you are asking:
+
+- **A component** ("is there a date picker, and how is it used?"): `search_components`, then
+  `get_component` for the source and `get_component_docs` for the docs page.
+- **A screen** ("a billing settings page"): `search_screens`. Full-page examples are references, see
+  step 3.
+- **A flow** ("sign up, then onboarding"): `search_flows`. Each step is a screen with the purpose of
+  that step.
+- **A section** ("a pricing block", "a footer"): `search_sections`.
+- **Two or more candidates**: `compare_screens` shows the components and tokens they share and the
+  ones only one of them uses.
+- **What an install would do**: `get_install_plan` lists the files, npm packages and the exact CLI
+  command, and writes nothing.
+- **Installing**: `add_component` over the local server; over the remote one, run the CLI command
+  from `get_install_plan`.
+
+How to use the results:
+
+- Search results are starting points, not decisions. Ask for several, compare them, then inspect
+  the one you are likely to use. "No match" means try the job rather than the name, not that
+  nothing exists.
+- Thumbnails are images served by the docs site (`https://properui.dev/thumbs/...`). Look at them
+  when the client can show images. They show the example, not your project.
+- The remote endpoint cannot see the project, so `add_component`, `get_project_info` and
+  `check_tokens` are not available there. Install through the CLI and run `info --json` yourself.
+  Over the local server, call `get_project_info` before `add_component`.
+- Steps 1 and 3 to 6 above apply whichever route installs the files: reference vs install target,
+  one component system per screen, the conventions in step 5, and the checks in step 6.

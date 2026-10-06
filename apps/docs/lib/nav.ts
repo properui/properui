@@ -21,6 +21,7 @@ export const nav: NavGroup[] = [
             { title: "Introduction", href: "/docs/introduction" },
             { title: "Linting", href: "/docs/linting" },
             { title: "Mapping Figma to the registry", href: "/docs/figma" },
+            { title: "MCP server", href: "/docs/mcp" },
             { title: "Quality", href: "/docs/quality" },
             { title: "Registry metadata for agents", href: "/docs/registry-metadata" },
             { title: "RTL support", href: "/docs/rtl" },

@@ -1,5 +1,11 @@
 # @properui/cli
 
+## 0.3.1
+
+### Patch Changes
+
+- The Proper UI Skill that `agent init` writes gains a "Using the Proper UI MCP" section: which tool answers which question (component, screen, flow, section, compare, install plan, install), that results are starting points, that thumbnails are docs-site images, and that over the remote endpoint installs go through the CLI.
+
 ## 0.3.0
 
 ### Minor Changes

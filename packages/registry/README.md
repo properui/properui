@@ -2,8 +2,7 @@
 
 Private build package. Walks `packages/ui/src`, derives every component's dependency graph from
 its actual imports, and writes the JSON files the CLI (`@properui/cli`) and the docs site's
-variant gallery read at `/r/<name>.json`. Nothing here is published — this package has no
-changeset — but its output is a public contract: the CLI and the docs site are consumers, and
+variant gallery read at `/r/<name>.json`. Nothing here is published to npm, but its output is a public contract: the CLI and the docs site are consumers, and
 `apps/docs/app/r/**` serves `dist/*` verbatim over HTTP.
 
 ## Build
@@ -33,7 +32,69 @@ iteration, wall-clock, etc.), not a bug in the registry's data.
 | `dist/stats.json`                                           | Every count quoted in the root `README.md` and the docs landing page — one generated source.                                                                                                                   |
 | `dist/icons.json`                                           | `{ package, alias, names }` — the installed `@properui/icons` export list, for the CLI's icon search.                                                                                                          |
 | `dist/exports.json`                                         | `{ "<entry-name>": ["ComboBox", ...] }` — named exports per entry, so `search` can index export names, not just entry names.                                                                                   |
+| `dist/flows.json`                                           | `{ flows: [{ id, title, description, tags, steps: [{ entry, purpose }] }] }` — curated journeys, from `src/flows.ts`.                                                                                          |
+| `dist/thumbs.json`                                          | `{ "<entry-name>": { light, dark } }` — site-relative thumbnail paths for example entries.                                                                                                                     |
 | `dist/shadcn/*`                                             | shadcn-format mirror, written by `shadcn.ts` from the files above.                                                                                                                                             |
+
+## flows.json and thumbs.json
+
+Two files that let a client (the MCP server, the docs gallery) browse examples visually and by journey.
+Both are written by `src/build.ts`; neither changes any `dist/<name>.json`.
+
+### `dist/thumbs.json`
+
+```json
+{
+    "login-simple": {
+        "light": "/thumbs/app-examples/log-in-pages/login-simple.webp",
+        "dark": null
+    }
+}
+```
+
+- Built by scanning `apps/docs/public/thumbs/<section>/<slug>/<variant>.webp`, with an optional
+  `<variant>-dark.webp` beside it. `<section>` is `app-examples`, `marketing` or `marketing-examples`; `<slug>` is the
+  group folder; `<variant>` is the example entry's name.
+- Paths are site-relative: `apps/docs` serves `public/` at the site root, so the URL is `https://properui.dev` plus the path.
+- Only entries with a light thumbnail appear. `dark` is `null` when there is no dark file.
+- A file is skipped, with a warning, when no entry has that name, or when the entry lives in a different group.
+  Variant names repeat across sibling groups (`dashboards` and `dashboards-02` both have `dashboard-01`) and the
+  registry keeps one entry per name, so only the thumbnail from the group in the entry's `docs` path counts.
+  Likewise `header-sections/` holds copies of `hero-header-sections/` thumbnails.
+- An entry whose own name ends in `-dark` keeps its own light thumbnail; the `-dark.webp` suffix only means "dark
+  version" when there is no entry of that exact name.
+
+### `dist/flows.json`
+
+```json
+{
+    "flows": [
+        {
+            "id": "auth",
+            "title": "Authentication",
+            "description": "Sign up, confirm the email address, log in, and recover a forgotten password.",
+            "tags": ["login", "sign up", "forgot password"],
+            "steps": [{ "entry": "signup-simple", "purpose": "A short sign-up form that asks for the minimum to create an account." }]
+        }
+    ]
+}
+```
+
+A flow is an ordered list of example entries that together cover one product journey. They are curated by hand in
+`src/flows.ts`, in the order they are written to the file.
+
+To add a flow, append an object to `FLOWS` in `src/flows.ts`:
+
+1. `id`: unique, kebab-case. `title` and `description`: one sentence each.
+2. `tags`: 4 to 8 words people search for ("login", "onboarding", "checkout", "paywall", "empty state").
+3. `steps`: 3 to 6 of `{ entry, purpose }`. `entry` is the name of an `example` entry in `dist/index.json`; `purpose` is one
+   sentence on what that screen does in the journey.
+4. Run `pnpm registry:build`. The build fails, listing every problem, if an id repeats, a step's entry does not exist
+   or is not an example, a step has no light thumbnail, a count is out of range, or any copy contains an em dash or an
+   ellipsis character.
+
+`stats.json` gains `flows` and `thumbnails` (counts of the two files above). Contract tests live in
+`src/outputs.test.ts`; run `pnpm -F @properui/registry test`, which builds first.
 
 ## Entry shape
 
@@ -128,5 +189,6 @@ pnpm registry:build && pnpm registry:build   # run twice
 diff -rq packages/registry/dist /tmp/previous-dist   # byte-identical, or explain why not
 pnpm -F @properui/registry type-check
 pnpm -F @properui/registry lint
+pnpm -F @properui/registry test   # builds, then checks flows.json, thumbs.json and stats.json
 grep -rl "eslint-disable" packages/registry/dist/*.json   # must be empty
 ```

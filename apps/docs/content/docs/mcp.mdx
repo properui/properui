@@ -1,0 +1,360 @@
+---
+title: MCP server
+section: docs
+description: "The Proper UI MCP lets an agent search web-app screens, flows, sections and components, inspect an entry, and plan or run an install. Remote endpoint, local stdio package, every tool, resource and prompt."
+metaTitle: "Proper UI MCP reference: tools, resources and client setup | Proper UI"
+metaDescription: "Endpoint, stdio command, every tool with parameters and sample results, resources, the build_screen prompt, client setup and troubleshooting for the Proper UI MCP."
+---
+
+The Proper UI MCP is a [Model Context Protocol](https://modelcontextprotocol.io) server over the same registry the CLI uses. An agent connected to it can search the library of screens, flows, sections and components, look at an entry in detail, and get an install plan. The product overview is on the [MCP page](/mcp).
+
+It is free, MIT licensed and needs no account, sign-in or API key.
+
+There are two ways to connect, and they differ in one way that matters:
+
+- **Remote** (`https://properui.dev/api/mcp`) has no access to your project. It searches, inspects and plans. To install, the agent takes the command from `get_install_plan` and runs the CLI through its own shell tool, so each file write goes through the approval your client already asks for.
+- **Local** (`npx -y @properui/mcp`) runs in your project, so it also has `add_component`, `get_project_info` and `check_tokens`. `add_component` writes the files exactly as `properui add` would.
+
+## Endpoints
+
+| Transport                          | How to reach it                           |
+| ---------------------------------- | ----------------------------------------- |
+| Remote, Streamable HTTP, stateless | `https://properui.dev/api/mcp`            |
+| Local, stdio                       | `npx -y @properui/mcp` (Node 20 or newer) |
+
+Use the remote URL for ChatGPT, Claude on the web and anywhere you want nothing installed. Use the stdio package when you want the agent to install straight into your project, when your client has no remote support, or to read a registry you host or keep offline:
+
+```bash
+npx -y @properui/mcp --registry https://registry.example.com/r
+npx -y @properui/mcp --registry ./registry
+```
+
+`--registry` takes a URL or a directory of registry JSON (the contents of `packages/registry/dist`). Without it the server reads `https://properui.dev/r`.
+
+## Client setup
+
+Each client below lists the remote form first and the local stdio form second, where the client supports it. Each command was checked against the client's own documentation on 6 October 2026. Menus and labels change, so follow the linked page if yours differs.
+
+### Claude Code
+
+```bash
+claude mcp add --transport http properui https://properui.dev/api/mcp
+```
+
+Or run the server locally, so `add_component` can install into the project:
+
+```bash
+claude mcp add properui -- npx -y @properui/mcp
+```
+
+Add `--scope user` to make it available in every project, or `--scope project` to share it through the repository. Run `/mcp` inside Claude Code, or `claude mcp list` in the shell, to check that it is connected. See the [Claude Code MCP documentation](https://code.claude.com/docs/en/mcp).
+
+### Claude Desktop and Web
+
+Claude takes remote servers as custom connectors:
+
+1. Open Customize, then Connectors.
+2. Choose `+ Add`, then `Add custom connector`.
+3. Name it `Proper UI`, paste `https://properui.dev/api/mcp` and continue.
+4. Choose the no sign in option and add the connector.
+5. In a conversation, use the `+` button, open Connectors and switch Proper UI on.
+
+Claude Desktop can also run the local server. Add this to `claude_desktop_config.json` and restart the app:
+
+```json
+{
+    "mcpServers": {
+        "properui": {
+            "command": "npx",
+            "args": ["-y", "@properui/mcp"]
+        }
+    }
+}
+```
+
+On Team and Enterprise plans an owner adds the connector first under Organization settings, then Connectors; members connect it from Customize. See [Get started with custom connectors using remote MCP](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp).
+
+### ChatGPT
+
+ChatGPT takes a remote server through its custom MCP server dialog:
+
+1. Open `chatgpt.com/plugins`, select the plus button, then `Add custom MCP server`.
+2. Give it a name and description.
+3. Under connection, enter `https://properui.dev/api/mcp`, including the `/mcp` path. No authentication is needed.
+4. Confirm the risk notice and create it, then check that the discovered tools include `search_screens` and `get_install_plan`.
+
+ChatGPT cannot run a local process, so only the remote URL applies, and it cannot write to your project: take the command from `get_install_plan` and run it in your own terminal. Plan availability and menu names change often. See [Connect from ChatGPT](https://developers.openai.com/apps-sdk/deploy/connect-chatgpt).
+
+### Codex
+
+```bash
+codex mcp add properui --url https://properui.dev/api/mcp
+```
+
+Or add the same server to your Codex `config.toml`:
+
+```toml
+[mcp_servers.properui]
+url = "https://properui.dev/api/mcp"
+```
+
+To run the server locally instead:
+
+```toml
+[mcp_servers.properui]
+command = "npx"
+args = ["-y", "@properui/mcp"]
+```
+
+See the [Codex MCP documentation](https://learn.chatgpt.com/docs/extend/mcp?surface=cli).
+
+### Cursor
+
+Add the server to `.cursor/mcp.json` in a project, or to `~/.cursor/mcp.json` for every project:
+
+```json
+{
+    "mcpServers": {
+        "properui": {
+            "url": "https://properui.dev/api/mcp"
+        }
+    }
+}
+```
+
+For the local server, use a `command` entry in the same file:
+
+```json
+{
+    "mcpServers": {
+        "properui": {
+            "command": "npx",
+            "args": ["-y", "@properui/mcp"]
+        }
+    }
+}
+```
+
+See the [Cursor MCP documentation](https://cursor.com/docs/context/mcp).
+
+### Gemini CLI
+
+```bash
+gemini mcp add --transport http properui https://properui.dev/api/mcp
+```
+
+For the local server, add the same `command` and `args` entry shown for Cursor under `mcpServers` in `~/.gemini/settings.json`. Run `/mcp` in Gemini CLI to check that it is connected. See the [Gemini CLI MCP server documentation](https://github.com/google-gemini/gemini-cli/blob/main/docs/tools/mcp-server.md).
+
+### Other clients
+
+Add a remote MCP server over Streamable HTTP with the URL above and no authentication. If your client only supports local servers, or you want the agent to install from the tool, register the stdio command `npx -y @properui/mcp` in whatever form your client takes.
+
+## What your agent can do with it
+
+| Outcome                | Tool                                                                     |
+| ---------------------- | ------------------------------------------------------------------------ |
+| Research a screen      | `search_screens`                                                         |
+| Follow a flow          | `search_flows`                                                           |
+| Compare approaches     | `compare_screens`                                                        |
+| Find a section         | `search_sections`                                                        |
+| Install what you found | `add_component` over stdio, or `get_install_plan` then the CLI over HTTP |
+
+## Tools
+
+Every search tool returns ranked items and says so plainly when nothing scores. Search is a fuzzy match over name, title, description, group, layer, what an entry composes with, and its exports. Both transports serve the tools below. The project tools at the end of the list exist only over stdio.
+
+### `search_screens`
+
+Full-page examples: dashboards, settings, sign-in and sign-up, verification, pricing, landing, about, contact, blog and legal pages, and more.
+
+- `query` (string, required): what you are looking for, in plain language.
+- `platform` (optional): `app` for product screens or `marketing` for marketing pages.
+- `limit` (optional integer, 1 to 25): how many results to return. Defaults to 8.
+
+### `search_sections`
+
+Marketing section variants: heroes, pricing, features, testimonials, FAQs, footers and more.
+
+- `query` (string, required)
+- `group` (optional string): restrict to one section family by name, such as `pricing-sections` or `hero-header-sections`. A partial name matches.
+- `limit` (optional integer, 1 to 25): defaults to 8.
+
+### `search_flows`
+
+Curated ordered sequences of screens (auth, onboarding, settings, billing, a marketing site, email lifecycle). Each step is a screen item with the purpose of that step. Flows are built only from entries that exist.
+
+- `query` (string, required)
+- `limit` (optional integer, 1 to 25): defaults to 5.
+
+### `search_components`
+
+Fuzzy search over the registry's names, titles, descriptions, docs example names and exported symbols: the published component groups, plus utils and hooks.
+
+- `query` (string, required)
+- `type` (optional): only entries of this type: `component`, `example`, `util`, `hook`, `style` or `html`.
+- `platform` (optional): `react`, `next`, `html`, `vue`, `angular`, `svelte`, `astro` or `vanilla`.
+- `limit` (optional integer, 1 to 100): defaults to 10.
+
+### `compare_screens`
+
+Puts two to five entries side by side: the components and semantic tokens they share, and the ones unique to each. Use it after a search, to choose between candidates before you read any of them in full.
+
+- `names` (array of strings, required): two to five registry names, such as `dashboard-02` and `dashboard-04`.
+- `include_source` (optional boolean, default `false`): append the full source of every file of every entry. Source is long, so ask for it only when the shortlist is down to two.
+
+### `get_component`
+
+The full registry entry for one name: every file with its source, npm and registry dependencies, usage guidance when published (intent, avoid_when, a11y_contract, token_contract) and the docs URL.
+
+- `name` (string, required): a registry name such as `dashboard-04`.
+- `includeDemoFiles` (optional boolean, default `false`): also return files marked as demo content (fixtures, placeholder data).
+
+### `get_component_docs`
+
+The entry's docs page as markdown: usage, props, examples and accessibility notes.
+
+- `name` (string, required): a registry name such as `buttons`.
+
+### `get_install_plan`
+
+Resolves what installing one or more entries would do, without doing it: registry dependencies, the npm packages the project needs, the files that would be written, and the exact CLI command. Over HTTP the agent runs that command itself; over stdio it can call `add_component` instead.
+
+- `names` (array of strings, required): one to twenty registry names to install together.
+
+### `list_components`
+
+Registry entries (name, layer, type, title, description, platforms), filtered and paged.
+
+- `layer` (optional string): such as `base`, `application` or `marketing`.
+- `type` (optional): `component`, `example`, `util`, `hook`, `style` or `html`.
+- `platform` (optional): the same values as in `search_components`.
+- `limit` (optional integer, 1 to 1000): defaults to 100.
+- `offset` (optional integer): rows to skip, for paging. Defaults to 0.
+
+### Project tools (stdio only)
+
+These need a project on disk, so the remote endpoint does not offer them. Each takes an optional `cwd`, which defaults to the directory the client started the server in.
+
+- `add_component` runs `properui add`: it resolves registry dependencies, rewrites `@/` imports to your `components.json` alias, records the install and returns the npm install command. It needs `components.json`, so run `npx @properui/cli@latest init` first. It takes `names` (required), `overwrite`, `dryRun`, `optional` (also install optional registry dependencies, default true), `withDemos`, `path` and `install`. Existing files are skipped unless `overwrite` is true, `dryRun` reports without writing, and it runs the package manager only when `install` is true.
+- `get_project_info` runs `properui info --json`: framework, platform, Tailwind, aliases, theme path, registry reachability and installed entries.
+- `check_tokens` runs `properui check`: raw palette classes, `dark:` variants and arbitrary colour values in a file or directory. It takes an optional `path`, relative to `cwd`, to scan one file or directory instead of the whole project.
+
+### Result shape
+
+The search tools return markdown with one line per hit, plus the same data as `structuredContent`: `query`, `total` and a `results` array whose items have these fields. The sample is abridged.
+
+```json
+{
+    "name": "dashboard-04",
+    "title": "Dashboard 04",
+    "layer": "app-examples",
+    "type": "example",
+    "group": "dashboards",
+    "description": "...",
+    "docsUrl": "https://properui.dev/components/dashboards/dashboard-04",
+    "previewUrl": "https://properui.dev/preview/variant/app-examples/dashboards/dashboard-04",
+    "thumbnail": {
+        "light": "https://properui.dev/thumbs/app-examples/dashboards/dashboard-04.webp",
+        "dark": null
+    },
+    "composesWith": ["app-navigation", "charts", "metrics", "table", "tabs"],
+    "tokenContract": ["bg-primary", "border-secondary", "text-primary", "text-tertiary"],
+    "addCommand": "npx @properui/cli@latest add dashboard-04"
+}
+```
+
+An entry without a thumbnail has `thumbnail: null` rather than being left out, and `dark` is `null` when only a light thumbnail is published. See [Registry metadata for agents](/docs/registry-metadata) for what each field means.
+
+### Install plan shape
+
+`get_install_plan` also returns markdown, with this `structuredContent`. The sample is abridged.
+
+```json
+{
+    "requested": ["dashboard-04"],
+    "command": "npx @properui/cli@latest add dashboard-04",
+    "commandWithoutOptional": null,
+    "entries": [{ "name": "charts", "title": "Charts", "layer": "base", "type": "component", "optional": false }],
+    "npmPackages": ["@properui/icons", "react-aria", "recharts"],
+    "optionalNpmPackages": [],
+    "files": [{ "entry": "dashboard-04", "path": "...", "target": "...", "optional": false }],
+    "demoFilesOmitted": 0,
+    "missingEntries": [],
+    "unreadableEntries": [],
+    "note": "..."
+}
+```
+
+## Resources
+
+| URI                          | Contents                                                              |
+| ---------------------------- | --------------------------------------------------------------------- |
+| `properui://registry/index`  | `index.json`: every entry's name, layer, type, title and dependencies |
+| `properui://registry/<name>` | One registry entry with the full source of every file                 |
+| `properui://stats`           | The library's numbers: entries, groups, variants, examples and tests  |
+
+All three are served over both stdio and HTTP.
+
+## Prompt
+
+`build_screen(description)` encodes the research-then-install workflow: say what you are building, search several results, inspect with `get_component`, plan with `get_install_plan`, install (`add_component` over stdio, the CLI over HTTP), then adapt copy and data while keeping the semantic tokens. Clients that list MCP prompts show it by name.
+
+## Install the Skill too
+
+The Skill tells an agent when and how to use Proper UI, including to search with the MCP first. Install it with the CLI:
+
+```bash
+npx @properui/cli@latest agent init
+```
+
+For agents the CLI does not target, install it from the skills registry instead. This reaches 75+ agents through [skills.sh](https://skills.sh):
+
+```bash
+npx skills add properui/properui
+```
+
+## Using it well
+
+1. Say what you are building (a screen, a flow or a section) and who it is for.
+2. Search and review several results, not the first, and use `compare_screens` when two candidates are close.
+3. Inspect the likely choice with `get_component`.
+4. Plan with `get_install_plan`.
+5. Install: `add_component` over stdio, the CLI over HTTP. Then replace placeholder copy and data and keep the tokens.
+
+## Troubleshooting
+
+- **The client says it cannot connect.** Check that the URL is exactly `https://properui.dev/api/mcp`, with no trailing path. Open it in a browser: a 405 or protocol error means the server is up and only speaks MCP.
+- **The server connects but no tools appear.** Start a new conversation or session; most clients load tools once, at the start. In ChatGPT, check that the connector is enabled for the conversation.
+- **`add_component` is not in the tool list.** The remote endpoint has no access to your project, so it does not offer the project tools. Use `get_install_plan` and run the CLI command, or register the local package (`npx -y @properui/mcp`).
+- **A client asks you to sign in.** The endpoint needs no sign-in. Choose the no authentication option when you add it.
+- **A client only supports local servers.** Use the stdio package with `npx -y @properui/mcp`. It needs Node 20 or newer.
+- **A search returns "no match".** That is an honest answer, not a failure. Try the thing's job rather than its name (`team invite` rather than `invite modal`), or search a different collection.
+- **You need it offline, or behind a firewall.** Use stdio with `--registry <directory>` pointing at a local copy of the registry.
+
+## How it relates to the CLI and the Skill
+
+- The [CLI](/docs/cli) installs. The MCP helps an agent decide what to install. Over stdio it can run the install itself with the CLI's own code; over HTTP it hands the final step to the CLI. Both read the same registry.
+- The [Skill](/docs/agents) is instructions kept in your repository. When the MCP is connected, the Skill tells the agent to use `search_*` and `get_component` before the CLI.
+
+## FAQs
+
+<FAQs
+    items={[
+        {
+            question: "Does the MCP write files into my project?",
+            answer: "Not over HTTP. The remote endpoint only searches, inspects and plans, and your agent runs the CLI through its own shell tool, so each file write goes through the approval your client already asks for. The local stdio package runs in your project, and its add_component tool writes files the way properui add does.",
+        },
+        {
+            question: "Is there a rate limit?",
+            answer: "Fair use. There is no per-user quota today. For heavy or automated use, run the stdio package against a local copy of the registry.",
+        },
+        {
+            question: "What data does it send?",
+            answer: "Only the tool arguments your agent passes, such as a search query. The server has no telemetry and never sees your code. The only usage signal is the aggregate request analytics Cloudflare provides for the endpoint.",
+        },
+        {
+            question: "Do I need the MCP if I already use the CLI and the Skill?",
+            answer: "No. The CLI and the Skill cover installing and working conventions. The MCP adds search across screens, flows and sections with thumbnails and links, which helps an agent compare options before it installs one.",
+        },
+    ]}
+/>

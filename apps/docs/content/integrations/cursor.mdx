@@ -38,13 +38,47 @@ This writes `.cursor/rules/properui.mdc` with `alwaysApply: true` frontmatter: C
 
 `alwaysApply: true` means Cursor includes this rule in every chat and every Agent mode session, not just when a matching file is open, which matters here, since the "search before you write markup" instruction applies to any file, not just component files. If you'd rather it only load when a `.tsx`/`.jsx` file is in context, open the generated file, drop `alwaysApply`, and add a `globs` line instead; Cursor's own docs cover the other rule types (Auto Attached, Agent Requested, Manual). Re-running `agent init --client cursor` after a Skill update replaces the file, so keep any such manual edit in mind before re-running with `--overwrite`.
 
+## MCP integration
+
+`@properui/mcp` gives Cursor the registry as tools: `list_components`, `search_components`, `get_component`,
+`get_component_docs`, the design library tools `search_screens`, `search_sections`, `search_flows`, `compare_screens` and `get_install_plan`, and, on the local server, `add_component`,
+`get_project_info` and `check_tokens`. Add the remote server to `.cursor/mcp.json` in a project, or to
+`~/.cursor/mcp.json` for every project. It needs no install and no account:
+
+```json
+{
+    "mcpServers": {
+        "properui": {
+            "url": "https://properui.dev/api/mcp"
+        }
+    }
+}
+```
+
+The remote server has no project to write to, so the agent runs the CLI command that `get_install_plan` prints. To let
+`add_component` install into the project, use a local `command` entry in the same file instead:
+
+```json
+{
+    "mcpServers": {
+        "properui": {
+            "command": "npx",
+            "args": ["-y", "@properui/mcp"]
+        }
+    }
+}
+```
+
+Reload Cursor, then check that `properui` is listed and enabled under MCP in settings. The full tool list is on the
+[MCP page](/integrations/mcp).
+
 ## FAQs
 
 <FAQs
     items={[
         {
             question: "Does Cursor need a Skill file or an MCP server for this?",
-            answer: "Neither is required, but both exist. npx @properui/cli@latest agent init --client cursor installs the rule in the .mdc format Cursor reads and registers the @properui/mcp server in .cursor/mcp.json. Without the server, Agent mode runs npx @properui/cli@latest search and add in its terminal instead.",
+            answer: "Neither is required, but both exist. npx @properui/cli@latest agent init --client cursor installs the rule in the .mdc format Cursor reads and registers the local @properui/mcp server in .cursor/mcp.json. Without the server, Agent mode runs npx @properui/cli@latest search and add in its terminal instead.",
         },
         {
             question: "Why .mdc and not a plain .md file?",

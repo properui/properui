@@ -2,7 +2,7 @@
 
 `tests/visual/baseline/` is a committed set of WebP screenshots — a curated ~25-route sample of
 the docs site (see `tests/visual/routes.ts`) at two viewports (1280x800 desktop, 390x844 mobile),
-in light and dark, plus a handful of `dir="rtl"` passes. 106 images total. `scripts/visual-check.ts`
+in light and dark, plus a handful of `dir="rtl"` passes. 110 images total. `scripts/visual-check.ts`
 re-captures the same routes and diffs each against its baseline with pixelmatch; `pnpm visual:check`
 fails if any capture exceeds `DIFF_THRESHOLD_PCT` (see `tests/visual/routes.ts`), if a baseline is
 missing, or if a capture's dimensions don't match.
@@ -66,7 +66,7 @@ rm -rf tests/visual/baseline
 docker cp visual-baseline-cap:/workc/tests/visual/baseline tests/visual/baseline
 docker rm -f visual-baseline-cap
 
-# 6. Sanity-check: file count should be 106, total size a few MB. Spot-check a handful of images
+# 6. Sanity-check: file count should be 110, total size a few MB. Spot-check a handful of images
 #    (light/dark, desktop/mobile, at least one RTL) to confirm they're real rendered pages and not
 #    error pages — scripts/visual-baseline.ts fails loudly (non-200 response or a rendered
 #    Next.js error page) instead of silently saving a broken capture, but a manual look is cheap

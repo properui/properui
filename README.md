@@ -49,6 +49,7 @@ so Claude Code, Codex, Cursor, v0, Bolt and Lovable can all drive them.
 | HTML registry entries      | `/r/<component>-html.json`                                                                        | Fetches `@properui/html` snippets (`type: "html"`) for Vue, Angular, Svelte, Astro and plain HTML; `add` picks them on an html-platform project.                                                                         |
 | Prebuilt stylesheet        | [`/css/properui.min.css`](https://properui.dev/css/properui.min.css)                              | Tokens plus the html component classes in one file, for a `<link>` on a page with no build step (also `@properui/tokens/dist/properui.min.css` on jsDelivr).                                                             |
 | MCP server                 | `npx -y @properui/mcp`                                                                            | The same registry and `add` as MCP tools (`search_components`, `get_component`, `add_component`, ...), for assistants that speak MCP.                                                                                    |
+| Remote MCP endpoint        | [`/api/mcp`](https://properui.dev/mcp) (`https://properui.dev/api/mcp`)                           | Streamable HTTP, no account. Searches screens, flows, sections and components and returns an install plan; the agent then runs the CLI. Setup per client on [`/mcp`](https://properui.dev/mcp).                          |
 
 Why generated code comes out better against this library specifically:
 
@@ -70,8 +71,13 @@ Why generated code comes out better against this library specifically:
   what renders.
 
 [`AGENTS.md`](./AGENTS.md) holds the conventions an assistant working in this repository should follow. The MCP server
-([`packages/mcp`](./packages/mcp)) registers with `claude mcp add properui -- npx -y @properui/mcp`; see
-[docs/mcp.md](./docs/mcp.md) for Cursor, Codex, Windsurf and VS Code.
+([`packages/mcp`](./packages/mcp)) registers with `claude mcp add properui -- npx -y @properui/mcp`, or without installing
+anything through the remote endpoint with `claude mcp add --transport http properui https://properui.dev/api/mcp`; see
+[properui.dev/mcp](https://properui.dev/mcp) for every client and [docs/mcp.md](./docs/mcp.md) for Cursor, Codex, Windsurf
+and VS Code.
+
+Install the Proper UI Skill, which tells an assistant when and how to use all of the above, with
+`npx @properui/cli@latest agent init`, or with `npx skills add properui/properui` (skills.sh, 75+ agents).
 
 ## Features
 

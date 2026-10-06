@@ -1,26 +1,38 @@
 ---
 title: MCP integration
 section: integrations
-description: "@properui/mcp is a Model Context Protocol server that gives Claude Code, Cursor, Codex, Windsurf and VS Code the Proper UI registry and the CLI's add as tools."
+description: "@properui/mcp is a Model Context Protocol server, local over stdio and remote at properui.dev/api/mcp, that gives Claude Code, Cursor, Codex, Windsurf and VS Code the Proper UI registry as tools."
 metaTitle: MCP (Model Context Protocol) server | Proper UI
-metaDescription: "Connect the Proper UI MCP server (@properui/mcp) to Claude Code, Cursor, Codex, Windsurf or VS Code: search, read and install registry components as tools."
+metaDescription: "Connect the Proper UI MCP server (@properui/mcp, or the remote endpoint properui.dev/api/mcp) to Claude Code, Cursor, Codex, Windsurf or VS Code: search screens, flows, sections and components, then install."
 ---
 
 `@properui/mcp` is a [Model Context Protocol](https://modelcontextprotocol.io) server. It gives an MCP-aware assistant the Proper UI registry and the CLI's `add` as tools, so it can search for a component by description, read its real source and docs, and install it with its dependency chain without leaving the chat or shelling out to `npx @properui/cli` for every lookup.
+
+It also runs as a remote endpoint, `https://properui.dev/api/mcp` (Streamable HTTP, stateless, no account), which needs nothing installed. The product overview is on the [MCP page](/mcp).
 
 It is not a second implementation: the registry client, fuzzy search, `add`, `info` and `check` are the CLI's own modules, bundled into the server. A file `add_component` writes is exactly what `properui add` would have written.
 
 ## Connect it
 
-The server runs over stdio through `npx`, so there is nothing to install.
+Two ways, and one difference. The remote endpoint has no access to your project, so it searches, inspects and plans, and the agent installs with the CLI using the command from `get_install_plan`. The stdio server runs in your project, so `add_component` installs directly. It runs through `npx`, so there is nothing to install first.
 
-**Claude Code:**
+**Remote** (Claude Code, Codex, Gemini CLI, Cursor, and Claude and ChatGPT as custom connectors):
+
+```bash
+claude mcp add --transport http properui https://properui.dev/api/mcp
+codex mcp add properui --url https://properui.dev/api/mcp
+gemini mcp add --transport http properui https://properui.dev/api/mcp
+```
+
+Cursor takes `{ "mcpServers": { "properui": { "url": "https://properui.dev/api/mcp" } } }` in `.cursor/mcp.json`. Per-client steps, including Claude Desktop and ChatGPT, are in the [MCP reference](/docs/mcp#client-setup).
+
+**Local (stdio), Claude Code:**
 
 ```bash
 claude mcp add properui -- npx -y @properui/mcp
 ```
 
-**Cursor** (`.cursor/mcp.json`), **Windsurf** (`~/.codeium/windsurf/mcp_config.json`) and **Claude Desktop**:
+**Local (stdio), Cursor** (`.cursor/mcp.json`), **Windsurf** (`~/.codeium/windsurf/mcp_config.json`) and **Claude Desktop**:
 
 ```json
 {
@@ -61,17 +73,22 @@ args = ["-y", "@properui/mcp"]
 
 | Tool                 | What it does                                                                                                                 |
 | -------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `list_components`    | Registry entries (name, layer, type, title, description), filtered by layer and type                                         |
+| `list_components`    | Registry entries (name, layer, type, title, description), filtered by layer, type and platform                               |
 | `search_components`  | Fuzzy search over names, titles, descriptions, example names and exported symbols, scored like `properui search`             |
+| `search_screens`     | Fuzzy search over full-page examples: dashboards, settings, auth, onboarding, billing, 404s, email templates                 |
+| `search_sections`    | Fuzzy search over marketing section variants: heroes, pricing, features, testimonials, footers                               |
+| `search_flows`       | Curated ordered sequences of screens, each step with its purpose                                                             |
+| `compare_screens`    | Two to five entries side by side: shared components and tokens, and what is unique to each                                   |
 | `get_component`      | One entry in full: every file with its source, npm and registry dependencies, usage guidance and the docs URL                |
 | `get_component_docs` | The entry's docs page as markdown                                                                                            |
+| `get_install_plan`   | What installing entries would do: registry dependencies, npm packages, files, and the exact CLI command. Writes nothing      |
 | `add_component`      | `properui add`: resolves `registryDependencies`, rewrites `@/` imports, records the install, returns the npm install command |
 | `get_project_info`   | `properui info --json`: framework, Tailwind, aliases, theme path, registry reachability, installed entries                   |
 | `check_tokens`       | `properui check`: raw palette classes, `dark:` variants and arbitrary colour values in a file or directory                   |
 
-The registry index is also exposed as a resource (`properui://registry/index`), and so is every entry (`properui://registry/<name>`).
+Over HTTP the server offers every tool except the last three (`add_component`, `get_project_info`, `check_tokens`), which need a project on disk. The server also has a `build_screen` prompt and a `properui://stats` resource, and the registry index and every entry are resources over both transports (`properui://registry/index`, `properui://registry/<name>`). Parameters and sample results for each tool are in the [MCP reference](/docs/mcp).
 
-`add_component` needs `components.json`, so run `npx @properui/cli@latest init` first; there is no `init` tool. It never runs the package manager unless the call passes `install: true`: by default it returns the install command for the agent to run or show you.
+Search results carry thumbnails, which are images served by this docs site (`https://properui.dev/thumbs/...`). `add_component` needs `components.json`, so run `npx @properui/cli@latest init` first; there is no `init` tool. It never runs the package manager unless the call passes `install: true`: by default it returns the install command for the agent to run or show you.
 
 ## Another registry
 
@@ -83,11 +100,11 @@ The server resolves the registry the way the CLI does: `--registry <source>` aft
     items={[
         {
             question: "Is there an MCP server for Proper UI today?",
-            answer: "Yes: @properui/mcp. Run it with npx -y @properui/mcp from any MCP client; the setup for Claude Code, Cursor, Codex, Windsurf and VS Code is above.",
+            answer: "Yes: @properui/mcp. Run it with npx -y @properui/mcp from any MCP client, or use the remote endpoint https://properui.dev/api/mcp; the setup for Claude Code, Cursor, Codex, Windsurf and VS Code is above.",
         },
         {
             question: "Do I still need the CLI?",
-            answer: "For init, yes: there is no init tool. For everything else the server covers the same ground as list, search, add, info and check. diff, remove, why and login are CLI-only.",
+            answer: "For init, yes: there is no init tool. Over stdio the server covers the same ground as list, search, add, info and check. Over HTTP it has no project, so the agent installs with the CLI using the command from get_install_plan. diff, remove, why and login are CLI-only.",
         },
         {
             question: "Which project does add_component write into?",

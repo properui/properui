@@ -3,12 +3,12 @@ title: Accessibility
 section: docs
 description: "What Proper UI's accessibility testing actually covers: automated axe-core checks in CI, what React Aria provides, and what composition still requires human review."
 metaTitle: Accessibility | Proper UI
-metaDescription: "0 detected axe violations in 125 automated suites (what that number means, what it doesn't, and why): automated tools can't check everything (W3C)."
+metaDescription: "0 detected axe violations in 143 automated suites (what that number means, what it doesn't, and why): automated tools can't check everything (W3C)."
 ---
 
 ## The claim, precisely
 
-Every component group in `packages/ui/src/components` ships a test suite that renders each documented variant and asserts zero detected [axe-core](https://github.com/dequelabs/axe-core) violations. As of this page, that's **125 of 128 test suites asserting `toHaveNoViolations`** (the other three are the jsdom interaction recipes on the [Testing](/docs/testing) page, which drive popovers rather than render variants), running on every pull request in CI.
+Every component group in `packages/ui/src/components` ships a test suite that renders each documented variant and asserts zero detected [axe-core](https://github.com/dequelabs/axe-core) violations. As of this page, that's **143 of 146 test suites asserting `toHaveNoViolations`** (the other three are the jsdom interaction recipes on the [Testing](/docs/testing) page, which drive popovers rather than render variants), running on every pull request in CI.
 
 That number is real, and it's also narrow. The [W3C](https://www.w3.org/WAI/test-evaluate/tools/selecting/) is direct about the ceiling: "Tools cannot check all accessibility aspects automatically. Human judgement is required." Automated tools "can not _determine_ accessibility, they can only _assist_ in doing so." This page exists so the number links to its own boundary instead of standing in for a claim the tests don't make.
 
@@ -30,7 +30,7 @@ What it does not, and structurally cannot, check:
 - **Focus order sensibility.** It can confirm elements are focusable and in the accessibility tree; whether tabbing through a page visits things in an order a person would consider sane is not something a DOM snapshot answers.
 - **Colour contrast, in this setup specifically.** Axe's contrast checks work by rendering; jsdom does no layout or paint, so there is no computed style, no `getBoundingClientRect`, and no way for axe to sample a background against a foreground. The rule isn't disabled, it simply never has anything to measure in this test environment.
 - **Screen-reader announcement quality.** Correct ARIA (roles, states, `aria-live`) doesn't guarantee an announcement makes sense out loud, in the order it fires, at the verbosity a screen-reader user wants.
-- **Keyboard operability beyond static ARIA.** Axe reads the DOM as rendered; it doesn't press keys. Of the 125 axe suites, only [`header-navigations.test.tsx`](../../../packages/ui/src/components/marketing/header-navigations/header-navigations.test.tsx) simulates a keyboard interaction (opening a menu, then dismissing it with `Escape`, via `fireEvent.keyDown`). Every other suite verifies the ARIA is correct in a single static render: not that arrow keys, `Home`/`End`, typeahead, or focus trapping behave correctly when actually driven.
+- **Keyboard operability beyond static ARIA.** Axe reads the DOM as rendered; it doesn't press keys. Of the 143 axe suites, only [`header-navigations.test.tsx`](../../../packages/ui/src/components/marketing/header-navigations/header-navigations.test.tsx) simulates a keyboard interaction (opening a menu, then dismissing it with `Escape`, via `fireEvent.keyDown`). Every other suite verifies the ARIA is correct in a single static render: not that arrow keys, `Home`/`End`, typeahead, or focus trapping behave correctly when actually driven.
 
 ## What React Aria provides
 
@@ -56,7 +56,7 @@ React Aria gives every primitive correct interaction behaviour, and the axe suit
 - **Alt text for the images you add.** The library doesn't ship your images or copy.
 - **Motion preferences.** Components with transitions don't unilaterally decide what `prefers-reduced-motion` should do in your product.
 
-This applies whether a human or an AI assistant is writing the composition. An assistant generating a page from these primitives can still put a heading level out of order, nest landmarks incorrectly, or leave an icon button unlabeled: the primitives being sound doesn't make the assembly automatically sound. Generated or hand-written, page composition is something that still gets reviewed, not something the 125 green suites already cover.
+This applies whether a human or an AI assistant is writing the composition. An assistant generating a page from these primitives can still put a heading level out of order, nest landmarks incorrectly, or leave an icon button unlabeled: the primitives being sound doesn't make the assembly automatically sound. Generated or hand-written, page composition is something that still gets reviewed, not something the 143 green suites already cover.
 
 ## Manual verification matrix
 
@@ -77,13 +77,13 @@ This matrix will be filled in, component by component, as real manual verificati
 
 ## The wording rule
 
-Every mention of this testing across the site, marketing included, follows one rule: say **"0 detected axe violations in 125 automated suites,"** never **"fully accessible."** The first sentence is a fact about a specific, named test. The second is a claim no automated suite, and no library, gets to make on your behalf.
+Every mention of this testing across the site, marketing included, follows one rule: say **"0 detected axe violations in 143 automated suites,"** never **"fully accessible."** The first sentence is a fact about a specific, named test. The second is a claim no automated suite, and no library, gets to make on your behalf.
 
 ## Known limitations
 
 - **RTL is infrastructure-complete, styling-incomplete.** React Aria's direction handling (arrow-key navigation, popover placement, field order) is done. The Tailwind logical-properties migration in `packages/ui/src/components` is not: see [RTL support](/docs/rtl) for the current counts. A component that hasn't migrated will not mirror correctly in a `dir="rtl"` document.
 - **No contrast testing.** As noted above, jsdom performs no layout, so axe's colour-contrast rule has nothing to sample against in this test environment. Contrast is currently guaranteed only by the shipped token values, not by an automated check.
-- **125 suites test render output, not interaction, almost everywhere.** Aside from the one keyboard-driven suite noted earlier, "no violations" describes a single static render of each demo: not a full session of tabbing, arrowing, and dismissing through it.
+- **143 suites test render output, not interaction, almost everywhere.** Aside from the one keyboard-driven suite noted earlier, "no violations" describes a single static render of each demo: not a full session of tabbing, arrowing, and dismissing through it.
 - **No visual regression baseline.** Per the project [roadmap](https://github.com/properui/properui/blob/main/ROADMAP.md), the screenshot tooling exists but has no committed baseline and no CI job, so a visual accessibility regression (e.g., a focus ring silently removed) would not be caught by any automated check today.
 
 ## FAQs
@@ -92,7 +92,7 @@ Every mention of this testing across the site, marketing included, follows one r
     items={[
         {
             question: "Does '0 axe violations' mean Proper UI is fully accessible?",
-            answer: "No. It means 125 automated test suites detect zero axe-core violations in a static render of every component demo, in jsdom, on every pull request. Automated tools cannot check every accessibility aspect (the W3C is explicit that human judgement is still required), so this page states exactly what that number covers and what it doesn't.",
+            answer: "No. It means 143 automated test suites detect zero axe-core violations in a static render of every component demo, in jsdom, on every pull request. Automated tools cannot check every accessibility aspect (the W3C is explicit that human judgement is still required), so this page states exactly what that number covers and what it doesn't.",
         },
         {
             question: "What does the automated testing actually check?",

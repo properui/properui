@@ -38,13 +38,41 @@ This writes `.agents/skills/properui/SKILL.md` (the path Codex discovers skills 
 
 If you already keep an `AGENTS.md`, `agent init` appends its block between marker comments rather than replacing the file: Codex concatenates every `AGENTS.md` it finds walking from your project root down to your current directory, and a file closer to where you're working can extend or override guidance from one higher up. A monorepo can run the command once at the root and skip repeating it in every package. Re-running it after a Skill update is safe: it replaces the installed file and updates the marked `AGENTS.md` block in place, leaving the rest of the file untouched.
 
+## MCP integration
+
+`@properui/mcp` gives Codex the registry as tools: `list_components`, `search_components`, `get_component`,
+`get_component_docs`, the design library tools `search_screens`, `search_sections`, `search_flows`, `compare_screens` and `get_install_plan`, and, on the local server, `add_component`,
+`get_project_info` and `check_tokens`. Register the remote server, with no install and no account:
+
+```bash
+codex mcp add properui --url https://properui.dev/api/mcp
+```
+
+Or add it to `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.properui]
+url = "https://properui.dev/api/mcp"
+```
+
+The remote server has no project to write to, so Codex runs the CLI command that `get_install_plan` prints. To let
+`add_component` install into the project, use the local server instead:
+
+```toml
+[mcp_servers.properui]
+command = "npx"
+args = ["-y", "@properui/mcp"]
+```
+
+Start a new Codex session so it loads the server. The full tool list is on the [MCP page](/integrations/mcp).
+
 ## FAQs
 
 <FAQs
     items={[
         {
             question: "Does Codex need a Skill file or an MCP server for this?",
-            answer: "Neither is required, but both exist. npx @properui/cli@latest agent init --client codex installs the Skill and prints the [mcp_servers.properui] block for ~/.codex/config.toml that registers @properui/mcp. Without the server, Codex's shell tool runs npx @properui/cli@latest search and add instead.",
+            answer: "Neither is required, but both exist. npx @properui/cli@latest agent init --client codex installs the Skill and prints the [mcp_servers.properui] block for ~/.codex/config.toml that registers the local @properui/mcp server. Without the server, Codex's shell tool runs npx @properui/cli@latest search and add instead.",
         },
         {
             question: "Will Codex overwrite my customizations to an installed component?",

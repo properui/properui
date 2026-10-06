@@ -1,6 +1,6 @@
 {
     "name": "@properui/cli",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "description": "CLI that copies Proper UI components into your React or Next.js project, shadcn-style.",
     "keywords": [
         "cli",

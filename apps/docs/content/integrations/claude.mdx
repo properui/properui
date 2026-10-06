@@ -41,13 +41,22 @@ With that in place, Claude reaches for `properui add` before improvising markup 
 ## MCP integration
 
 `@properui/mcp` lets Claude query the registry directly instead of shelling out to `npx` for each
-lookup: `search_components`, `get_component`, `get_component_docs`, `add_component` and more. Register it once:
+lookup: `list_components`, `search_components`, `get_component`, `get_component_docs`, the design library tools
+`search_screens`, `search_sections`, `search_flows`, `compare_screens` and `get_install_plan`, and, on the local server, `add_component`, `get_project_info` and `check_tokens`. Register the remote
+server once, with no install and no account:
+
+```bash
+claude mcp add --transport http properui https://properui.dev/api/mcp
+```
+
+The remote server searches, compares and plans but has no project to write to, so Claude runs the CLI command that
+`get_install_plan` prints. To let `add_component` install straight into the project, run the local server instead:
 
 ```bash
 claude mcp add properui -- npx -y @properui/mcp
 ```
 
-`agent init --client claude` also writes it to the project's `.mcp.json`. The full tool list is on the
+`agent init --client claude` also writes the local server to the project's `.mcp.json`. The full tool list is on the
 [MCP page](/integrations/mcp). The CLI still works on its own: Claude Code runs `properui search` and
 `properui add` through its shell tool when the server is not connected.
 

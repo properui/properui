@@ -3,27 +3,29 @@ title: Quality
 section: docs
 description: "What is actually verified about Proper UI, how it's verified, and what is not: release status, CI checks, clean-room installs, accessibility scope, and known gaps, dated and sourced."
 metaTitle: Quality | Proper UI
-metaDescription: "Proper UI's quality claims, sourced: exact CI jobs, clean-room install results, 0 detected axe violations in 125 suites, and what's not verified yet."
+metaDescription: "Proper UI's quality claims, sourced: exact CI jobs, clean-room install results, 0 detected axe violations in 143 suites, and what's not verified yet."
 ---
 
 ## Why this page exists
 
 Adjectives like "battle-tested" or "production-ready" don't tell you anything you can check. This page replaces them with what is actually run, where it runs, and what it does not cover. Every number below is quoted from a file in this repository, not typed by hand. When a number changes, this page is regenerated from the same sources.
 
-**Last verified: 2026-09-12.** This page is updated per release, not on a fixed schedule; if a section describes a script or job that no longer matches `main`, [open an issue](https://github.com/properui/properui/issues).
+**Last verified: 2026-10-06.** This page is updated per release, not on a fixed schedule; if a section describes a script or job that no longer matches `main`, [open an issue](https://github.com/properui/properui/issues).
 
 ## Release status
 
 |                                                           |                                  |
 | --------------------------------------------------------- | -------------------------------- |
-| `@properui/ui`                                            | `0.2.0`                          |
-| `@properui/cli`                                           | `0.2.2`                          |
-| Registry entries                                          | **804**                          |
-| Component groups (published layers)                       | **75**                           |
-| Component groups (all layers, incl. foundations/examples) | **111**                          |
+| `@properui/ui`                                            | `0.3.0`                          |
+| `@properui/cli`                                           | `0.3.1`                          |
+| `@properui/mcp`                                           | `0.3.0`                          |
+| Registry entries                                          | **818**                          |
+| Component groups (published layers)                       | **89**                           |
+| Component groups (all layers, incl. foundations/examples) | **125**                          |
 | Marketing section variants                                | **446**                          |
 | Page examples (marketing + app)                           | **233** (105 marketing, 128 app) |
-| Test suites with an axe assertion                         | **125**                          |
+| Curated flows                                             | **13**                           |
+| Test suites with an axe assertion                         | **143**                          |
 
 Counts are quoted from `packages/registry/dist/stats.json`, which the registry build (`pnpm registry:build`) generates. They are not hand-maintained.
 
@@ -48,7 +50,7 @@ Two jobs run on every pull request and on every push to `main`, defined in `.git
 2. `pnpm type-check`
 3. `pnpm lint`
 4. `pnpm prettier:check`
-5. `pnpm test`: unit and component tests across the workspace, including the 125 axe suites described on the [Accessibility](/docs/accessibility) page
+5. `pnpm test`: unit and component tests across the workspace, including the 143 axe suites described on the [Accessibility](/docs/accessibility) page
 6. `pnpm check:assets`
 7. `pnpm build`
 8. `pnpm build-storybook`
@@ -74,7 +76,7 @@ This runs on every PR via the `clean-room` job in `.github/workflows/ci.yml`. It
 
 ## Accessibility
 
-**125** of the 128 test suites in `packages/ui/src/components` render each documented variant through [axe-core](https://github.com/dequelabs/axe-core) and asserts zero detected violations, on every PR. That is a real, narrow claim: not "fully accessible." It doesn't cover meaningful alt text, focus-order sensibility, contrast (jsdom has no layout engine), screen-reader announcement quality, or keyboard operability beyond static ARIA, and no manual assistive-technology audit has been performed yet. See [Accessibility](/docs/accessibility) for the full scope, what React Aria provides underneath the axe suites, and the manual verification matrix: that page is the source of truth for this claim; this section doesn't repeat it.
+**143** of the 146 test suites in `packages/ui/src/components` render each documented variant through [axe-core](https://github.com/dequelabs/axe-core) and asserts zero detected violations, on every PR. That is a real, narrow claim: not "fully accessible." It doesn't cover meaningful alt text, focus-order sensibility, contrast (jsdom has no layout engine), screen-reader announcement quality, or keyboard operability beyond static ARIA, and no manual assistive-technology audit has been performed yet. See [Accessibility](/docs/accessibility) for the full scope, what React Aria provides underneath the axe suites, and the manual verification matrix: that page is the source of truth for this claim; this section doesn't repeat it.
 
 ## Visual quality
 
@@ -153,7 +155,7 @@ pnpm docs:diff --all --report reports/visual-parity.md
     items={[
         {
             question: 'Does "0 detected axe violations" mean Proper UI is fully accessible?',
-            answer: "No. It means 125 automated test suites, run on every pull request, detect zero axe-core violations in the rendered markup they check. It doesn't cover contrast, focus order, screen-reader announcement quality, or a manual keyboard/assistive-technology pass: see the Accessibility page for the full boundary.",
+            answer: "No. It means 143 automated test suites, run on every pull request, detect zero axe-core violations in the rendered markup they check. It doesn't cover contrast, focus order, screen-reader announcement quality, or a manual keyboard/assistive-technology pass: see the Accessibility page for the full boundary.",
         },
         {
             question: "Is there a visual regression test in CI?",

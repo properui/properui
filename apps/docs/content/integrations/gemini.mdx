@@ -3,7 +3,7 @@ title: Gemini integration
 section: integrations
 description: Point Gemini CLI or Gemini-based agents at Proper UI's registry and GEMINI.md conventions so it composes screens from real components.
 metaTitle: Gemini integration | Proper UI
-metaDescription: "Use Proper UI with Gemini: recommended GEMINI.md instructions, prompts that resolve to real components, and the optional MCP server."
+metaDescription: "Use Proper UI with Gemini: recommended GEMINI.md instructions, prompts that resolve to real components, and the MCP server."
 ---
 
 Gemini CLI and Gemini-based coding agents can run shell commands the same way Claude Code can, so the setup mirrors it closely: give Gemini enough project context to reach for `properui add` before it writes markup from scratch.
@@ -49,7 +49,18 @@ UI markup:
 
 ## MCP integration
 
-Gemini CLI reads the same `mcpServers` config format as most other MCP clients. Register `@properui/mcp` in your `settings.json`:
+`@properui/mcp` gives Gemini the registry as tools: `list_components`, `search_components`, `get_component`,
+`get_component_docs`, the design library tools `search_screens`, `search_sections`, `search_flows`, `compare_screens` and `get_install_plan`, and, on the local server, `add_component`,
+`get_project_info` and `check_tokens`. Register the remote server, with no install and no account:
+
+```bash
+gemini mcp add --transport http properui https://properui.dev/api/mcp
+```
+
+Run `/mcp` in Gemini CLI to check that it is connected. The remote server has no project to write to, so Gemini runs
+the CLI command that `get_install_plan` prints. To let `add_component` install into the project, use the local server:
+Gemini CLI reads the same `mcpServers` config format as most other MCP clients, so add it to `~/.gemini/settings.json`
+(or `.gemini/settings.json` in a project):
 
 ```json
 {
@@ -62,7 +73,7 @@ Gemini CLI reads the same `mcpServers` config format as most other MCP clients. 
 }
 ```
 
-The [MCP integration guide](/integrations/mcp) covers registry options and the full tool list: `list_components`, `search_components`, `get_component`, `get_component_docs`, `add_component`, `get_project_info` and `check_tokens`.
+The [MCP integration guide](/integrations/mcp) covers registry options and the full tool list.
 
 ## FAQs
 
@@ -70,7 +81,7 @@ The [MCP integration guide](/integrations/mcp) covers registry options and the f
     items={[
         {
             question: "Does Gemini need the MCP server, or is the CLI enough?",
-            answer: "The CLI is enough on its own: Gemini's shell tool can run npx @properui/cli@latest search and add directly. The MCP server just avoids spawning a fresh process for every lookup.",
+            answer: "The CLI is enough on its own: Gemini's shell tool can run npx @properui/cli@latest search and add directly. The MCP server avoids spawning a fresh process for every lookup and adds search over screens, flows and sections, with thumbnails and an install plan.",
         },
         {
             question: "Is the setup different from the Claude Code integration?",

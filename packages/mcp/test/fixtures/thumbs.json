@@ -1,0 +1,10 @@
+{
+    "settings-13": { "light": "/thumbs/app-examples/settings-pages/settings-13.webp", "dark": null },
+    "dashboard-04": {
+        "light": "/thumbs/app-examples/dashboards/dashboard-04.webp",
+        "dark": "/thumbs/app-examples/dashboards/dashboard-04-dark.webp"
+    },
+    "pricing-dual-action": { "light": "/thumbs/marketing/pricing-sections/pricing-dual-action.webp", "dark": null },
+    "step-1-forgot-password": { "light": "/thumbs/app-examples/forgot-password-pages/step-1-forgot-password.webp", "dark": null },
+    "simple-verification": null
+}

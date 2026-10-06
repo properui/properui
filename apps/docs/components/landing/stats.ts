@@ -33,3 +33,9 @@ export const AXE_SUITES = registryStats.axeSuites;
 
 /** "0 Detected axe violations" — not a stats.json field: it is definitionally zero whenever the axe suites above are green. */
 export const AXE_VIOLATIONS = 0;
+
+/** "13 Flows": ordered multi-screen journeys in the registry. Zero until `stats.json` carries the field. */
+export const FLOWS = (registryStats as { flows?: number }).flows ?? 0;
+
+/** "679 Thumbnails": rendered preview images in the registry. Zero until `stats.json` carries the field. */
+export const THUMBNAILS = (registryStats as { thumbnails?: number }).thumbnails ?? 0;

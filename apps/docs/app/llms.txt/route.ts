@@ -35,7 +35,7 @@ export function GET() {
         "- CLI: `npx @properui/cli@latest add <component>` writes the files and resolves dependencies.",
         "- CLI: `npx @properui/cli@latest check` flags raw palette classes and arbitrary values in place of semantic tokens.",
         "- CLI: `npx @properui/cli@latest icons` lists and installs icon components the same way `add` handles the rest of the registry.",
-        "- MCP: `npx -y @properui/mcp` serves the same registry over stdio as tools (`search_components`, `get_component`, `add_component`, `get_project_info`, `check_tokens`, ...).",
+        `- MCP: search screens, flows, sections and components, then plan or run the install. Remote \`${absoluteUrl("/api/mcp")}\` (Streamable HTTP, no account; \`search_screens\`, \`search_sections\`, \`search_flows\`, \`search_components\`, \`compare_screens\`, \`get_component\`, \`get_install_plan\`) or local \`npx -y @properui/mcp\` (adds \`add_component\`, \`get_project_info\`, \`check_tokens\`). Overview: [${absoluteUrl("/mcp")}](${absoluteUrl("/mcp")}); reference: [MCP server](${absoluteUrl(markdownUrl("/docs/mcp"))}).`,
         `- Non-React projects: \`info --json\` reports \`platform\`; on \`html\` (Vue, Nuxt, Angular, Svelte, Astro, plain HTML) \`add <name>\` installs the \`<name>-html\` snippet entry, and [${absoluteUrl("/css/properui.min.css")}](${absoluteUrl("/css/properui.min.css")}) is a prebuilt stylesheet with the tokens and the \`pui-*\` component classes. What each platform gets: [Frameworks](${absoluteUrl(markdownUrl("/docs/frameworks"))}).`,
         `- Testing components against jsdom needs a few shims React Aria doesn't ship by default: see [Testing](${absoluteUrl(markdownUrl("/docs/testing"))}).`,
         `- Importing Proper UI into an app with its own Tailwind theme: ten utility names collide and Proper UI's namespaces win regardless of import order; see [Adopting Proper UI](${absoluteUrl(markdownUrl("/docs/adopting"))}).`,
@@ -43,7 +43,7 @@ export function GET() {
         "## Pages",
         "",
         // Overview routes are generated, so they have no markdown twin — link the pages themselves.
-        ...["/", "/components", "/application-ui", "/marketing"].map((route) => `- [${route}](${absoluteUrl(route)})`),
+        ...["/", "/mcp", "/components", "/application-ui", "/marketing"].map((route) => `- [${route}](${absoluteUrl(route)})`),
         ...pages.map(
             (page) =>
                 `- [${page.frontmatter.title}](${absoluteUrl(markdownUrl(page.href))})${page.frontmatter.description ? `: ${page.frontmatter.description}` : ""}`,

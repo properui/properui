@@ -1,13 +1,13 @@
 {
     "name": "@properui/registry",
-    "version": "0.0.0",
+    "version": "0.1.0",
     "private": true,
     "type": "module",
     "scripts": {
         "build": "tsx src/build.ts && tsx src/shadcn.ts",
         "lint": "eslint src",
         "type-check": "tsc --noEmit",
-        "test": "echo \"no tests\""
+        "test": "tsx --test src/outputs.test.ts"
     },
     "devDependencies": {
         "tsx": "^4.19.2",

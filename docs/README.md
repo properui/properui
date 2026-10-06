@@ -37,7 +37,7 @@ Component-level reference (props, examples, source links) lives on that site, un
 | Guide                                                   | What it covers                                                                                                      |
 | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | [CLI](./cli.md)                                         | `init`, `add`, `list`, `search`, `diff`, `login`, and the react/html platforms                                      |
-| [MCP server](./mcp.md)                                  | `@properui/mcp`: the registry and `add` as tools for AI assistants                                                  |
+| [MCP server](./mcp.md)                                  | `@properui/mcp`: the registry, screens, flows, sections and `add` as tools for AI assistants, local or remote       |
 | [Contributing components](./contributing-components.md) | Adding a component end to end                                                                                       |
 | [Ecosystem listing kit](./ecosystem.md)                 | Getting `@properui` listed on shadcn's registry directory, `registry.directory`, `21st.dev` and skills marketplaces |
 

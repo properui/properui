@@ -17,7 +17,9 @@ npx @properui/cli@latest add buttons date-picker # write the files, report what 
 npx @properui/cli@latest info --json             # this project's setup: framework, platform, aliases, installed entries
 npx @properui/cli@latest list --platform html    # the html entries (<component>-html) for non-React projects
 npx @properui/cli@latest agent init              # install the Proper UI Skill for Claude, Codex, Cursor and Lovable
+npx skills add properui/properui                 # the same Skill through skills.sh, which reaches 75+ agents
 npx -y @properui/mcp                             # MCP server over stdio: the same registry and add, as tools
+claude mcp add --transport http properui https://properui.dev/api/mcp   # remote MCP endpoint, no account (https://properui.dev/mcp)
 ```
 
 `add` resolves `registryDependencies`, rewrites `@/` imports to the alias in `components.json`, and reports the missing
@@ -32,7 +34,11 @@ values that should have been semantic tokens. `agent init` writes the portable S
 into `.claude/skills/`, `.agents/skills/`, or `.cursor/rules/`, so every session after the first one gets this
 guidance automatically instead of relying on this file alone. It also registers the MCP server (`@properui/mcp`) in
 `.mcp.json` and `.cursor/mcp.json`; when an assistant has those tools (`search_components`, `get_component`,
-`add_component`, ...) connected, prefer them to shelling out to the CLI.
+`add_component`, ...) connected, prefer them to shelling out to the CLI. The same server is also hosted at
+`https://properui.dev/api/mcp` (Streamable HTTP, stateless, no account). It has no access to a project, so it offers the
+search and plan tools (`search_screens`, `search_sections`, `search_flows`, `compare_screens`, `get_install_plan`) but
+not `add_component`; over HTTP, take the command from `get_install_plan` and run the CLI. The product page is
+`https://properui.dev/mcp`.
 
 `info --json` also reports `platform`. `react` (Next.js, Vite React, Remix, React) gets the TSX components. `html`
 (Vue, Nuxt, Angular, Svelte, SvelteKit, Astro, plain HTML, or `init --platform html`) makes `init` wire
@@ -100,9 +106,10 @@ Do not document or generate code against these, because they do not exist:
 - `properui upgrade` / `properui migrate`. The commands are `init`, `create`, `add`, `remove`, `why`, `check`, `icons`,
   `list`, `search`, `diff`, `login`, `info`, `theme` and `agent init`.
 - A browser OAuth flow for `login`. It takes `--token`, or prompts you to paste one.
-- MCP tools beyond the seven `@properui/mcp` ships: `list_components`, `search_components`, `get_component`,
-  `get_component_docs`, `add_component`, `get_project_info` and `check_tokens`. There is no `init` tool: run
-  `npx @properui/cli@latest init` for that.
+- MCP tools beyond the twelve `@properui/mcp` ships: `list_components`, `search_components`, `search_screens`,
+  `search_sections`, `search_flows`, `compare_screens`, `get_component`, `get_component_docs`, `get_install_plan`,
+  `add_component`, `get_project_info` and `check_tokens`. The remote endpoint omits the last three, which need a project
+  on disk. There is no `init` tool: run `npx @properui/cli@latest init` for that.
 - Vue, Angular or Svelte ports of the React components. Non-React projects get `@properui/tokens`, the
   `@properui/html` classes and snippets, and the `@properui/elements` custom elements, which cover a curated subset
   (about twenty components, listed in `docs/frameworks.md`), not the whole React library.

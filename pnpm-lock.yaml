@@ -107,6 +107,9 @@ importers:
       '@properui/icons':
         specifier: npm:@untitledui/icons@^0.0.22
         version: '@untitledui/icons@0.0.22(react@19.2.8)'
+      '@properui/mcp':
+        specifier: workspace:*
+        version: link:../../packages/mcp
       '@properui/ui':
         specifier: workspace:*
         version: link:../../packages/ui

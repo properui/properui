@@ -12,6 +12,7 @@ import { ExampleShowcase } from "~/components/landing/sections/example-showcase"
 import { Faq } from "~/components/landing/sections/faq";
 import { FinalCta } from "~/components/landing/sections/final-cta";
 import { Hero } from "~/components/landing/sections/hero";
+import { McpCallout } from "~/components/landing/sections/mcp-callout";
 import { ProofStrip } from "~/components/landing/sections/proof-strip";
 import { Trust } from "~/components/landing/sections/trust";
 import { Workflow } from "~/components/landing/sections/workflow";
@@ -99,6 +100,7 @@ export default function LandingPage() {
                 <Consistency />
                 <Workflow />
                 <AgentSetup />
+                <McpCallout />
                 <Trust />
                 <Faq />
                 <FinalCta />

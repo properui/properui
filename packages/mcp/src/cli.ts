@@ -9,11 +9,12 @@
 export { scanForViolations, type Finding } from "../../cli/src/commands/check.js";
 export { collectSnapshot, type ProjectSnapshot } from "../../cli/src/commands/info.js";
 export { scoreEntry } from "../../cli/src/commands/search.js";
+export { readAuthToken } from "../../cli/src/auth.js";
 export { type ComponentsConfig, aliasBaseDir, configPath, configPlatform, readConfig, writeConfig } from "../../cli/src/config.js";
 export { installCommand, installSpec, missingDependencies } from "../../cli/src/deps.js";
 export { detectPackageManager } from "../../cli/src/detect.js";
 export { type WriteResult, prepareFile, writeSourceFile } from "../../cli/src/files.js";
-export { nearestNames } from "../../cli/src/fuzzy.js";
+export { editDistance, fuzzyScore, nearestNames } from "../../cli/src/fuzzy.js";
 export { PLATFORM_FILTERS, entryPlatforms, isHtmlEntry, matchesPlatform, resolveForPlatform } from "../../cli/src/platform.js";
 export {
     DEFAULT_REGISTRY_URL,

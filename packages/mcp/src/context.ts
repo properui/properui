@@ -17,6 +17,17 @@ export interface ServerOptions {
     cwd?: string;
     /** How long a registry index stays cached, in milliseconds. Defaults to five minutes. */
     cacheTtlMs?: number;
+    /**
+     * Public site origin that docs, preview and thumbnail links point at. Defaults to the
+     * registry's own origin when it is remote, else https://properui.dev.
+     */
+    siteUrl?: string;
+    /**
+     * Serve without a project directory, as the HTTP handler does: `components.json` is never
+     * looked up, and the project-bound tools (`add_component`, `get_project_info`, `check_tokens`)
+     * are not registered.
+     */
+    hosted?: boolean;
 }
 
 /** Public site the registry is served from; `docs` routes in registry entries are relative to it. */
@@ -26,11 +37,15 @@ const DEFAULT_TTL_MS = 5 * 60 * 1000;
 
 export class ServerContext {
     readonly defaultCwd: string;
+    readonly hosted: boolean;
+    private readonly site: string | undefined;
     private readonly registryOverride: string | undefined;
     private readonly ttl: number;
     private readonly cache = new Map<string, { registry: Registry; created: number }>();
 
     constructor(options: ServerOptions = {}) {
+        this.hosted = Boolean(options.hosted);
+        this.site = options.siteUrl?.replace(/\/+$/, "");
         this.defaultCwd = path.resolve(options.cwd ?? process.cwd());
         this.registryOverride = options.registry ?? process.env.PROPERUI_REGISTRY ?? undefined;
         this.ttl = options.cacheTtlMs ?? DEFAULT_TTL_MS;
@@ -43,7 +58,7 @@ export class ServerContext {
 
     /** The registry source a call against `cwd` reads, resolved exactly like the CLI resolves it. */
     registrySource(cwd?: string): string {
-        return resolveRegistrySource(this.registryOverride, readConfig(this.cwd(cwd))?.registry);
+        return resolveRegistrySource(this.registryOverride, this.hosted ? undefined : readConfig(this.cwd(cwd))?.registry);
     }
 
     /** The flag-level override (`--registry` / `PROPERUI_REGISTRY`), if any. */
@@ -62,6 +77,7 @@ export class ServerContext {
 
     /** Origin docs pages live on: the registry's own origin when it is remote, else the public site. */
     siteUrl(registry: Registry): string {
+        if (this.site) return this.site;
         return registry.remote ? new URL(registry.source).origin : DEFAULT_SITE_URL;
     }
 }

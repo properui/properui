@@ -1,0 +1,450 @@
+/*
+ * Section styles for the `/mcp` page (apps/docs/app/mcp/page.tsx and client-tabs.tsx). Scoped under
+ * `.pui-landing`; every custom class carries the `mcp-` prefix. Relies on the generic classes and
+ * tokens in landing.css: .container, .section, .section-heading, .eyebrow, .button, .command, the
+ * hero and final-cta blocks, and the --ink/--ink-2/--muted/--line/--violet-* custom properties.
+ * Imported by the /mcp page only.
+ */
+
+/* Hero additions */
+.pui-landing .mcp-hero {
+    padding-bottom: 72px;
+}
+.pui-landing .mcp-hero-command {
+    position: relative;
+    z-index: 1;
+    width: min(560px, 100%);
+    margin-top: 30px;
+    text-align: start;
+}
+.pui-landing .mcp-hero-command > span {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--ink-2);
+    font-size: 12px;
+    font-weight: 750;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+.pui-landing .mcp-hero-command .command {
+    background: #fff;
+}
+.pui-landing .main-nav a[aria-current="page"] {
+    color: var(--violet-700);
+}
+
+/* Alternate section background */
+.pui-landing .mcp-alt {
+    border-block: 1px solid var(--line);
+    background: var(--soft);
+}
+
+/* Collection cards */
+.pui-landing .mcp-cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+.pui-landing .mcp-card {
+    display: grid;
+    align-content: start;
+    gap: 10px;
+    padding: 24px;
+    border: 1px solid var(--line-2);
+    border-radius: 16px;
+    background: #fff;
+}
+.pui-landing .mcp-card h3 {
+    margin: 0;
+    font-size: 18px;
+    letter-spacing: -0.02em;
+}
+.pui-landing .mcp-card p {
+    margin: 0;
+    color: var(--ink-2);
+    font-size: 16px;
+    line-height: 1.55;
+}
+.pui-landing .mcp-card .mcp-card-count {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px;
+}
+.pui-landing .mcp-card-count strong {
+    color: var(--violet-700);
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+}
+.pui-landing .mcp-card-count span {
+    color: var(--ink-2);
+    font-size: 14px;
+    font-weight: 600;
+}
+.pui-landing .mcp-card code {
+    justify-self: start;
+    max-width: 100%;
+    padding: 4px 8px;
+    border-radius: 6px;
+    color: var(--violet-800);
+    background: var(--violet-50);
+    font: 13px/1.4 var(--mono);
+    overflow-wrap: anywhere;
+}
+
+/* Outcome cards: five across on wide screens, wrapping and centred below that */
+.pui-landing .mcp-outcomes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 18px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+.pui-landing .mcp-outcomes > li {
+    flex: 1 1 210px;
+    max-width: 100%;
+}
+
+/* Skill install block under the client tabs */
+.pui-landing .mcp-skill {
+    display: grid;
+    gap: 14px;
+    margin-top: 28px;
+    padding: 28px;
+    border: 1px solid var(--line-2);
+    border-radius: 16px;
+    background: #fff;
+}
+.pui-landing .mcp-skill h3 {
+    margin: 0;
+    font-size: 20px;
+    letter-spacing: -0.02em;
+}
+.pui-landing .mcp-skill p {
+    max-width: 70ch;
+    margin: 0;
+    color: var(--ink-2);
+    font-size: 16px;
+    line-height: 1.6;
+}
+.pui-landing .mcp-skill .mcp-commands {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.pui-landing .mcp-skill .mcp-command {
+    min-width: 0;
+}
+
+/* Footer small print: the shared grey fails contrast on the dark footer. */
+.pui-landing .site-footer .footer-bottom {
+    color: #94979c;
+}
+
+/* Result fields and sample */
+.pui-landing .mcp-results {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 40px;
+    align-items: start;
+}
+.pui-landing .mcp-fields {
+    display: grid;
+    gap: 22px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+.pui-landing .mcp-fields h3,
+.pui-landing .mcp-steps h3 {
+    margin: 0 0 4px;
+    font-size: 17px;
+    letter-spacing: -0.01em;
+}
+.pui-landing .mcp-fields p,
+.pui-landing .mcp-steps p {
+    margin: 0;
+    color: var(--ink-2);
+    font-size: 16px;
+    line-height: 1.6;
+}
+.pui-landing .mcp-fields code,
+.pui-landing .mcp-steps code,
+.pui-landing .mcp-faq-item code,
+.pui-landing .mcp-panel code:not(.command code) {
+    padding: 1px 5px;
+    border-radius: 5px;
+    color: var(--violet-800);
+    background: var(--violet-50);
+    font-size: 0.92em;
+    overflow-wrap: anywhere;
+}
+.pui-landing .mcp-sample {
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid var(--line-2);
+    border-radius: 16px;
+    background: #fff;
+}
+.pui-landing .mcp-sample img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-bottom: 1px solid var(--line);
+}
+.pui-landing .mcp-sample pre {
+    margin: 0;
+    padding: 18px 20px;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+    color: var(--ink);
+    background: #fff;
+    font-size: 13px;
+    line-height: 1.6;
+}
+.pui-landing .mcp-sample code {
+    padding: 0;
+    background: none;
+    color: inherit;
+    font-size: inherit;
+}
+.pui-landing .mcp-sample figcaption {
+    padding: 10px 20px 14px;
+    border-top: 1px solid var(--line);
+    color: var(--ink-2);
+    font-size: 14px;
+}
+
+/* Setup tabs */
+.pui-landing .mcp-tablist {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.pui-landing .mcp-tab {
+    padding: 10px 18px;
+    border: 1px solid var(--line-2);
+    border-radius: 999px;
+    color: var(--ink-2);
+    background: #fff;
+    cursor: pointer;
+    font: 650 14px/1 var(--body);
+}
+.pui-landing .mcp-tab:hover {
+    color: var(--ink);
+    border-color: var(--ink-2);
+}
+.pui-landing .mcp-tab[aria-selected="true"] {
+    border-color: var(--violet-600);
+    color: #fff;
+    background: var(--violet-600);
+}
+.pui-landing .mcp-tab:focus-visible,
+.pui-landing .mcp-panel:focus-visible {
+    outline: 2px solid var(--violet-600);
+    outline-offset: 3px;
+}
+.pui-landing .mcp-panel {
+    display: grid;
+    gap: 18px;
+    margin-top: 22px;
+    padding: 28px;
+    border: 1px solid var(--line-2);
+    border-radius: 16px;
+    background: #fff;
+}
+.pui-landing .mcp-panel h3 {
+    margin: 0;
+    font-size: 22px;
+    letter-spacing: -0.03em;
+}
+.pui-landing .mcp-panel p {
+    margin: 0;
+    color: var(--ink-2);
+    font-size: 16px;
+    line-height: 1.6;
+}
+.pui-landing .mcp-commands {
+    display: grid;
+    gap: 14px;
+}
+.pui-landing .mcp-command > span {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--ink-2);
+    font-size: 12px;
+    font-weight: 750;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+.pui-landing .mcp-steps-list {
+    display: grid;
+    gap: 8px;
+    padding-inline-start: 22px;
+    margin: 0;
+    color: var(--ink-2);
+    font-size: 16px;
+    line-height: 1.6;
+}
+.pui-landing .mcp-steps-list li::marker {
+    color: var(--violet-700);
+    font-weight: 700;
+}
+.pui-landing .mcp-panel .mcp-source {
+    font-size: 14px;
+}
+.pui-landing .mcp-source a {
+    color: var(--violet-700);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+.pui-landing .mcp-source a:focus-visible {
+    border-radius: 3px;
+    outline: 2px solid var(--violet-600);
+    outline-offset: 2px;
+}
+
+/* Research steps */
+.pui-landing .mcp-steps {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 18px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    counter-reset: mcp-step;
+}
+.pui-landing .mcp-steps li {
+    position: relative;
+    padding: 56px 20px 22px;
+    border: 1px solid var(--line-2);
+    border-radius: 16px;
+    background: #fff;
+    counter-increment: mcp-step;
+}
+.pui-landing .mcp-steps li::before {
+    content: counter(mcp-step);
+    position: absolute;
+    inset-block-start: 18px;
+    inset-inline-start: 20px;
+    display: grid;
+    width: 28px;
+    height: 28px;
+    place-items: center;
+    border-radius: 50%;
+    color: #fff;
+    background: var(--violet-600);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+/* Limits */
+.pui-landing .mcp-limits {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    max-width: 960px;
+    padding: 0;
+    margin: 0 auto;
+    list-style: none;
+}
+.pui-landing .mcp-limits li {
+    padding: 20px 22px;
+    border: 1px solid var(--line-2);
+    border-inline-start: 4px solid var(--violet-600);
+    border-radius: 12px;
+    color: var(--ink-2);
+    background: #fff;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+/* FAQ */
+.pui-landing .mcp-faq {
+    max-width: 820px;
+    margin: 0 auto;
+    border-top: 1px solid var(--line-2);
+}
+.pui-landing .mcp-faq-item {
+    border-bottom: 1px solid var(--line-2);
+}
+.pui-landing .mcp-faq-item summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 4px;
+    color: var(--ink);
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 650;
+    list-style: none;
+}
+.pui-landing .mcp-faq-item summary::-webkit-details-marker {
+    display: none;
+}
+.pui-landing .mcp-faq-item summary:focus-visible {
+    border-radius: 6px;
+    outline: 2px solid var(--violet-600);
+    outline-offset: 2px;
+}
+.pui-landing .mcp-faq-item summary b {
+    flex: none;
+    color: var(--violet-700);
+    font-size: 20px;
+    font-weight: 500;
+}
+.pui-landing .mcp-faq-item[open] summary b {
+    transform: rotate(45deg);
+}
+.pui-landing .mcp-faq-item p {
+    max-width: 66ch;
+    margin: 0 0 22px;
+    color: var(--ink-2);
+    font-size: 16px;
+    line-height: 1.65;
+}
+
+@media (max-width: 1100px) {
+    .pui-landing .mcp-cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .pui-landing .mcp-steps {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 860px) {
+    .pui-landing .mcp-skill .mcp-commands {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .pui-landing .mcp-results,
+    .pui-landing .mcp-limits {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 560px) {
+    .pui-landing .mcp-cards,
+    .pui-landing .mcp-steps {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .pui-landing .mcp-panel,
+    .pui-landing .mcp-skill {
+        padding: 20px 16px;
+    }
+    .pui-landing .mcp-tab {
+        padding: 10px 14px;
+    }
+}
+
+/* The shared muted colour is too light on the alternate background; use the stronger body ink. */
+.pui-landing .mcp-alt .section-heading > p {
+    color: var(--ink-2);
+}

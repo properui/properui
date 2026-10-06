@@ -11,12 +11,16 @@
  * Also emits one `type: "html"` entry per `packages/html/src/components/<component>/` folder
  * (named `<component>-html`, one file per `*.html` snippet) when that package exists, and tags
  * every entry with the `platforms` it runs on.
+ *
+ * Also writes packages/registry/dist/flows.json and thumbs.json (flows from src/flows.ts, thumbnails from
+ * apps/docs/public/thumbs); a flow that names a missing entry or an entry without a thumbnail fails the build.
  */
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import ts from "typescript";
+import { FLOWS } from "./flows";
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 const UI_SRC = path.join(REPO, "packages", "ui", "src");
@@ -26,6 +30,7 @@ const OUT = path.join(REPO, "packages", "registry", "dist");
 const SCHEMA_FILE = path.join(REPO, "packages", "registry", "schema.json");
 const MANIFEST_DIR = path.join(REPO, "packages", "registry", "manifest");
 const THEME_FILE = path.join(UI_SRC, "styles", "theme.css");
+const THUMBS_DIR = path.join(REPO, "apps", "docs", "public", "thumbs");
 const CHANGELOG_FILE = path.join(REPO, "packages", "ui", "CHANGELOG.md");
 /** `@properui/html` snippets: `<component>/<variant>.html`, one registry entry per folder. */
 const HTML_COMPONENTS = path.join(REPO, "packages", "html", "src", "components");
@@ -1126,6 +1131,81 @@ const buildHtmlEntries = (): RegistryEntry[] =>
 // Build
 // ---------------------------------------------------------------------------
 
+// dist/thumbs.json — site-relative thumbnail paths per example entry, from apps/docs/public/thumbs.
+// Layout: <section>/<slug>/<variant>.webp (+ <variant>-dark.webp), where <variant> is the entry name
+// and <slug> the group's docs folder. Variant names can repeat across sibling groups (the build keeps one
+// entry per name), so a file only counts when its folder matches the folder in the entry's docs path.
+type ThumbPaths = { light: string; dark: string | null };
+
+const readThumbs = (entries: RegistryEntry[]): { thumbs: Record<string, ThumbPaths>; skipped: string[] } => {
+    const byName = new Map(entries.map((entry) => [entry.name, entry]));
+    const light = new Map<string, string>();
+    const dark = new Map<string, string>();
+    const skipped: string[] = [];
+
+    const subdirs = (dir: string) => listDir(dir).filter((name) => isDir(path.join(dir, name)));
+    for (const section of subdirs(THUMBS_DIR)) {
+        for (const slug of subdirs(path.join(THUMBS_DIR, section))) {
+            for (const file of listDir(path.join(THUMBS_DIR, section, slug))) {
+                const relative = `${section}/${slug}/${file}`;
+                if (!file.endsWith(".webp")) continue;
+                const stem = file.slice(0, -".webp".length);
+                // An exact entry name wins, so an entry that itself ends in "-dark" keeps its own thumbnail.
+                const isDark = !byName.has(stem) && stem.endsWith("-dark");
+                const name = isDark ? stem.slice(0, -"-dark".length) : stem;
+                const entry = byName.get(name);
+                if (!entry) {
+                    skipped.push(`${relative} (no registry entry named "${name}")`);
+                    continue;
+                }
+                const docsGroup = entry.docs?.split("/").slice(-2, -1)[0];
+                if (docsGroup !== undefined && docsGroup !== slug) {
+                    skipped.push(`${relative} (entry "${name}" belongs to group "${docsGroup}")`);
+                    continue;
+                }
+                (isDark ? dark : light).set(name, `/thumbs/${relative}`);
+            }
+        }
+    }
+
+    const thumbs: Record<string, ThumbPaths> = {};
+    for (const entry of entries) {
+        const lightPath = light.get(entry.name);
+        if (lightPath) thumbs[entry.name] = { light: lightPath, dark: dark.get(entry.name) ?? null };
+    }
+    for (const name of dark.keys()) if (!light.has(name)) skipped.push(`dark thumbnail for "${name}" has no light thumbnail`);
+    return { thumbs, skipped };
+};
+
+/** Flows are curated by hand in flows.ts; every step must resolve to a real example with a thumbnail. */
+const validateFlows = (entries: RegistryEntry[], thumbs: Record<string, ThumbPaths>): string[] => {
+    const errors: string[] = [];
+    const examples = new Set(entries.filter((entry) => entry.type === "example").map((entry) => entry.name));
+    const seen = new Set<string>();
+    const forbiddenCopy = /[\u2014\u2026]/;
+
+    for (const flow of FLOWS) {
+        const where = `flow "${flow.id}"`;
+        if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(flow.id)) errors.push(`${where}: id must be kebab-case`);
+        if (seen.has(flow.id)) errors.push(`${where}: duplicate flow id`);
+        seen.add(flow.id);
+        if (!flow.title.trim() || !flow.description.trim()) errors.push(`${where}: title and description are required`);
+        if (flow.tags.length < 4 || flow.tags.length > 8) errors.push(`${where}: needs 4 to 8 tags, has ${flow.tags.length}`);
+        if (flow.steps.length < 3 || flow.steps.length > 6) errors.push(`${where}: needs 3 to 6 steps, has ${flow.steps.length}`);
+
+        const copy = [flow.title, flow.description, ...flow.tags, ...flow.steps.map((step) => step.purpose)];
+        if (copy.some((text) => forbiddenCopy.test(text))) errors.push(`${where}: copy must not contain an em dash or an ellipsis character`);
+
+        for (const [index, step] of flow.steps.entries()) {
+            const at = `${where} step ${index + 1} ("${step.entry}")`;
+            if (!examples.has(step.entry)) errors.push(`${at}: no example entry with that name in the registry`);
+            else if (!thumbs[step.entry]) errors.push(`${at}: no light thumbnail under apps/docs/public/thumbs`);
+            if (!step.purpose.trim()) errors.push(`${at}: purpose is required`);
+        }
+    }
+    return errors;
+};
+
 const build = () => {
     if (!isDir(SRC)) {
         console.error(`registry:build — no component source at ${SRC}`);
@@ -1418,6 +1498,16 @@ const build = () => {
         process.exit(1);
     }
 
+    // ---- Thumbnails and flows (validated before dist/ is wiped) ---------------
+
+    const { thumbs, skipped: skippedThumbs } = readThumbs(entries);
+    const flowErrors = validateFlows(entries, thumbs);
+    if (flowErrors.length > 0) {
+        console.error(`\nregistry:build — ${flowErrors.length} flow error(s) in packages/registry/src/flows.ts:\n`);
+        for (const error of flowErrors) console.error(`  ${error}`);
+        process.exit(1);
+    }
+
     // ---- Write ------------------------------------------------------------
 
     rmSync(OUT, { recursive: true, force: true });
@@ -1443,6 +1533,12 @@ const build = () => {
             .filter(([, names]) => names.length > 0),
     );
     writeFileSync(path.join(OUT, "exports.json"), `${JSON.stringify(exportsByEntry, null, 2)}\n`);
+
+    // ---- dist/thumbs.json — { "<entry>": { light, dark } }, site-relative paths served by apps/docs.
+    writeFileSync(path.join(OUT, "thumbs.json"), `${JSON.stringify(thumbs, null, 2)}\n`);
+
+    // ---- dist/flows.json — curated journeys from src/flows.ts, already validated above.
+    writeFileSync(path.join(OUT, "flows.json"), `${JSON.stringify({ flows: FLOWS }, null, 2)}\n`);
 
     // ---- Stats --------------------------------------------------------------
     // Single generated source for every count quoted in the README and the landing page
@@ -1498,6 +1594,8 @@ const build = () => {
         // equals `entries`. Kept as its own field so a future empty group shows up as a gap here
         // instead of silently changing what `entries` means.
         entriesWithFiles: entries.filter((entry) => entry.type !== "html" && entry.files.length > 0).length,
+        flows: FLOWS.length,
+        thumbnails: Object.keys(thumbs).length,
     };
     writeFileSync(path.join(OUT, "stats.json"), `${JSON.stringify(stats, null, 4)}\n`);
 
@@ -1523,6 +1621,12 @@ const build = () => {
         for (const item of unique(emptyGroups)) console.warn(`  ${item}`);
     }
 
+    if (skippedThumbs.length > 0) {
+        console.warn(`registry:build — ${skippedThumbs.length} thumbnail file(s) skipped:`);
+        for (const item of skippedThumbs.slice(0, 10)) console.warn(`  ${item}`);
+        if (skippedThumbs.length > 10) console.warn(`  and ${skippedThumbs.length - 10} more`);
+    }
+
     const htmlDir = path.relative(REPO, HTML_COMPONENTS).split(path.sep).join("/");
     if (htmlEntries.length > 0) console.log(`registry:build — ${htmlEntries.length} html entries from ${htmlDir}`);
     else if (isDir(HTML_COMPONENTS)) console.log(`registry:build — 0 html entries: no *.html snippets under ${htmlDir}`);
@@ -1532,6 +1636,7 @@ const build = () => {
     console.log(
         `registry:build — ${entries.length} entries (${components} components, ${examples} examples, ${support} utils/hooks/styles, ${htmlEntries.length} html), ${fileCount} files → ${out}`,
     );
+    console.log(`registry:build — ${FLOWS.length} flows, ${Object.keys(thumbs).length} thumbnails → ${out}/flows.json, ${out}/thumbs.json`);
 };
 
 build();

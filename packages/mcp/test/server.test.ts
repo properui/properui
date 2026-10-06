@@ -77,11 +77,16 @@ describe("tools", () => {
         expect(tools.map((tool) => tool.name).sort()).toEqual([
             "add_component",
             "check_tokens",
+            "compare_screens",
             "get_component",
             "get_component_docs",
+            "get_install_plan",
             "get_project_info",
             "list_components",
             "search_components",
+            "search_flows",
+            "search_screens",
+            "search_sections",
         ]);
     });
 
