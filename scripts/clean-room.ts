@@ -168,8 +168,19 @@ const VITE: Target = {
     srcRoot: "src",
     scaffold(appDir: string) {
         const parent = path.dirname(appDir);
+        console.log(`npm ${run(parent, "npm", ["--version"]).trim()}`);
         run(parent, "npm", ["create", "vite@latest", path.basename(appDir), "--", "--template", "react-ts"]);
-        run(appDir, "npm", ["install"]);
+        try {
+            run(appDir, "npm", ["install"]);
+        } catch (error) {
+            // npm 10.8.x (bundled with Node 20) dies inside arborist on the current create-vite
+            // template graph before any Proper UI code runs. That is npm's bug, not the scaffold's
+            // or ours (npm 12 and --legacy-peer-deps both install it), so retry once with the
+            // flag and say so, instead of failing the gate on a package manager defect.
+            if (!String(error).includes("edgesOut")) throw error;
+            console.warn("npm install hit the arborist 'edgesOut' crash (npm 10.8.x); retrying with --legacy-peer-deps.");
+            run(appDir, "npm", ["install", "--legacy-peer-deps"]);
+        }
 
         // A bare `npm create vite@latest` scaffold has no Tailwind pipeline at all: no
         // `tailwindcss`/`@tailwindcss/vite` installed, no plugin registered in vite.config.ts,

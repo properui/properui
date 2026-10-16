@@ -27,6 +27,9 @@ jobs:
             - uses: actions/setup-node@v4
               with: { node-version: 20, cache: pnpm }
             - run: pnpm install --frozen-lockfile
+            # Node 20's bundled npm (10.8.x) crashes with "Cannot read properties of null (reading 'edgesOut')"
+            # on the current create-vite template graph (seen 16 Oct 2026); npm 12 installs it cleanly.
+            - run: npm install -g npm@latest
             - run: pnpm test:clean-room
     # Compares a curated ~25-route sample of the docs site (tests/visual/routes.ts) against the
     # committed baseline (tests/visual/baseline/). Needs the docs site built and served on
