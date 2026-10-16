@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Script from "next/script";
+import { ANALYTICS_SCRIPT_URL, ANALYTICS_WEBSITE_ID } from "~/lib/analytics";
 import { SITE_URL } from "~/lib/site";
 import { ThemeProvider } from "@properui/ui/providers";
 import { RouterProvider } from "@properui/ui/providers/router-provider";
@@ -24,6 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <ThemeProvider>
                     <RouterProvider>{children}</RouterProvider>
                 </ThemeProvider>
+                {ANALYTICS_WEBSITE_ID ? <Script src={ANALYTICS_SCRIPT_URL} data-website-id={ANALYTICS_WEBSITE_ID} strategy="afterInteractive" /> : null}
             </body>
         </html>
     );

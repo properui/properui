@@ -112,7 +112,8 @@ None of these tool-specific workflows has an automated end-to-end test today, wi
 
 ## Known limitations
 
-Sourced from `ROADMAP.md`, which exists specifically so nothing in the docs promises what the code doesn't do yet:
+- **Site analytics.** properui.dev loads a cookieless Umami page-view script (no personal data, no cross-site tracking, no consent banner needed) and records a handful of named events such as copying a command or opening the viewer. The CLI and the MCP server send nothing anywhere except the registry requests they make on your behalf.
+  Sourced from `ROADMAP.md`, which exists specifically so nothing in the docs promises what the code doesn't do yet:
 
 - **RTL coverage is incomplete.** Logical properties (`ms-*`, `pe-*`, `text-start`) are the house rule, but the port is partial: roughly **281** logical spacing utilities against **365** physical ones across `packages/ui/src/components`. Base components are further along; marketing sections and page examples carry most of the remaining physical values. Storybook also has no direction toggle yet.
 - **No committed visual regression baseline.** Covered above: the tooling exists, the baseline and CI comparison do not.

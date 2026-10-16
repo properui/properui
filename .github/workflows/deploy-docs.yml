@@ -40,6 +40,8 @@ jobs:
 
             # `next build` followed by the OpenNext transform into .open-next/.
             - run: pnpm -F docs cf:build
+              env:
+                  NEXT_PUBLIC_UMAMI_WEBSITE_ID: ${{ vars.UMAMI_WEBSITE_ID }}
 
             # `opennextjs-cloudflare deploy`, not `wrangler deploy`: it runs populateCache
             # first, which copies the prerendered pages and /r/*.json payloads into

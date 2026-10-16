@@ -1,6 +1,7 @@
 "use client";
 
 import { type MouseEvent, type ReactNode, createContext, useCallback, useContext, useEffect, useId, useMemo, useRef, useState } from "react";
+import { track } from "~/lib/analytics";
 import { CopyButton } from "./copy-button";
 
 /** What the viewer labels an item. `flow-step` is a screen, section or component opened from inside a flow. */
@@ -139,6 +140,8 @@ export function LibraryLightboxProvider({ children }: { children: ReactNode }) {
 
     const open = useCallback<LightboxApi["open"]>((items, index, opener) => {
         if (items.length === 0) return;
+        const first = items[Math.min(Math.max(index, 0), items.length - 1)];
+        if (first) track("lightbox_open", { kind: first.kind, name: first.name });
         openerRef.current = opener ?? document.activeElement;
         setViewport("desktop");
         setSession({ items, index: Math.min(Math.max(index, 0), items.length - 1) });

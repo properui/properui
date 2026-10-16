@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { copyLabel, track } from "~/lib/analytics";
 
 type CopyButtonProps = {
     /** Text written to the clipboard. */
@@ -34,6 +35,7 @@ export function CopyButton({ value, children, successLabel = "Copied", failureLa
     const handleClick = async () => {
         try {
             await navigator.clipboard.writeText(value);
+            track("copy", { label: copyLabel(value) });
             setStatus("success");
             if (timeoutRef.current) clearTimeout(timeoutRef.current);
             timeoutRef.current = setTimeout(() => setStatus("idle"), 1600);

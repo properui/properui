@@ -2,6 +2,7 @@
 
 import { type KeyboardEvent, useEffect, useId, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
+import { track } from "~/lib/analytics";
 
 /** One row of `/library-index.json`: the slim shape the search needs, nothing more. */
 type SearchEntry = {
@@ -155,6 +156,9 @@ export function LibrarySearch() {
     const noMatch = load === "ready" && debounced !== "" && matches.length === 0;
     const suggestions = useMemo(() => (noMatch ? nearest(entries, debounced) : []), [entries, debounced, noMatch]);
     const options = noMatch ? suggestions : matches;
+    useEffect(() => {
+        if (noMatch) track("search_no_match", { query: debounced.slice(0, 40) });
+    }, [noMatch, debounced]);
 
     const showPanel = open && query.trim() !== "";
 
@@ -168,6 +172,7 @@ export function LibrarySearch() {
 
     const go = (entry: SearchEntry) => {
         setOpen(false);
+        track("search_open", { kind: entry.kind, name: entry.name });
         router.push(entry.docs);
     };
 
